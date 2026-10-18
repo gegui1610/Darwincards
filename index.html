@@ -1441,7 +1441,7 @@ function msRenderRoom(){
  const ps=msPlayers(), tables=msTables();
  $('rp').innerHTML=ps.map((p,i)=>`<div class="pp"><span>${i===0?ico('crown',18):ico(p.spectator?'eye':'user',18)}</span><b>${E(p.name)}</b>${i===0?'<span class="sub">(anfitrião)</span>':''}${p.spectator?'<span class="dc-room-badge">ESPECTADOR</span>':''}</div>`).join('')||'<div class="pp sub">Aguardando participantes…</div>';
  $('dc-tables').innerHTML=tables.map((t,i)=>`<div class="dc-table${MS_SELECTED_TABLE===i?' live':''}" data-table="${i}"><h3>Mesa ${i+1}<span>${t.filter(Boolean).length}/2 jogadores</span></h3>${t.map((p,j)=>p?`<div class="dc-seat">${ico('user',15)}<b>${E(p.name)}</b>${p.id===ME.id?'<i>você</i>':''}</div>`:'<div class="dc-seat empty">Vaga disponível</div>').join('')}<div class="dc-seat viewer">${ico('eye',15)} Espectadores acompanham esta mesa</div></div>`).join('');
- $('bg').hidden=myIdx!==0;$('bg').disabled=myIdx!==0||!tables[MS_SELECTED_TABLE][0]||!tables[MS_SELECTED_TABLE][1];$('bg').textContent='Iniciar Mesa '+(MS_SELECTED_TABLE+1);
+ $('bg').hidden=false;$('bg').disabled=myIdx!==0;$('bg').textContent=myIdx===0?'Iniciar Mesa '+(MS_SELECTED_TABLE+1):'Aguardando o anfitrião';
  const sb=$('dc-spectate');sb.textContent=MS_SPECTATOR?'Voltar a procurar vaga':'Entrar como espectador';sb.classList.toggle('dc-spectator',MS_SPECTATOR);
 }
 function msSetPlayers(players){
@@ -1512,14 +1512,18 @@ function msJoin(){
 joinRoom=msJoin;
 
 function msStartSelected(){
- const ps=msPlayers().filter(p=>!p.spectator),start=MS_SELECTED_TABLE*2,table=ps.slice(start,start+2);
- if(!ROOM||myIdx!==0)return toast('Somente o anfitrião pode iniciar uma mesa.');
- if(table.length<2)return toast('É preciso ter dois jogadores sentados na Mesa '+(MS_SELECTED_TABLE+1)+'.');
- ROOM.guest=table[1];ROOM.table=MS_SELECTED_TABLE;
- REPL=[[],[]];P=[deal(ACTIVE_FORMAT==='custom'?ACTIVE_DECK_SPEC:null),deal()];PREV=[null,null];fxReset();
- S={mp:true,v:0,log:['Rodada 1: vez de '+table[0].name+'.'],sel:null,swap:null,nsel:null,amb:null,nsUsed:false,dmgUsed:false,turn:0,act:2,round:1,over:false,win:null,names:[table[0].name,table[1].name]};
- startTurn(0);go('game');render();sync();
+ try{
+  const ps=msPlayers().filter(p=>!p.spectator),start=MS_SELECTED_TABLE*2,table=ps.slice(start,start+2);
+  if(!ROOM||myIdx!==0)return toast('Somente o anfitrião pode iniciar uma mesa.');
+  if(table.length<2)return toast('É preciso ter dois jogadores sentados na Mesa '+(MS_SELECTED_TABLE+1)+'.');
+  ROOM.guest=table[1];ROOM.table=MS_SELECTED_TABLE;
+  REPL=[[],[]];P=[deal(ACTIVE_FORMAT==='custom'?ACTIVE_DECK_SPEC:null),deal()];PREV=[null,null];fxReset();
+  S={mp:true,v:0,log:['Rodada 1: vez de '+table[0].name+'.'],sel:null,swap:null,nsel:null,amb:null,nsUsed:false,dmgUsed:false,turn:0,act:2,round:1,over:false,win:null,names:[table[0].name,table[1].name]};
+  startTurn(0);go('game');render();sync();
+ }catch(e){console.error('Falha ao iniciar mesa',e);toast('Não foi possível iniciar a mesa: '+(e.message||'erro inesperado'));}
 }
+window.msStartSelected=msStartSelected;
+if(document.getElementById('bg'))document.getElementById('bg').onclick=msStartSelected;
 
 /* Instala a camada multi-sala sem alterar o motor das cartas. */
 window.addEventListener('load',()=>{
