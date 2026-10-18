@@ -1448,18 +1448,64 @@ function msSetPlayers(players){
 }
 function msHostAdd(conn,name){
  const ps=msPlayers();if(ps.length>=4){msSend(conn,{type:'room-full'});conn.close();return}
- const p={id:conn.peer,name:String(name||'Amigo').slice(0,24),spectator:false};ROOM.players=[...ps,p];MS_CONNS.push(conn);roomUI=msRenderRoom;msRenderRoom();msBroadcast(msRoomPacket());msSend(conn,msRoomPacket());
+ const p={id:conn.peer,name:String(name||'Amigo').slice(0,24),spectator:false};if(ps.some(x=>x.id===p.id)){msSend(conn,{type:'room-busy'});try{conn.close()}catch(e){}return}ROOM.players=[...ps,p];MS_CONNS.push(conn);roomUI=msRenderRoom;msRenderRoom();msBroadcast(msRoomPacket());msSend(conn,msRoomPacket());
  conn.on('data',d=>{if(d?.type==='spectator'){const q=ROOM.players.find(x=>x.id===conn.peer);if(q){q.spectator=!!d.value;msBroadcast(msRoomPacket());msRenderRoom()}}else if(d?.type==='state'&&d.c){/* espectadores recebem a mesa ativa */msBroadcast(d)}});
  conn.on('close',()=>{ROOM.players=ROOM.players.filter(x=>x.id!==conn.peer);MS_CONNS=MS_CONNS.filter(x=>x!==conn);msBroadcast(msRoomPacket());msRenderRoom()});
 }
 function msHostCreate(){
+ if(!window.Peer)return toast('A biblioteca de conexão não carregou. Abra a página com internet e tente de novo.');
+ if(MS_JOINING||ROOM){toast('Você já está em uma sala.');return}
  cleanup();MS_HOST=true;MS_SPECTATOR=false;const code=rc();myIdx=0;ROOM={code,host:{id:ME.id||'host',name:ME.name,spectator:false},guest:null,players:[{id:ME.id||'host',name:ME.name,spectator:false}],status:'wait',deckMode:ACTIVE_FORMAT};
- PEER=makeDarwinPeer('darwin-'+code);PEER.on('open',msRenderRoom);PEER.on('connection',c=>{c.on('open',()=>msHostAdd(c,c.metadata?.name||'Amigo'))});PEER.on('error',peerError);
+ try{PEER=makeDarwinPeer('darwin-'+code);PEER.on('open',msRenderRoom);PEER.on('connection',c=>{if(MS_CONNS.some(x=>x.peer===c.peer)){try{c.close()}catch(e){}return}c.on('open',()=>msHostAdd(c,c.metadata?.name||'Amigo'))});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui abrir a sala. Confira se a página está em HTTPS.')}
 }
 function msJoin(){
  const code=$('code').value.trim().toUpperCase();if(code.length!==6)return toast('Digite o código de 6 letras que aparece na sala do anfitrião.');cleanup();MS_HOST=false;MS_SPECTATOR=false;myIdx=1;PEER=makeDarwinPeer();PEER.on('open',()=>{PCONN=PEER.connect('darwin-'+code,{metadata:{name:ME.name},reliable:true});PCONN.on('open',()=>msSend(PCONN,{type:'hello2',name:ME.name}));PCONN.on('data',d=>{if(d?.type==='room2'){ROOM=ROOM||{};ROOM.code=d.code;ROOM.host=d.host;ROOM.players=d.players||[];ROOM.deckMode=d.deckMode||'ready';msRenderRoom()}else if(d?.type==='room-full')toast('Esta sala já está cheia (4 jogadores).') ;else if(d?.type==='state'&&d.c){if(!S.mp){S.mp=true;PREV=[null,null];fxReset()}fromCanon(d.c);if(cur!=='game')go('game');render()}});PCONN.on('close',()=>toast('A conexão com a sala foi encerrada.'))});PEER.on('error',peerError);
 }
 function msToggleSpectator(){MS_SPECTATOR=!MS_SPECTATOR;if(MS_HOST){const p=ROOM.players.find(x=>x.id===ME.id);if(p)p.spectator=MS_SPECTATOR;msBroadcast(msRoomPacket());msRenderRoom()}else msSend(PCONN,{type:'spectator',value:MS_SPECTATOR})}
+/* Correção de conexão: uma única rota de entrada e uma tentativa ativa por navegador. */
+let MS_JOINING=false, MS_ATTEMPT=0, MS_LOCAL_CLOSE=false;
+const msCloseTransport=()=>{
+ MS_LOCAL_CLOSE=true; MS_JOINING=false; MS_ATTEMPT++;
+ if(JOIN_TIMER){clearTimeout(JOIN_TIMER);JOIN_TIMER=null}
+ MS_CONNS.forEach(c=>{try{c.close()}catch(e){}});MS_CONNS=[];
+ if(PCONN){try{PCONN.close()}catch(e){}}PCONN=null;
+ if(PEER){try{PEER.destroy()}catch(e){}}PEER=null;
+ setTimeout(()=>{MS_LOCAL_CLOSE=false},0);
+};
+const msCleanup=cleanup;
+cleanup=function(){msCloseTransport();msCleanup();};
+function msJoin(){
+ if(!window.Peer)return toast('A biblioteca de conexão não carregou. Abra a página com internet e tente de novo.');
+ const code=$('code').value.trim().toUpperCase();
+ if(code.length!==6)return toast('Digite o código de 6 letras que aparece na sala do anfitrião.');
+ if(MS_JOINING||ROOM){toast('Você já está tentando entrar ou já está em uma sala.');return}
+ MS_JOINING=true;MS_HOST=false;MS_SPECTATOR=false;myIdx=1;MS_LOCAL_CLOSE=false;
+ const attempt=++MS_ATTEMPT;toast('Procurando a sala '+code+'…');
+ const fail=(msg)=>{if(attempt!==MS_ATTEMPT)return;MS_JOINING=false;if(JOIN_TIMER){clearTimeout(JOIN_TIMER);JOIN_TIMER=null}if(PCONN){try{PCONN.close()}catch(e){}}PCONN=null;if(PEER){try{PEER.destroy()}catch(e){}}PEER=null;toast(msg)};
+ try{
+  PEER=makeDarwinPeer();
+  PEER.on('open',()=>{
+   if(attempt!==MS_ATTEMPT)return;
+   toast('Conexão aberta; aguardando confirmação da sala…');
+   const c=PEER.connect('darwin-'+code,{metadata:{name:ME.name},reliable:true});PCONN=c;
+   c.on('open',()=>{if(attempt===MS_ATTEMPT)msSend(c,{type:'hello2',name:ME.name,clientId:ME.id||ME.name})});
+   c.on('data',d=>{
+    if(attempt!==MS_ATTEMPT||!d)return;
+    if(d.type==='room2'){MS_JOINING=false;if(JOIN_TIMER){clearTimeout(JOIN_TIMER);JOIN_TIMER=null}ROOM={code:d.code,host:d.host,players:d.players||[],deckMode:d.deckMode||'ready',status:'wait'};msRenderRoom();return}
+    if(d.type==='room-full'){fail('A sala já está cheia. Tente a outra mesa ou entre como espectador.');return}
+    if(d.type==='room-busy'){fail('A sala está temporariamente ocupada. Tente novamente em alguns segundos.');return}
+    if(d.type==='state'&&d.c){if(!S.mp){S.mp=true;PREV=[null,null];fxReset()}fromCanon(d.c);if(cur!=='game')go('game');render()}
+   });
+   c.on('close',()=>{if(attempt!==MS_ATTEMPT||MS_LOCAL_CLOSE)return;if(!ROOM)fail('A conexão foi encerrada antes da confirmação. A sala continua aberta; tente entrar novamente.');else toast('Sua conexão com a sala foi encerrada.')});
+   c.on('error',e=>{if(attempt===MS_ATTEMPT)fail('Falha na conexão com a sala ('+(e&&e.type||'rede')+'). Tente novamente.')});
+  });
+  PEER.on('error',e=>{if(attempt===MS_ATTEMPT)fail(e&&e.type==='peer-unavailable'?'Sala não encontrada ou anfitrião desconectado.':'Não foi possível conectar à sala. Tente novamente.')});
+  JOIN_TIMER=setTimeout(()=>{if(attempt===MS_ATTEMPT&&!ROOM)fail('A sala não respondeu. Ela pode estar cheia ou o código pode ter sido digitado incorretamente.')},20000);
+ }catch(e){fail('Não consegui iniciar a conexão. Tente novamente.');}
+}
+/* O auto-join por link e o botão usam exatamente a mesma função. */
+joinRoom=msJoin;
+
 /* Instala a camada multi-sala sem alterar o motor das cartas. */
 window.addEventListener('load',()=>{
  $('bc').onclick=msHostCreate;$('bj').onclick=msJoin;$('dc-spectate').onclick=msToggleSpectator;
