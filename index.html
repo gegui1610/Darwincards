@@ -1118,7 +1118,7 @@ async function joinRoom(){
  if(!window.Peer)return toast('A biblioteca de conexão não carregou. Abra a página com internet e tente de novo.');
  const code=$('code').value.trim().toUpperCase();if(code.length!==6)return toast('Digite o código de 6 letras que aparece na sala do anfitrião.');
  cleanup();myIdx=1;toast('Procurando a sala '+code+'…');
- try{PEER=makeDarwinPeer();PEER.on('open',()=>{toast('Código enviado; negociando conexão…');PCONN=PEER.connect('darwin-'+code,{metadata:{name:ME.name},reliable:true});bindPeerConn(PCONN,false);JOIN_TIMER=setTimeout(()=>{if(!ROOM||ROOM.code!==code){toast('A sala não respondeu. Confira o código e se o anfitrião ainda está conectado.');}},15000)});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui conectar. Confira se a página está em HTTPS.')}
+ try{PEER=makeDarwinPeer();PEER.on('open',()=>{toast('Código enviado; negociando conexão…');PCONN=PEER.connect('darwin-'+code,{metadata:{name:ME.name,clientId:msClientId()},reliable:true});bindPeerConn(PCONN,false);JOIN_TIMER=setTimeout(()=>{if(!ROOM||ROOM.code!==code){toast('A sala não respondeu. Confira o código e se o anfitrião ainda está conectado.');}},15000)});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui conectar. Confira se a página está em HTTPS.')}
 }
 async function startGame(){
  if(!ROOM||!ROOM.guest||myIdx!==0)return;
@@ -1423,6 +1423,7 @@ $('ed').addEventListener('click',async e=>{const b=e.target.closest('[data-photo
 <script id="dc-multimesas-js">
 /* Sala ampliada: até 4 participantes, duas mesas e espectadores. */
 let MS_CONNS=[], MS_HOST=false, MS_SPECTATOR=false, MS_SELECTED_TABLE=0;
+function msClientId(){try{let id=localStorage.getItem('dc-client-id');if(!id){id='p-'+(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2));localStorage.setItem('dc-client-id',id)}return id}catch(e){return 'p-'+ME.name}}
 const msMe=()=>({id:ME.id||('local-'+ME.name),name:ME.name||'Jogador',spectator:!!MS_SPECTATOR});
 function msPlayers(){
  if(!ROOM)return [];
@@ -1439,29 +1440,33 @@ function msRenderRoom(){
  $('dc-room-format').textContent='Formato escolhido: '+({'ready':'Clássico (baralho pronto)','random':'Aleatório','custom':'Meu baralho'}[ROOM.deckMode||ACTIVE_FORMAT]||'Clássico');
  const ps=msPlayers(), tables=msTables();
  $('rp').innerHTML=ps.map((p,i)=>`<div class="pp"><span>${i===0?ico('crown',18):ico(p.spectator?'eye':'user',18)}</span><b>${E(p.name)}</b>${i===0?'<span class="sub">(anfitrião)</span>':''}${p.spectator?'<span class="dc-room-badge">ESPECTADOR</span>':''}</div>`).join('')||'<div class="pp sub">Aguardando participantes…</div>';
- $('dc-tables').innerHTML=tables.map((t,i)=>`<div class="dc-table${MS_SELECTED_TABLE===i?' live':''}"><h3>Mesa ${i+1}<span>${t.filter(Boolean).length}/2 jogadores</span></h3>${t.map((p,j)=>p?`<div class="dc-seat">${ico('user',15)}<b>${E(p.name)}</b>${p.id===ME.id?'<i>você</i>':''}</div>`:'<div class="dc-seat empty">Vaga disponível</div>').join('')}<div class="dc-seat viewer">${ico('eye',15)} Espectadores acompanham esta mesa</div></div>`).join('');
- $('bg').hidden=myIdx!==0;$('bg').disabled=myIdx!==0||!tables[MS_SELECTED_TABLE][0]||!tables[MS_SELECTED_TABLE][1];
+ $('dc-tables').innerHTML=tables.map((t,i)=>`<div class="dc-table${MS_SELECTED_TABLE===i?' live':''}" data-table="${i}"><h3>Mesa ${i+1}<span>${t.filter(Boolean).length}/2 jogadores</span></h3>${t.map((p,j)=>p?`<div class="dc-seat">${ico('user',15)}<b>${E(p.name)}</b>${p.id===ME.id?'<i>você</i>':''}</div>`:'<div class="dc-seat empty">Vaga disponível</div>').join('')}<div class="dc-seat viewer">${ico('eye',15)} Espectadores acompanham esta mesa</div></div>`).join('');
+ $('bg').hidden=myIdx!==0;$('bg').disabled=myIdx!==0||!tables[MS_SELECTED_TABLE][0]||!tables[MS_SELECTED_TABLE][1];$('bg').textContent='Iniciar Mesa '+(MS_SELECTED_TABLE+1);
  const sb=$('dc-spectate');sb.textContent=MS_SPECTATOR?'Voltar a procurar vaga':'Entrar como espectador';sb.classList.toggle('dc-spectator',MS_SPECTATOR);
 }
 function msSetPlayers(players){
  if(!ROOM)return;ROOM.players=(players||[]).slice(0,4);ROOM.host=ROOM.players[0]||ROOM.host;ROOM.guest=ROOM.players[1]||null;msRenderRoom();
 }
-function msHostAdd(conn,name){
- const ps=msPlayers();if(ps.length>=4){msSend(conn,{type:'room-full'});conn.close();return}
- const p={id:conn.peer,name:String(name||'Amigo').slice(0,24),spectator:false};if(ps.some(x=>x.id===p.id)){msSend(conn,{type:'room-busy'});try{conn.close()}catch(e){}return}ROOM.players=[...ps,p];MS_CONNS.push(conn);roomUI=msRenderRoom;msRenderRoom();msBroadcast(msRoomPacket());msSend(conn,msRoomPacket());
- conn.on('data',d=>{if(d?.type==='spectator'){const q=ROOM.players.find(x=>x.id===conn.peer);if(q){q.spectator=!!d.value;msBroadcast(msRoomPacket());msRenderRoom()}}else if(d?.type==='state'&&d.c){/* espectadores recebem a mesa ativa */msBroadcast(d)}});
- conn.on('close',()=>{ROOM.players=ROOM.players.filter(x=>x.id!==conn.peer);MS_CONNS=MS_CONNS.filter(x=>x!==conn);msBroadcast(msRoomPacket());msRenderRoom()});
+function msHostAdd(conn,name,clientId){
+ const stableId=String(clientId||conn.metadata?.clientId||conn.peer), label=String(name||'Amigo').slice(0,24), ps=msPlayers();
+ let p=ps.find(x=>x.id===stableId);
+ if(!p){if(ps.length>=4){msSend(conn,{type:'room-full'});try{conn.close()}catch(e){}return}p={id:stableId,name:label,spectator:false};ROOM.players=[...ps,p]}
+ else{p.name=label;p.spectator=false}
+ const old=MS_CONNS.find(x=>x._msClientId===stableId&&x!==conn);if(old){try{old.close()}catch(e){}MS_CONNS=MS_CONNS.filter(x=>x!==old)}
+ conn._msClientId=stableId;MS_CONNS.push(conn);roomUI=msRenderRoom;msRenderRoom();msBroadcast(msRoomPacket());msSend(conn,msRoomPacket());
+ conn.on('data',d=>{if(d?.type==='spectator'){const q=ROOM.players.find(x=>x.id===stableId);if(q){q.spectator=!!d.value;msBroadcast(msRoomPacket());msRenderRoom()}}else if(d?.type==='state'&&d.c){/* espectadores recebem a mesa ativa */msBroadcast(d)}});
+ conn.on('close',()=>{const active=MS_CONNS.find(x=>x._msClientId===stableId);if(active&&active!==conn)return;ROOM.players=ROOM.players.filter(x=>x.id!==stableId);MS_CONNS=MS_CONNS.filter(x=>x!==conn);msBroadcast(msRoomPacket());msRenderRoom()});
 }
 function msHostCreate(){
  if(!window.Peer)return toast('A biblioteca de conexão não carregou. Abra a página com internet e tente de novo.');
  if(MS_JOINING||ROOM){toast('Você já está em uma sala.');return}
- cleanup();MS_HOST=true;MS_SPECTATOR=false;const code=rc();myIdx=0;ROOM={code,host:{id:ME.id||'host',name:ME.name,spectator:false},guest:null,players:[{id:ME.id||'host',name:ME.name,spectator:false}],status:'wait',deckMode:ACTIVE_FORMAT};
- try{PEER=makeDarwinPeer('darwin-'+code);PEER.on('open',msRenderRoom);PEER.on('connection',c=>{if(MS_CONNS.some(x=>x.peer===c.peer)){try{c.close()}catch(e){}return}c.on('open',()=>msHostAdd(c,c.metadata?.name||'Amigo'))});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui abrir a sala. Confira se a página está em HTTPS.')}
+ cleanup();MS_HOST=true;MS_SPECTATOR=false;const code=rc();myIdx=0;ROOM={code,host:{id:ME.id||'host',name:ME.name,spectator:false},guest:null,players:[{id:msClientId(),name:ME.name,spectator:false}],status:'wait',deckMode:ACTIVE_FORMAT};
+ try{PEER=makeDarwinPeer('darwin-'+code);PEER.on('open',msRenderRoom);PEER.on('connection',c=>{if(MS_CONNS.some(x=>x.peer===c.peer)){try{c.close()}catch(e){}return}c.on('open',()=>msHostAdd(c,c.metadata?.name||'Amigo',c.metadata?.clientId))});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui abrir a sala. Confira se a página está em HTTPS.')}
 }
 function msJoin(){
- const code=$('code').value.trim().toUpperCase();if(code.length!==6)return toast('Digite o código de 6 letras que aparece na sala do anfitrião.');cleanup();MS_HOST=false;MS_SPECTATOR=false;myIdx=1;PEER=makeDarwinPeer();PEER.on('open',()=>{PCONN=PEER.connect('darwin-'+code,{metadata:{name:ME.name},reliable:true});PCONN.on('open',()=>msSend(PCONN,{type:'hello2',name:ME.name}));PCONN.on('data',d=>{if(d?.type==='room2'){ROOM=ROOM||{};ROOM.code=d.code;ROOM.host=d.host;ROOM.players=d.players||[];ROOM.deckMode=d.deckMode||'ready';msRenderRoom()}else if(d?.type==='room-full')toast('Esta sala já está cheia (4 jogadores).') ;else if(d?.type==='state'&&d.c){if(!S.mp){S.mp=true;PREV=[null,null];fxReset()}fromCanon(d.c);if(cur!=='game')go('game');render()}});PCONN.on('close',()=>toast('A conexão com a sala foi encerrada.'))});PEER.on('error',peerError);
+ const code=$('code').value.trim().toUpperCase();if(code.length!==6)return toast('Digite o código de 6 letras que aparece na sala do anfitrião.');cleanup();MS_HOST=false;MS_SPECTATOR=false;myIdx=1;PEER=makeDarwinPeer();PEER.on('open',()=>{PCONN=PEER.connect('darwin-'+code,{metadata:{name:ME.name,clientId:msClientId()},reliable:true});PCONN.on('open',()=>msSend(PCONN,{type:'hello2',name:ME.name}));PCONN.on('data',d=>{if(d?.type==='room2'){ROOM=ROOM||{};ROOM.code=d.code;ROOM.host=d.host;ROOM.players=d.players||[];ROOM.deckMode=d.deckMode||'ready';msRenderRoom()}else if(d?.type==='room-full')toast('Esta sala já está cheia (4 jogadores).') ;else if(d?.type==='state'&&d.c){if(!S.mp){S.mp=true;PREV=[null,null];fxReset()}fromCanon(d.c);if(cur!=='game')go('game');render()}});PCONN.on('close',()=>toast('A conexão com a sala foi encerrada.'))});PEER.on('error',peerError);
 }
-function msToggleSpectator(){MS_SPECTATOR=!MS_SPECTATOR;if(MS_HOST){const p=ROOM.players.find(x=>x.id===ME.id);if(p)p.spectator=MS_SPECTATOR;msBroadcast(msRoomPacket());msRenderRoom()}else msSend(PCONN,{type:'spectator',value:MS_SPECTATOR})}
+function msToggleSpectator(){MS_SPECTATOR=!MS_SPECTATOR;if(MS_HOST){const p=ROOM.players.find(x=>x.id===msClientId());if(p)p.spectator=MS_SPECTATOR;msBroadcast(msRoomPacket());msRenderRoom()}else msSend(PCONN,{type:'spectator',value:MS_SPECTATOR,clientId:msClientId()})}
 /* Correção de conexão: uma única rota de entrada e uma tentativa ativa por navegador. */
 let MS_JOINING=false, MS_ATTEMPT=0, MS_LOCAL_CLOSE=false;
 const msCloseTransport=()=>{
@@ -1487,8 +1492,8 @@ function msJoin(){
   PEER.on('open',()=>{
    if(attempt!==MS_ATTEMPT)return;
    toast('Conexão aberta; aguardando confirmação da sala…');
-   const c=PEER.connect('darwin-'+code,{metadata:{name:ME.name},reliable:true});PCONN=c;
-   c.on('open',()=>{if(attempt===MS_ATTEMPT)msSend(c,{type:'hello2',name:ME.name,clientId:ME.id||ME.name})});
+   const c=PEER.connect('darwin-'+code,{metadata:{name:ME.name,clientId:msClientId()},reliable:true});PCONN=c;
+   c.on('open',()=>{if(attempt===MS_ATTEMPT)msSend(c,{type:'hello2',name:ME.name,clientId:msClientId()})});
    c.on('data',d=>{
     if(attempt!==MS_ATTEMPT||!d)return;
     if(d.type==='room2'){MS_JOINING=false;if(JOIN_TIMER){clearTimeout(JOIN_TIMER);JOIN_TIMER=null}ROOM={code:d.code,host:d.host,players:d.players||[],deckMode:d.deckMode||'ready',status:'wait'};msRenderRoom();return}
@@ -1509,9 +1514,16 @@ joinRoom=msJoin;
 /* Instala a camada multi-sala sem alterar o motor das cartas. */
 window.addEventListener('load',()=>{
  $('bc').onclick=msHostCreate;$('bj').onclick=msJoin;$('dc-spectate').onclick=msToggleSpectator;
- const oldStart=startGame;startGame=function(){const ps=msPlayers().filter(p=>!p.spectator);if(!ROOM||myIdx!==0||ps.length<2)return toast('É preciso ter dois jogadores sentados em uma mesa.');ROOM.guest=ps[1];return oldStart()};
+ const oldStart=startGame;startGame=function(){
+  const ps=msPlayers().filter(p=>!p.spectator),start=MS_SELECTED_TABLE*2,table=ps.slice(start,start+2);
+  if(!ROOM||myIdx!==0)return toast('Somente o anfitrião pode iniciar uma mesa.');
+  if(table.length<2)return toast('É preciso ter dois jogadores sentados na Mesa '+(MS_SELECTED_TABLE+1)+'.');
+  ROOM.guest=table[1];ROOM.table=MS_SELECTED_TABLE;
+  return oldStart();
+ };
  const oldSync=sync;sync=function(){oldSync();if(MS_HOST&&ROOM)msBroadcast({type:'state',c:toCanon()})};
  const oldRender=render;render=function(){oldRender();const over=!!S.over;const r=$('dc-rematch'),b=$('dc-back-room');if(r){r.hidden=!over||!ROOM;r.disabled=myIdx!==0}if(b)b.hidden=!over||!ROOM};
+ $('dc-tables').onclick=e=>{const t=e.target.closest('[data-table]');if(!t)return;MS_SELECTED_TABLE=+t.dataset.table;msRenderRoom()};
  $('dc-rematch').onclick=()=>{if(myIdx===0)startGame()};$('dc-back-room').onclick=()=>{if(ROOM){S.over=false;S.mp=false;msRenderRoom()}};
  $('lv').addEventListener('click',()=>{if(ROOM&&S.over)msRenderRoom()});
 });
