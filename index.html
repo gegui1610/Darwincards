@@ -908,8 +908,8 @@ function canPlace(inc,ti){
 function checkWin(){
  for(const s of [0,1])if(!P[s].field.some(Boolean)&&!P[s].reserve.length){S.over=true;S.win=1-s}
 }
-function toCanon(){return{P:myIdx===1?[P[1],P[0]]:P,repl:myIdx===1?[REPL[1],REPL[0]]:REPL,turn:S.turn===0?myIdx:1-myIdx,act:S.act,round:S.round,over:S.over,win:S.win==null?null:(S.win===0?myIdx:1-myIdx),log:S.log,v:S.v,amb:S.amb||null,ns:!!S.nsUsed,du:!!S.dmgUsed}}
-function fromCanon(c){P=myIdx===0?c.P:[c.P[1],c.P[0]];REPL=myIdx===0?(c.repl||[[],[]]):[(c.repl||[[],[]])[1]||[],(c.repl||[[],[]])[0]||[]];S.turn=c.turn===myIdx?0:1;S.act=c.act;S.round=c.round;S.over=c.over;S.win=c.win==null?null:(c.win===myIdx?0:1);S.log=c.log;S.v=c.v;S.amb=c.amb||null;S.nsUsed=!!c.ns;S.dmgUsed=!!c.du;S.sel=S.swap=S.nsel=null}
+function toCanon(){return{P:myIdx===1?[P[1],P[0]]:P,repl:myIdx===1?[REPL[1],REPL[0]]:REPL,turn:S.turn===0?myIdx:1-myIdx,act:S.act,round:S.round,over:S.over,win:S.win==null?null:(S.win===0?myIdx:1-myIdx),log:S.log,v:S.v,amb:S.amb||null,ns:!!S.nsUsed,du:!!S.dmgUsed,names:myIdx===1?[S.names[1],S.names[0]]:S.names}}
+function fromCanon(c){P=myIdx===0?c.P:[c.P[1],c.P[0]];REPL=myIdx===0?(c.repl||[[],[]]):[(c.repl||[[],[]])[1]||[],(c.repl||[[],[]])[0]||[]];S.names=myIdx===0?(c.names||S.names):((c.names&&[c.names[1],c.names[0]])||S.names);S.turn=c.turn===myIdx?0:1;S.act=c.act;S.round=c.round;S.over=c.over;S.win=c.win==null?null:(c.win===myIdx?0:1);S.log=c.log;S.v=c.v;S.amb=c.amb||null;S.nsUsed=!!c.ns;S.dmgUsed=!!c.du;S.sel=S.swap=S.nsel=null}
 function sync(){if(!S.mp)return;S.v++;const c=toCanon();if(PCONN&&PCONN.open){try{PCONN.send({type:'state',c})}catch(e){toast('Falha ao enviar estado da partida.')}}else if(ref)ref.update({state:JSON.stringify(c),status:S.over?'end':'play',t:Date.now()}).catch(e=>toast('Falha ao sincronizar ('+(e&&e.code)+')'))}
 function spend(){
  S.act--;S.sel=S.swap=S.nsel=null;checkWin();sync();render();
@@ -1443,9 +1443,10 @@ function msSyncIdentity(){
 function msTableOf(id){const p=msPlayers().find(x=>x.id===id);return !p||p.spectator?-1:(p.table===1?1:0)}
 function msRouteState(table,c){const pair=msTables()[table]||[];MS_CONNS.filter(x=>x._msTable===table).forEach(x=>{const side=pair.findIndex(p=>p.id===x._msClientId);msSend(x,{type:'table-state',table,side:side<0?0:side,c})})}
 function msRenderGameMeta(){
- const names=S.names||[];['0','1'].forEach((side)=>{const p=(ROOM&&((msTables()[MS_LOCAL_TABLE]||[])[Number(side)]))||null;const av=document.getElementById('n'+side)?.parentElement?.querySelector('.av');const el=document.getElementById('n'+side);if(el)el.textContent=names[Number(side)]||p?.name||'';if(av&&av.classList.contains('av')){const url=p?.avatar||'';av.classList.toggle('has-photo',!!url);av.innerHTML=url?`<img src="${E(url)}" alt="${E(p.name)}">`:ico(side==='0'?'user':'user',24)}});
+ const pair=ROOM?(msTables()[MS_LOCAL_TABLE]||[]):[],local=[pair[MS_LOCAL_SIDE]||null,pair[1-MS_LOCAL_SIDE]||null];
+ ['0','1'].forEach(side=>{const p=local[Number(side)],av=document.getElementById('n'+side)?.parentElement?.querySelector('.av'),el=document.getElementById('n'+side);if(el)el.textContent=S.names?.[Number(side)]||p?.name||'Jogador';if(av&&av.classList.contains('av')){const url=p?.avatar||'';av.classList.toggle('has-photo',!!url);av.innerHTML=url?`<img src="${E(url)}" alt="${E(p?.name||'Jogador')}">`:ico('user',24)}});
 }
-function msApplyTableState(table,c,side){MS_LOCAL_TABLE=table;const mine=msTables()[table].findIndex(p=>p.id===msClientId());MS_LOCAL_SIDE=Number.isInteger(side)?side:(mine>=0?mine:0);myIdx=MS_LOCAL_SIDE;S.mp=true;PREV=[null,null];fxReset();fromCanon(c);if(cur!=='game')go('game');msRenderGameMeta();render()}
+function msApplyTableState(table,c,side){MS_LOCAL_TABLE=table;const pair=msTables()[table]||[],mine=pair.findIndex(p=>p.id===msClientId());MS_LOCAL_SIDE=Number.isInteger(side)?side:(mine>=0?mine:0);myIdx=MS_LOCAL_SIDE;S.mp=true;PREV=[null,null];fxReset();if(!c.names)c={...c,names:pair.map(p=>p?.name||'Jogador')};fromCanon(c);if(cur!=='game')go('game');msRenderGameMeta();render()}
 function msCreateInitialCanonical(names){
  const save={P,S,myIdx,REPL,PREV};try{myIdx=0;REPL=[[],[]];P=[deal(ACTIVE_FORMAT==='custom'?ACTIVE_DECK_SPEC:null),deal()];PREV=[null,null];S={mp:true,v:0,log:['Rodada 1: vez de '+names[0]+'.'],sel:null,swap:null,nsel:null,amb:null,nsUsed:false,dmgUsed:false,turn:0,act:2,round:1,over:false,win:null,names};startTurn(0);return toCanon()}finally{P=save.P;S=save.S;myIdx=save.myIdx;REPL=save.REPL;PREV=save.PREV}}
 function msRoomPacket(){return {type:'room2',code:ROOM.code,deckMode:ROOM.deckMode||'ready',host:ROOM.host,players:msPlayers()}}
@@ -1458,7 +1459,7 @@ function msRenderRoom(){
  const ps=msPlayers(), tables=msTables();
  $('rp').innerHTML=ps.map((p,i)=>`<div class="pp"><span>${i===0?ico('crown',18):ico(p.spectator?'eye':'user',18)}</span><b>${E(p.name)}</b>${i===0?'<span class="sub">(anfitrião)</span>':''}${p.spectator?'<span class="dc-room-badge">ESPECTADOR</span>':''}</div>`).join('')||'<div class="pp sub">Aguardando participantes…</div>';
  $('dc-tables').innerHTML=tables.map((t,i)=>`<div class="dc-table${MS_SELECTED_TABLE===i?' live':''}" data-table="${i}"><h3>Mesa ${i+1}<span>${t.filter(Boolean).length}/2 jogadores</span></h3>${t.map((p,j)=>p?`<div class="dc-seat">${ico('user',15)}<b>${E(p.name)}</b>${p.id===ME.id?'<i>você</i>':''}</div>`:'<div class="dc-seat empty">Vaga disponível</div>').join('')}<div class="dc-seat viewer">${ico('eye',15)} Espectadores acompanham esta mesa</div></div>`).join('');
- $('bg').hidden=false;$('bg').disabled=myIdx!==0;$('bg').textContent=myIdx===0?'Iniciar Mesa '+(MS_SELECTED_TABLE+1):'Aguardando o anfitrião';
+ $('bg').hidden=true;const allBtn=$('dc-start-all');if(allBtn){allBtn.hidden=false;allBtn.disabled=myIdx!==0||tables.some(t=>t.length<2);allBtn.textContent=allBtn.disabled?'Aguardando 4 jogadores':'Iniciar as duas mesas';}
  const sb=$('dc-spectate');sb.textContent=MS_SPECTATOR?'Voltar a procurar vaga':'Entrar como espectador';sb.classList.toggle('dc-spectator',MS_SPECTATOR);
 }
 function msSetPlayers(players){
@@ -1543,9 +1544,9 @@ function msStartSelected(){
 function msStartAll(){
  try{
   if(!ROOM||myIdx!==0)return toast('Somente o anfitrião pode iniciar as mesas.');
+  const tables=msTables();if(tables.some(t=>t.length<2))return toast('As duas mesas precisam ter dois jogadores: são necessários 4 participantes.');
   const full=[];ROOM.activeTables=ROOM.activeTables||{};
-  for(let table=0;table<2;table++){const pair=msTables()[table]||[];if(pair.length<2)continue;const c=msCreateInitialCanonical([pair[0].name,pair[1].name]);full.push({table,pair,c});ROOM.activeTables[table]=true;MS_CONNS.forEach(conn=>{conn._msTable=msTableOf(conn._msClientId);if(conn._msTable===table){const side=(msTables()[table]||[]).findIndex(p=>p.id===conn._msClientId);msSend(conn,{type:'table-start',table,side:side<0?0:side,c})}})}
-  if(!full.length)return toast('Nenhuma mesa está com dois jogadores.');
+  for(let table=0;table<2;table++){const pair=tables[table],c=msCreateInitialCanonical([pair[0].name,pair[1].name]);full.push({table,pair,c});ROOM.activeTables[table]=true;MS_CONNS.forEach(conn=>{conn._msTable=msTableOf(conn._msClientId);if(conn._msTable===table){const side=pair.findIndex(p=>p.id===conn._msClientId);msSend(conn,{type:'table-start',table,side:side<0?0:side,c})}})}
   const mine=full.find(x=>x.pair.some(p=>p.id===msClientId()));if(mine){const side=mine.pair.findIndex(p=>p.id===msClientId());MS_LOCAL_TABLE=mine.table;MS_LOCAL_SIDE=side;myIdx=side;ROOM.guest=mine.pair[1];S.mp=true;PREV=[null,null];fxReset();fromCanon(mine.c);go('game');msRenderGameMeta();render()}
   toast(full.length===2?'As duas mesas foram iniciadas.':'Mesa disponível iniciada.');
  }catch(e){console.error('Falha ao iniciar mesas',e);toast('Não foi possível iniciar as mesas: '+(e.message||'erro inesperado'));}
