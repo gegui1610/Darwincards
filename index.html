@@ -80,7 +80,15 @@ select.big#dc-deck-select{appearance:none;-webkit-appearance:none;font-size:15px
 .dc-room-tools{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:12px 0 8px;padding:10px;border:1px solid var(--bd);border-radius:14px;background:var(--pan);text-align:left}.dc-room-cap{display:flex;flex-direction:column;gap:3px}.dc-room-cap span{font-size:12px;color:var(--mut)}
 .dc-tables{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0;text-align:left}.dc-table{border:2px solid var(--bd);border-radius:16px;padding:10px;background:var(--pan);min-height:128px}.dc-table.live{border-color:var(--yel);box-shadow:0 0 0 2px #fdb92733}.dc-table h3{margin:0 0 8px;font-size:15px;display:flex;justify-content:space-between}.dc-table h3 span{font-size:11px;color:var(--mut);font-weight:500}.dc-seat{display:flex;align-items:center;gap:6px;padding:6px 8px;margin:4px 0;border-radius:9px;background:var(--panel);font-size:13px}.dc-seat.empty{border:1px dashed var(--bd);color:var(--mut);background:transparent}.dc-seat.viewer{opacity:.75}.dc-seat i{font-style:normal;margin-left:auto;font-size:11px;color:var(--mut)}.dc-room-help{margin:8px 0 12px}.dc-room-badge{display:inline-block;padding:2px 7px;border-radius:99px;background:var(--yel);color:#201600;font-size:10px;font-weight:800}.dc-spectator{border-color:#8d6bd1!important;color:#6543a8!important}@media(max-width:620px){.dc-tables{grid-template-columns:1fr}.dc-room-tools{align-items:stretch}.dc-room-tools button{width:100%}}
 .av img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}.av.has-photo{padding:0;overflow:hidden}
-</style></head><body><div id="dc-version">V5.6</div>
+</style><style id="dc-trow-css">
+.trow.t4{gap:1.2cqw}
+.trow.t4 .oc{width:12.2cqw;height:12.2cqw;font-size:4cqw}
+.trow.t4 .ccl{padding-left:7cqw}
+.trow.t4 .ccl::before{left:4.8cqw}
+.trow.t4 .ccl span{font-size:3.4cqw}
+.trow.t4 .ccl b{font-size:5.3cqw}
+.trow.t0 .ccl,.trow.t1 .ccl{padding-right:3cqw}
+</style></head><body><div id="dc-version">V5.7</div>
 
 
 
@@ -990,12 +998,12 @@ function cardHTML(c,side,i){
  if(S.swap!==null&&side===0&&canPlace(P[0].reserve[S.swap],i))tg=' tgt';
  if(S.nsel!=null&&side===0){const q=P[0].ns.hand[S.nsel];if(q&&(q.type==='ut'||(q.type==='item'&&!c.item&&(!q.only||c.n===q.only))))tg=' tgt'}
  const sts=(c.st||[]).map(x=>`${LAB[x.k]||x.k}${x.k==='half'?'':' '+(x.v>0?'+':'')+x.v} (${x.left}r)`).join(' · ');
- const tl=CHR.filter(x=>chrOn(x,c)),slots=[0,1,2].map(j=>tl[j]?tagHTML(tl[j]):'<span class="oc empty"></span>').join('');
+ const tl=CHR.filter(x=>chrOn(x,c)).slice(0,4),slots=tl.map(tagHTML).join('');
  const isym=c.item&&NSICON[c.item.id]?`<img class="itsym" src="${NSICON[c.item.id]}" alt="" title="${E(c.item.n)}">`:'';
  return `<div class="card cl-${E(c.cls)}${tg}" data-side="${side}" data-i="${i}"><div class="ci">
  ${isym}<div class="cab${isym?' has-it':''}"><span class="cnm" title="${E(c.n)}">${E(c.n)}</span><span class="cpv"><small>PV</small><b>${+c.hp}<u>/${+c.max}</u></b></span></div>
  <div class="cart"><i${c.img?` style="background-image:url('${E(c.img)}')"`:''}></i></div>
- <div class="trow">${slots}<div class="ccl"><span>Classe:</span><b>${E(clsN(c.cls))}</b></div></div>
+ <div class="trow t${tl.length}">${slots}<div class="ccl"><span>Classe:</span><b>${E(clsN(c.cls))}</b></div></div>
  <div class="cabs">${rows}
  ${c.item?`<div class="extra it">Item: ${E(c.item.n)}</div>`:''}
  ${sts?`<div class="extra">${E(sts)}</div>`:''}
