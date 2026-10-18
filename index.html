@@ -1119,7 +1119,7 @@ async function joinRoom(){
  if(!window.Peer)return toast('A biblioteca de conexão não carregou. Abra a página com internet e tente de novo.');
  const code=$('code').value.trim().toUpperCase();if(code.length!==6)return toast('Digite o código de 6 letras que aparece na sala do anfitrião.');
  cleanup();myIdx=1;toast('Procurando a sala '+code+'…');
- try{PEER=makeDarwinPeer();PEER.on('open',()=>{toast('Código enviado; negociando conexão…');PCONN=PEER.connect('darwin-'+code,{metadata:{name:ME.name,clientId:msClientId(),avatar:DC_PROFILE?.avatar_url||''},reliable:true});bindPeerConn(PCONN,false);JOIN_TIMER=setTimeout(()=>{if(!ROOM||ROOM.code!==code){toast('A sala não respondeu. Confira o código e se o anfitrião ainda está conectado.');}},15000)});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui conectar. Confira se a página está em HTTPS.')}
+ try{PEER=makeDarwinPeer();PEER.on('open',()=>{toast('Código enviado; negociando conexão…');PCONN=PEER.connect('darwin-'+code,{metadata:{name:msAccountName(),clientId:msClientId(),avatar:DC_PROFILE?.avatar_url||''},reliable:true});bindPeerConn(PCONN,false);JOIN_TIMER=setTimeout(()=>{if(!ROOM||ROOM.code!==code){toast('A sala não respondeu. Confira o código e se o anfitrião ainda está conectado.');}},15000)});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui conectar. Confira se a página está em HTTPS.')}
 }
 async function startGame(){
  if(!ROOM||!ROOM.guest||myIdx!==0)return;
@@ -1424,6 +1424,7 @@ $('ed').addEventListener('click',async e=>{const b=e.target.closest('[data-photo
 <script id="dc-multimesas-js">
 /* Sala ampliada: até 4 participantes, duas mesas e espectadores. */
 let MS_CONNS=[], MS_HOST=false, MS_SPECTATOR=false, MS_SELECTED_TABLE=0, MS_LOCAL_TABLE=0, MS_LOCAL_SIDE=0;
+function msAccountName(){return String(DC_PROFILE?.username||ME.name||'Jogador').trim().slice(0,24)||'Jogador'}
 function msClientId(){try{let id=localStorage.getItem('dc-client-id');if(!id){id='p-'+(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2));localStorage.setItem('dc-client-id',id)}return id}catch(e){return 'p-'+ME.name}}
 const msMe=()=>({id:ME.id||('local-'+ME.name),name:ME.name||'Jogador',spectator:!!MS_SPECTATOR});
 function msNormalizePlayers(){
@@ -1440,11 +1441,11 @@ function msSyncIdentity(){
  const id=msClientId(),tables=msTables();for(let t=0;t<2;t++){const idx=tables[t].findIndex(p=>p.id===id);if(idx>=0){MS_LOCAL_TABLE=t;MS_LOCAL_SIDE=idx;myIdx=idx;return}}
 }
 function msTableOf(id){const p=msPlayers().find(x=>x.id===id);return !p||p.spectator?-1:(p.table===1?1:0)}
-function msRouteState(table,c){MS_CONNS.filter(x=>x._msTable===table).forEach(x=>msSend(x,{type:'table-state',table,c}))}
+function msRouteState(table,c){const pair=msTables()[table]||[];MS_CONNS.filter(x=>x._msTable===table).forEach(x=>{const side=pair.findIndex(p=>p.id===x._msClientId);msSend(x,{type:'table-state',table,side:side<0?0:side,c})})}
 function msRenderGameMeta(){
  const names=S.names||[];['0','1'].forEach((side)=>{const p=(ROOM&&((msTables()[MS_LOCAL_TABLE]||[])[Number(side)]))||null;const av=document.getElementById('n'+side)?.parentElement?.querySelector('.av');const el=document.getElementById('n'+side);if(el)el.textContent=names[Number(side)]||p?.name||'';if(av&&av.classList.contains('av')){const url=p?.avatar||'';av.classList.toggle('has-photo',!!url);av.innerHTML=url?`<img src="${E(url)}" alt="${E(p.name)}">`:ico(side==='0'?'user':'user',24)}});
 }
-function msApplyTableState(table,c){MS_LOCAL_TABLE=table;const mine=msTables()[table].findIndex(p=>p.id===msClientId());MS_LOCAL_SIDE=mine>=0?mine:0;myIdx=MS_LOCAL_SIDE;S.mp=true;PREV=[null,null];fxReset();fromCanon(c);if(cur!=='game')go('game');msRenderGameMeta();render()}
+function msApplyTableState(table,c,side){MS_LOCAL_TABLE=table;const mine=msTables()[table].findIndex(p=>p.id===msClientId());MS_LOCAL_SIDE=Number.isInteger(side)?side:(mine>=0?mine:0);myIdx=MS_LOCAL_SIDE;S.mp=true;PREV=[null,null];fxReset();fromCanon(c);if(cur!=='game')go('game');msRenderGameMeta();render()}
 function msCreateInitialCanonical(names){
  const save={P,S,myIdx,REPL,PREV};try{myIdx=0;REPL=[[],[]];P=[deal(ACTIVE_FORMAT==='custom'?ACTIVE_DECK_SPEC:null),deal()];PREV=[null,null];S={mp:true,v:0,log:['Rodada 1: vez de '+names[0]+'.'],sel:null,swap:null,nsel:null,amb:null,nsUsed:false,dmgUsed:false,turn:0,act:2,round:1,over:false,win:null,names};startTurn(0);return toCanon()}finally{P=save.P;S=save.S;myIdx=save.myIdx;REPL=save.REPL;PREV=save.PREV}}
 function msRoomPacket(){return {type:'room2',code:ROOM.code,deckMode:ROOM.deckMode||'ready',host:ROOM.host,players:msPlayers()}}
@@ -1476,11 +1477,11 @@ function msHostAdd(conn,name,clientId,avatar){
 function msHostCreate(){
  if(!window.Peer)return toast('A biblioteca de conexão não carregou. Abra a página com internet e tente de novo.');
  if(MS_JOINING||ROOM){toast('Você já está em uma sala.');return}
- cleanup();MS_HOST=true;MS_SPECTATOR=false;const code=rc();myIdx=0;ROOM={code,host:{id:ME.id||'host',name:ME.name,spectator:false},guest:null,players:[{id:msClientId(),name:ME.name,avatar:DC_PROFILE?.avatar_url||'',spectator:false}],status:'wait',deckMode:ACTIVE_FORMAT};
+ cleanup();MS_HOST=true;MS_SPECTATOR=false;const code=rc();myIdx=0;ROOM={code,host:{id:ME.id||'host',name:msAccountName(),spectator:false},guest:null,players:[{id:msClientId(),name:msAccountName(),avatar:DC_PROFILE?.avatar_url||'',spectator:false}],status:'wait',deckMode:ACTIVE_FORMAT};
  try{PEER=makeDarwinPeer('darwin-'+code);PEER.on('open',msRenderRoom);PEER.on('connection',c=>{if(MS_CONNS.some(x=>x.peer===c.peer)){try{c.close()}catch(e){}return}c.on('open',()=>msHostAdd(c,c.metadata?.name||'Amigo',c.metadata?.clientId,c.metadata?.avatar||''))});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui abrir a sala. Confira se a página está em HTTPS.')}
 }
-function msJoin(){
- const code=$('code').value.trim().toUpperCase();if(code.length!==6)return toast('Digite o código de 6 letras que aparece na sala do anfitrião.');cleanup();MS_HOST=false;MS_SPECTATOR=false;myIdx=1;PEER=makeDarwinPeer();PEER.on('open',()=>{PCONN=PEER.connect('darwin-'+code,{metadata:{name:ME.name,clientId:msClientId()},reliable:true});PCONN.on('open',()=>msSend(PCONN,{type:'hello2',name:ME.name}));PCONN.on('data',d=>{if(d?.type==='room2'){ROOM=ROOM||{};ROOM.code=d.code;ROOM.host=d.host;ROOM.players=d.players||[];ROOM.deckMode=d.deckMode||'ready';msRenderRoom()}else if(d?.type==='room-full')toast('Esta sala já está cheia (4 jogadores).') ;else if(d?.type==='state'&&d.c){if(!S.mp){S.mp=true;PREV=[null,null];fxReset()}fromCanon(d.c);if(cur!=='game')go('game');render()}});PCONN.on('close',()=>toast('A conexão com a sala foi encerrada.'))});PEER.on('error',peerError);
+function msLegacyJoin(){
+ const code=$('code').value.trim().toUpperCase();if(code.length!==6)return toast('Digite o código de 6 letras que aparece na sala do anfitrião.');cleanup();MS_HOST=false;MS_SPECTATOR=false;myIdx=1;PEER=makeDarwinPeer();PEER.on('open',()=>{PCONN=PEER.connect('darwin-'+code,{metadata:{name:msAccountName(),clientId:msClientId(),avatar:DC_PROFILE?.avatar_url||''},reliable:true});PCONN.on('open',()=>msSend(PCONN,{type:'hello2',name:ME.name}));PCONN.on('data',d=>{if(d?.type==='room2'){ROOM=ROOM||{};ROOM.code=d.code;ROOM.host=d.host;ROOM.players=d.players||[];ROOM.deckMode=d.deckMode||'ready';msRenderRoom()}else if(d?.type==='room-full')toast('Esta sala já está cheia (4 jogadores).') ;else if(d?.type==='state'&&d.c){if(!S.mp){S.mp=true;PREV=[null,null];fxReset()}fromCanon(d.c);if(cur!=='game')go('game');render()}});PCONN.on('close',()=>toast('A conexão com a sala foi encerrada.'))});PEER.on('error',peerError);
 }
 function msToggleSpectator(){MS_SPECTATOR=!MS_SPECTATOR;if(MS_HOST){const p=ROOM.players.find(x=>x.id===msClientId());if(p)p.spectator=MS_SPECTATOR;msBroadcast(msRoomPacket());msRenderRoom()}else msSend(PCONN,{type:'spectator',value:MS_SPECTATOR,clientId:msClientId()})}
 /* Correção de conexão: uma única rota de entrada e uma tentativa ativa por navegador. */
@@ -1508,16 +1509,15 @@ function msJoin(){
   PEER.on('open',()=>{
    if(attempt!==MS_ATTEMPT)return;
    toast('Conexão aberta; aguardando confirmação da sala…');
-   const c=PEER.connect('darwin-'+code,{metadata:{name:ME.name,clientId:msClientId()},reliable:true});PCONN=c;
-   c.on('open',()=>{if(attempt===MS_ATTEMPT)msSend(c,{type:'hello2',name:ME.name,clientId:msClientId()})});
+   const c=PEER.connect('darwin-'+code,{metadata:{name:msAccountName(),clientId:msClientId(),avatar:DC_PROFILE?.avatar_url||''},reliable:true});PCONN=c;
+   c.on('open',()=>{if(attempt===MS_ATTEMPT)msSend(c,{type:'hello2',name:msAccountName(),clientId:msClientId()})});
    c.on('data',d=>{
     if(attempt!==MS_ATTEMPT||!d)return;
     if(d.type==='room2'){MS_JOINING=false;if(JOIN_TIMER){clearTimeout(JOIN_TIMER);JOIN_TIMER=null}ROOM={code:d.code,host:d.host,players:d.players||[],deckMode:d.deckMode||'ready',status:'wait'};msNormalizePlayers();msSyncIdentity();msRenderRoom();return}
-    if(d.type==='table-start'){msApplyTableState(d.table,d.c);return}
-    if(d.type==='table-state'){msApplyTableState(d.table,d.c);return}
+    if(d.type==='table-start'){msApplyTableState(d.table,d.c,d.side);return}
+    if(d.type==='table-state'){msApplyTableState(d.table,d.c,d.side);return}
     if(d.type==='room-full'){fail('A sala já está cheia. Tente a outra mesa ou entre como espectador.');return}
     if(d.type==='room-busy'){fail('A sala está temporariamente ocupada. Tente novamente em alguns segundos.');return}
-    if(d.type==='state'&&d.c){if(!S.mp){S.mp=true;PREV=[null,null];fxReset()}fromCanon(d.c);if(cur!=='game')go('game');render()}
    });
    c.on('close',()=>{if(attempt!==MS_ATTEMPT||MS_LOCAL_CLOSE)return;if(!ROOM)fail('A conexão foi encerrada antes da confirmação. A sala continua aberta; tente entrar novamente.');else toast('Sua conexão com a sala foi encerrada.')});
    c.on('error',e=>{if(attempt===MS_ATTEMPT)fail('Falha na conexão com a sala ('+(e&&e.type||'rede')+'). Tente novamente.')});
@@ -1535,7 +1535,7 @@ function msStartSelected(){
   if(!ROOM||myIdx!==0)return toast('Somente o anfitrião pode iniciar uma mesa.');
   if(table.length<2)return toast('É preciso ter dois jogadores sentados na Mesa '+(MS_SELECTED_TABLE+1)+'.');
   const names=[table[0].name,table[1].name],c=msCreateInitialCanonical(names);ROOM.guest=table[1];ROOM.table=MS_SELECTED_TABLE;ROOM.activeTables=ROOM.activeTables||{};ROOM.activeTables[MS_SELECTED_TABLE]=true;
-  MS_CONNS.forEach(conn=>{conn._msTable=msTableOf(conn._msClientId);if(conn._msTable===MS_SELECTED_TABLE)msSend(conn,{type:'table-start',table:MS_SELECTED_TABLE,c})});
+  MS_CONNS.forEach(conn=>{conn._msTable=msTableOf(conn._msClientId);if(conn._msTable===MS_SELECTED_TABLE){const side=(msTables()[MS_SELECTED_TABLE]||[]).findIndex(p=>p.id===conn._msClientId);msSend(conn,{type:'table-start',table:MS_SELECTED_TABLE,side:side<0?0:side,c})}});
   const mine=table.findIndex(p=>p.id===msClientId());if(mine>=0){MS_LOCAL_TABLE=MS_SELECTED_TABLE;MS_LOCAL_SIDE=mine;myIdx=mine;S.mp=true;PREV=[null,null];fxReset();fromCanon(c);go('game');msRenderGameMeta();render()}
   toast('Mesa '+(MS_SELECTED_TABLE+1)+' iniciada.');
  }catch(e){console.error('Falha ao iniciar mesa',e);toast('Não foi possível iniciar a mesa: '+(e.message||'erro inesperado'));}
@@ -1544,7 +1544,7 @@ function msStartAll(){
  try{
   if(!ROOM||myIdx!==0)return toast('Somente o anfitrião pode iniciar as mesas.');
   const full=[];ROOM.activeTables=ROOM.activeTables||{};
-  for(let table=0;table<2;table++){const pair=msTables()[table]||[];if(pair.length<2)continue;const c=msCreateInitialCanonical([pair[0].name,pair[1].name]);full.push({table,pair,c});ROOM.activeTables[table]=true;MS_CONNS.forEach(conn=>{conn._msTable=msTableOf(conn._msClientId);if(conn._msTable===table)msSend(conn,{type:'table-start',table,c})})}
+  for(let table=0;table<2;table++){const pair=msTables()[table]||[];if(pair.length<2)continue;const c=msCreateInitialCanonical([pair[0].name,pair[1].name]);full.push({table,pair,c});ROOM.activeTables[table]=true;MS_CONNS.forEach(conn=>{conn._msTable=msTableOf(conn._msClientId);if(conn._msTable===table){const side=(msTables()[table]||[]).findIndex(p=>p.id===conn._msClientId);msSend(conn,{type:'table-start',table,side:side<0?0:side,c})}})}
   if(!full.length)return toast('Nenhuma mesa está com dois jogadores.');
   const mine=full.find(x=>x.pair.some(p=>p.id===msClientId()));if(mine){const side=mine.pair.findIndex(p=>p.id===msClientId());MS_LOCAL_TABLE=mine.table;MS_LOCAL_SIDE=side;myIdx=side;ROOM.guest=mine.pair[1];S.mp=true;PREV=[null,null];fxReset();fromCanon(mine.c);go('game');msRenderGameMeta();render()}
   toast(full.length===2?'As duas mesas foram iniciadas.':'Mesa disponível iniciada.');
