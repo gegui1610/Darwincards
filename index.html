@@ -1511,9 +1511,19 @@ function msJoin(){
 /* O auto-join por link e o botão usam exatamente a mesma função. */
 joinRoom=msJoin;
 
+function msStartSelected(){
+ const ps=msPlayers().filter(p=>!p.spectator),start=MS_SELECTED_TABLE*2,table=ps.slice(start,start+2);
+ if(!ROOM||myIdx!==0)return toast('Somente o anfitrião pode iniciar uma mesa.');
+ if(table.length<2)return toast('É preciso ter dois jogadores sentados na Mesa '+(MS_SELECTED_TABLE+1)+'.');
+ ROOM.guest=table[1];ROOM.table=MS_SELECTED_TABLE;
+ REPL=[[],[]];P=[deal(ACTIVE_FORMAT==='custom'?ACTIVE_DECK_SPEC:null),deal()];PREV=[null,null];fxReset();
+ S={mp:true,v:0,log:['Rodada 1: vez de '+table[0].name+'.'],sel:null,swap:null,nsel:null,amb:null,nsUsed:false,dmgUsed:false,turn:0,act:2,round:1,over:false,win:null,names:[table[0].name,table[1].name]};
+ startTurn(0);go('game');render();sync();
+}
+
 /* Instala a camada multi-sala sem alterar o motor das cartas. */
 window.addEventListener('load',()=>{
- $('bc').onclick=msHostCreate;$('bj').onclick=msJoin;$('dc-spectate').onclick=msToggleSpectator;
+ $('bc').onclick=msHostCreate;$('bj').onclick=msJoin;$('dc-spectate').onclick=msToggleSpectator;$('bg').onclick=msStartSelected;
  const oldStart=startGame;startGame=function(){
   const ps=msPlayers().filter(p=>!p.spectator),start=MS_SELECTED_TABLE*2,table=ps.slice(start,start+2);
   if(!ROOM||myIdx!==0)return toast('Somente o anfitrião pode iniciar uma mesa.');
