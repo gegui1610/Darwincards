@@ -1459,7 +1459,7 @@ function msRenderRoom(){
  const ps=msPlayers(), tables=msTables();
  $('rp').innerHTML=ps.map((p,i)=>`<div class="pp"><span>${i===0?ico('crown',18):ico(p.spectator?'eye':'user',18)}</span><b>${E(p.name)}</b>${i===0?'<span class="sub">(anfitrião)</span>':''}${p.spectator?'<span class="dc-room-badge">ESPECTADOR</span>':''}</div>`).join('')||'<div class="pp sub">Aguardando participantes…</div>';
  $('dc-tables').innerHTML=tables.map((t,i)=>`<div class="dc-table${MS_SELECTED_TABLE===i?' live':''}" data-table="${i}"><h3>Mesa ${i+1}<span>${t.filter(Boolean).length}/2 jogadores</span></h3>${t.map((p,j)=>p?`<div class="dc-seat">${ico('user',15)}<b>${E(p.name)}</b>${p.id===ME.id?'<i>você</i>':''}</div>`:'<div class="dc-seat empty">Vaga disponível</div>').join('')}<div class="dc-seat viewer">${ico('eye',15)} Espectadores acompanham esta mesa</div></div>`).join('');
- $('bg').hidden=true;const allBtn=$('dc-start-all'),occupied=tables.filter(t=>t.length===2).length;if(allBtn){allBtn.hidden=false;allBtn.disabled=myIdx!==0||occupied===0;allBtn.textContent=occupied===2?'Iniciar as duas mesas':occupied===1?'Iniciar mesa ocupada':'Aguardando jogadores';}
+ const occupied=tables.filter(t=>t.length===2).length;$('bg').hidden=false;$('bg').disabled=myIdx!==0||occupied===0;$('bg').textContent=occupied===2?'Iniciar as duas mesas':occupied===1?'Iniciar mesa ocupada':'Aguardando jogadores';
  const sb=$('dc-spectate');sb.textContent=MS_SPECTATOR?'Voltar a procurar vaga':'Entrar como espectador';sb.classList.toggle('dc-spectator',MS_SPECTATOR);
 }
 function msSetPlayers(players){
@@ -1554,12 +1554,12 @@ function msStartAll(){
 }
 window.msStartSelected=msStartSelected;
 window.msStartAll=msStartAll;
-if(document.getElementById('bg'))document.getElementById('bg').onclick=msStartSelected;
+if(document.getElementById('bg'))document.getElementById('bg').onclick=msStartAll;
 if(document.getElementById('dc-start-all'))document.getElementById('dc-start-all').onclick=msStartAll;
 
 /* Instala a camada multi-sala sem alterar o motor das cartas. */
 window.addEventListener('load',()=>{
- $('bc').onclick=msHostCreate;$('bj').onclick=msJoin;$('dc-spectate').onclick=msToggleSpectator;$('bg').onclick=msStartSelected;$('dc-start-all').onclick=msStartAll;
+ $('bc').onclick=msHostCreate;$('bj').onclick=msJoin;$('dc-spectate').onclick=msToggleSpectator;$('bg').onclick=msStartAll;$('dc-start-all').onclick=msStartAll;
  const oldStart=startGame;startGame=function(){
   const table=msTables()[MS_SELECTED_TABLE]||[];
   if(!ROOM||myIdx!==0)return toast('Somente o anfitrião pode iniciar uma mesa.');
