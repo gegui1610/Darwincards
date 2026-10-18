@@ -945,16 +945,16 @@ function bindPeerConn(conn,host){
  conn.on('close',()=>{if(S.mp&&!S.over){toast('O outro jogador saiu da partida.');S.over=true;S.win=myIdx===0?1:0;render()}else if(ROOM)toast('A conexão da sala foi encerrada.')});
  conn.on('error',e=>{console.warn('Peer connection error:',e);toast('A conexão com o jogador falhou ('+(e&&e.type||'erro')+').')});
 }
-async function createRoom(){
+function makeDarwinPeer(id){const opts={host:location.hostname,port:location.port?Number(location.port):(location.protocol==='https:'?443:80),secure:location.protocol==='https:',path:'/api',key:'peerjs',debug:1};return id?new Peer(id,opts):new Peer(opts)} async function createRoom(){
  if(!window.Peer)return toast('A biblioteca de conexão não carregou. Abra a página com internet e tente de novo.');
  cleanup();const code=rc();myIdx=0;ROOM={code,host:{id:ME.id,name:ME.name},guest:null,status:'wait'};
- try{PEER=new Peer('darwin-'+code);PEER.on('open',()=>roomUI());PEER.on('connection',c=>{if(PCONN){c.close();return}bindPeerConn(c,true)});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui abrir a sala. Confira se a página está em HTTPS.')}
+ try{PEER=makeDarwinPeer('darwin-'+code);PEER.on('open',()=>roomUI());PEER.on('connection',c=>{if(PCONN){c.close();return}bindPeerConn(c,true)});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui abrir a sala. Confira se a página está em HTTPS.')}
 }
 async function joinRoom(){
  if(!window.Peer)return toast('A biblioteca de conexão não carregou. Abra a página com internet e tente de novo.');
  const code=$('code').value.trim().toUpperCase();if(code.length!==6)return toast('Digite o código de 6 letras que aparece na sala do anfitrião.');
  cleanup();myIdx=1;toast('Procurando a sala '+code+'…');
- try{PEER=new Peer();PEER.on('open',()=>{toast('Código enviado; negociando conexão…');PCONN=PEER.connect('darwin-'+code,{metadata:{name:ME.name},reliable:true});bindPeerConn(PCONN,false);JOIN_TIMER=setTimeout(()=>{if(!ROOM||ROOM.code!==code){toast('A sala não respondeu. Confira o código e se o anfitrião ainda está conectado.');}},15000)});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui conectar. Confira se a página está em HTTPS.')}
+ try{PEER=makeDarwinPeer();PEER.on('open',()=>{toast('Código enviado; negociando conexão…');PCONN=PEER.connect('darwin-'+code,{metadata:{name:ME.name},reliable:true});bindPeerConn(PCONN,false);JOIN_TIMER=setTimeout(()=>{if(!ROOM||ROOM.code!==code){toast('A sala não respondeu. Confira o código e se o anfitrião ainda está conectado.');}},15000)});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui conectar. Confira se a página está em HTTPS.')}
 }
 async function startGame(){
  if(!ROOM||!ROOM.guest||myIdx!==0)return;
