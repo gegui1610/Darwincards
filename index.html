@@ -79,6 +79,7 @@ select.big#dc-deck-select{appearance:none;-webkit-appearance:none;font-size:15px
 </style><style id="dc-multimesas-css">
 .dc-room-tools{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:12px 0 8px;padding:10px;border:1px solid var(--bd);border-radius:14px;background:var(--pan);text-align:left}.dc-room-cap{display:flex;flex-direction:column;gap:3px}.dc-room-cap span{font-size:12px;color:var(--mut)}
 .dc-tables{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0;text-align:left}.dc-table{border:2px solid var(--bd);border-radius:16px;padding:10px;background:var(--pan);min-height:128px}.dc-table.live{border-color:var(--yel);box-shadow:0 0 0 2px #fdb92733}.dc-table h3{margin:0 0 8px;font-size:15px;display:flex;justify-content:space-between}.dc-table h3 span{font-size:11px;color:var(--mut);font-weight:500}.dc-seat{display:flex;align-items:center;gap:6px;padding:6px 8px;margin:4px 0;border-radius:9px;background:var(--panel);font-size:13px}.dc-seat.empty{border:1px dashed var(--bd);color:var(--mut);background:transparent}.dc-seat.viewer{opacity:.75}.dc-seat i{font-style:normal;margin-left:auto;font-size:11px;color:var(--mut)}.dc-room-help{margin:8px 0 12px}.dc-room-badge{display:inline-block;padding:2px 7px;border-radius:99px;background:var(--yel);color:#201600;font-size:10px;font-weight:800}.dc-spectator{border-color:#8d6bd1!important;color:#6543a8!important}@media(max-width:620px){.dc-tables{grid-template-columns:1fr}.dc-room-tools{align-items:stretch}.dc-room-tools button{width:100%}}
+.av img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}.av.has-photo{padding:0;overflow:hidden}
 </style></head><body><div id="dc-version">V5.3</div>
 
 
@@ -1092,7 +1093,7 @@ function readEdn(){document.querySelectorAll('#edn .ed').forEach(r=>{const c=NS[
 let PEER=null,PCONN=null,JOIN_TIMER=null;
 const rc=()=>Array.from({length:6},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(Math.random()*24)]).join('');
 function roomUI(){
- if(!ROOM)return;go('room');$('rcode').textContent=ROOM.code;const invite=new URL(location.href);invite.searchParams.set('room',ROOM.code);$('dc-invite-link').textContent=invite.href;$('dc-room-format').textContent='Formato escolhido: '+({'ready':'Clássico (baralho pronto)','random':'Aleatório','custom':'Meu baralho'}[ROOM.deckMode||ACTIVE_FORMAT]||'Clássico');
+ if(!ROOM)return;msSyncIdentity();go('room');$('rcode').textContent=ROOM.code;const invite=new URL(location.href);invite.searchParams.set('room',ROOM.code);$('dc-invite-link').textContent=invite.href;$('dc-room-format').textContent='Formato escolhido: '+({'ready':'Clássico (baralho pronto)','random':'Aleatório','custom':'Meu baralho'}[ROOM.deckMode||ACTIVE_FORMAT]||'Clássico');
  $('rp').innerHTML=`<div class="pp">${ico('crown',18)} <b>${E(ROOM.host.name)}</b> <span class="sub">(anfitrião)</span></div>`+(ROOM.guest?`<div class="pp">${ico('user',18)} <b>${E(ROOM.guest.name)}</b></div>`:`<div class="pp sub">Aguardando jogador…</div>`);
  $('bg').hidden=myIdx!==0;$('bg').disabled=myIdx!==0||!ROOM.guest;
 }
@@ -1118,7 +1119,7 @@ async function joinRoom(){
  if(!window.Peer)return toast('A biblioteca de conexão não carregou. Abra a página com internet e tente de novo.');
  const code=$('code').value.trim().toUpperCase();if(code.length!==6)return toast('Digite o código de 6 letras que aparece na sala do anfitrião.');
  cleanup();myIdx=1;toast('Procurando a sala '+code+'…');
- try{PEER=makeDarwinPeer();PEER.on('open',()=>{toast('Código enviado; negociando conexão…');PCONN=PEER.connect('darwin-'+code,{metadata:{name:ME.name,clientId:msClientId()},reliable:true});bindPeerConn(PCONN,false);JOIN_TIMER=setTimeout(()=>{if(!ROOM||ROOM.code!==code){toast('A sala não respondeu. Confira o código e se o anfitrião ainda está conectado.');}},15000)});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui conectar. Confira se a página está em HTTPS.')}
+ try{PEER=makeDarwinPeer();PEER.on('open',()=>{toast('Código enviado; negociando conexão…');PCONN=PEER.connect('darwin-'+code,{metadata:{name:ME.name,clientId:msClientId(),avatar:DC_PROFILE?.avatar_url||''},reliable:true});bindPeerConn(PCONN,false);JOIN_TIMER=setTimeout(()=>{if(!ROOM||ROOM.code!==code){toast('A sala não respondeu. Confira o código e se o anfitrião ainda está conectado.');}},15000)});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui conectar. Confira se a página está em HTTPS.')}
 }
 async function startGame(){
  if(!ROOM||!ROOM.guest||myIdx!==0)return;
@@ -1422,7 +1423,7 @@ $('ed').addEventListener('click',async e=>{const b=e.target.closest('[data-photo
 </script>
 <script id="dc-multimesas-js">
 /* Sala ampliada: até 4 participantes, duas mesas e espectadores. */
-let MS_CONNS=[], MS_HOST=false, MS_SPECTATOR=false, MS_SELECTED_TABLE=0;
+let MS_CONNS=[], MS_HOST=false, MS_SPECTATOR=false, MS_SELECTED_TABLE=0, MS_LOCAL_TABLE=0, MS_LOCAL_SIDE=0;
 function msClientId(){try{let id=localStorage.getItem('dc-client-id');if(!id){id='p-'+(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2));localStorage.setItem('dc-client-id',id)}return id}catch(e){return 'p-'+ME.name}}
 const msMe=()=>({id:ME.id||('local-'+ME.name),name:ME.name||'Jogador',spectator:!!MS_SPECTATOR});
 function msPlayers(){
@@ -1431,6 +1432,18 @@ function msPlayers(){
  return [ROOM.host,...(ROOM.guest?[ROOM.guest]:[])].filter(Boolean);
 }
 function msTables(){const ps=msPlayers(),playing=ps.filter(p=>!p.spectator);return [[playing[0]||null,playing[1]||null],[playing[2]||null,playing[3]||null]]}
+function msSyncIdentity(){
+ const id=msClientId(),playing=msPlayers().filter(p=>!p.spectator),idx=playing.findIndex(p=>p.id===id);
+ if(idx>=0){MS_LOCAL_TABLE=Math.floor(idx/2);MS_LOCAL_SIDE=idx%2;myIdx=MS_LOCAL_SIDE}
+}
+function msTableOf(id){const playing=msPlayers().filter(p=>!p.spectator),idx=playing.findIndex(p=>p.id===id);return idx<0?-1:Math.floor(idx/2)}
+function msRouteState(table,c){MS_CONNS.filter(x=>x._msTable===table).forEach(x=>msSend(x,{type:'table-state',table,c}))}
+function msRenderGameMeta(){
+ const names=S.names||[];['0','1'].forEach((side)=>{const p=(ROOM&&msPlayers().filter(x=>!x.spectator)[MS_LOCAL_TABLE*2+Number(side)])||null;const av=document.getElementById('n'+side)?.parentElement?.querySelector('.av');const el=document.getElementById('n'+side);if(el)el.textContent=names[Number(side)]||p?.name||'';if(av&&av.classList.contains('av')){const url=p?.avatar||'';av.classList.toggle('has-photo',!!url);av.innerHTML=url?`<img src="${E(url)}" alt="${E(p.name)}">`:ico(side==='0'?'user':'user',24)}});
+}
+function msApplyTableState(table,c){MS_LOCAL_TABLE=table;const playing=msPlayers().filter(p=>!p.spectator),mine=playing.findIndex(p=>p.id===msClientId());MS_LOCAL_SIDE=mine>=0&&Math.floor(mine/2)===table?mine%2:0;myIdx=MS_LOCAL_SIDE;S.mp=true;PREV=[null,null];fxReset();fromCanon(c);if(cur!=='game')go('game');msRenderGameMeta();render()}
+function msCreateInitialCanonical(names){
+ const save={P,S,myIdx,REPL,PREV};try{myIdx=0;REPL=[[],[]];P=[deal(ACTIVE_FORMAT==='custom'?ACTIVE_DECK_SPEC:null),deal()];PREV=[null,null];S={mp:true,v:0,log:['Rodada 1: vez de '+names[0]+'.'],sel:null,swap:null,nsel:null,amb:null,nsUsed:false,dmgUsed:false,turn:0,act:2,round:1,over:false,win:null,names};startTurn(0);return toCanon()}finally{P=save.P;S=save.S;myIdx=save.myIdx;REPL=save.REPL;PREV=save.PREV}}
 function msRoomPacket(){return {type:'room2',code:ROOM.code,deckMode:ROOM.deckMode||'ready',host:ROOM.host,players:msPlayers()}}
 function msSend(c,d){try{if(c&&c.open)c.send(d)}catch(e){console.warn('room send',e)}}
 function msBroadcast(d){MS_CONNS.forEach(c=>msSend(c,d))}
@@ -1447,21 +1460,21 @@ function msRenderRoom(){
 function msSetPlayers(players){
  if(!ROOM)return;ROOM.players=(players||[]).slice(0,4);ROOM.host=ROOM.players[0]||ROOM.host;ROOM.guest=ROOM.players[1]||null;msRenderRoom();
 }
-function msHostAdd(conn,name,clientId){
+function msHostAdd(conn,name,clientId,avatar){
  const stableId=String(clientId||conn.metadata?.clientId||conn.peer), label=String(name||'Amigo').slice(0,24), ps=msPlayers();
  let p=ps.find(x=>x.id===stableId);
- if(!p){if(ps.length>=4){msSend(conn,{type:'room-full'});try{conn.close()}catch(e){}return}p={id:stableId,name:label,spectator:false};ROOM.players=[...ps,p]}
- else{p.name=label;p.spectator=false}
+ if(!p){if(ps.length>=4){msSend(conn,{type:'room-full'});try{conn.close()}catch(e){}return}p={id:stableId,name:label,avatar:avatar||'',spectator:false};ROOM.players=[...ps,p]}
+ else{p.name=label;p.avatar=avatar||p.avatar||'';p.spectator=false}
  const old=MS_CONNS.find(x=>x._msClientId===stableId&&x!==conn);if(old){try{old.close()}catch(e){}MS_CONNS=MS_CONNS.filter(x=>x!==old)}
- conn._msClientId=stableId;MS_CONNS.push(conn);roomUI=msRenderRoom;msRenderRoom();msBroadcast(msRoomPacket());msSend(conn,msRoomPacket());
- conn.on('data',d=>{if(d?.type==='spectator'){const q=ROOM.players.find(x=>x.id===stableId);if(q){q.spectator=!!d.value;msBroadcast(msRoomPacket());msRenderRoom()}}else if(d?.type==='state'&&d.c){/* espectadores recebem a mesa ativa */msBroadcast(d)}});
+ conn._msClientId=stableId;conn._msTable=msTableOf(stableId);MS_CONNS.push(conn);roomUI=msRenderRoom;msRenderRoom();msBroadcast(msRoomPacket());msSend(conn,msRoomPacket());
+ conn.on('data',d=>{if(d?.type==='spectator'){const q=ROOM.players.find(x=>x.id===stableId);if(q){q.spectator=!!d.value;conn._msTable=msTableOf(stableId);msBroadcast(msRoomPacket());msRenderRoom()}}else if(d?.type==='state'&&d.c){conn._msTable=msTableOf(stableId);if(conn._msTable>=0)msRouteState(conn._msTable,d.c)}});
  conn.on('close',()=>{const active=MS_CONNS.find(x=>x._msClientId===stableId);if(active&&active!==conn)return;ROOM.players=ROOM.players.filter(x=>x.id!==stableId);MS_CONNS=MS_CONNS.filter(x=>x!==conn);msBroadcast(msRoomPacket());msRenderRoom()});
 }
 function msHostCreate(){
  if(!window.Peer)return toast('A biblioteca de conexão não carregou. Abra a página com internet e tente de novo.');
  if(MS_JOINING||ROOM){toast('Você já está em uma sala.');return}
- cleanup();MS_HOST=true;MS_SPECTATOR=false;const code=rc();myIdx=0;ROOM={code,host:{id:ME.id||'host',name:ME.name,spectator:false},guest:null,players:[{id:msClientId(),name:ME.name,spectator:false}],status:'wait',deckMode:ACTIVE_FORMAT};
- try{PEER=makeDarwinPeer('darwin-'+code);PEER.on('open',msRenderRoom);PEER.on('connection',c=>{if(MS_CONNS.some(x=>x.peer===c.peer)){try{c.close()}catch(e){}return}c.on('open',()=>msHostAdd(c,c.metadata?.name||'Amigo',c.metadata?.clientId))});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui abrir a sala. Confira se a página está em HTTPS.')}
+ cleanup();MS_HOST=true;MS_SPECTATOR=false;const code=rc();myIdx=0;ROOM={code,host:{id:ME.id||'host',name:ME.name,spectator:false},guest:null,players:[{id:msClientId(),name:ME.name,avatar:DC_PROFILE?.avatar_url||'',spectator:false}],status:'wait',deckMode:ACTIVE_FORMAT};
+ try{PEER=makeDarwinPeer('darwin-'+code);PEER.on('open',msRenderRoom);PEER.on('connection',c=>{if(MS_CONNS.some(x=>x.peer===c.peer)){try{c.close()}catch(e){}return}c.on('open',()=>msHostAdd(c,c.metadata?.name||'Amigo',c.metadata?.clientId,c.metadata?.avatar||''))});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui abrir a sala. Confira se a página está em HTTPS.')}
 }
 function msJoin(){
  const code=$('code').value.trim().toUpperCase();if(code.length!==6)return toast('Digite o código de 6 letras que aparece na sala do anfitrião.');cleanup();MS_HOST=false;MS_SPECTATOR=false;myIdx=1;PEER=makeDarwinPeer();PEER.on('open',()=>{PCONN=PEER.connect('darwin-'+code,{metadata:{name:ME.name,clientId:msClientId()},reliable:true});PCONN.on('open',()=>msSend(PCONN,{type:'hello2',name:ME.name}));PCONN.on('data',d=>{if(d?.type==='room2'){ROOM=ROOM||{};ROOM.code=d.code;ROOM.host=d.host;ROOM.players=d.players||[];ROOM.deckMode=d.deckMode||'ready';msRenderRoom()}else if(d?.type==='room-full')toast('Esta sala já está cheia (4 jogadores).') ;else if(d?.type==='state'&&d.c){if(!S.mp){S.mp=true;PREV=[null,null];fxReset()}fromCanon(d.c);if(cur!=='game')go('game');render()}});PCONN.on('close',()=>toast('A conexão com a sala foi encerrada.'))});PEER.on('error',peerError);
@@ -1496,7 +1509,9 @@ function msJoin(){
    c.on('open',()=>{if(attempt===MS_ATTEMPT)msSend(c,{type:'hello2',name:ME.name,clientId:msClientId()})});
    c.on('data',d=>{
     if(attempt!==MS_ATTEMPT||!d)return;
-    if(d.type==='room2'){MS_JOINING=false;if(JOIN_TIMER){clearTimeout(JOIN_TIMER);JOIN_TIMER=null}ROOM={code:d.code,host:d.host,players:d.players||[],deckMode:d.deckMode||'ready',status:'wait'};msRenderRoom();return}
+    if(d.type==='room2'){MS_JOINING=false;if(JOIN_TIMER){clearTimeout(JOIN_TIMER);JOIN_TIMER=null}ROOM={code:d.code,host:d.host,players:d.players||[],deckMode:d.deckMode||'ready',status:'wait'};msSyncIdentity();msRenderRoom();return}
+    if(d.type==='table-start'){msApplyTableState(d.table,d.c);return}
+    if(d.type==='table-state'){msApplyTableState(d.table,d.c);return}
     if(d.type==='room-full'){fail('A sala já está cheia. Tente a outra mesa ou entre como espectador.');return}
     if(d.type==='room-busy'){fail('A sala está temporariamente ocupada. Tente novamente em alguns segundos.');return}
     if(d.type==='state'&&d.c){if(!S.mp){S.mp=true;PREV=[null,null];fxReset()}fromCanon(d.c);if(cur!=='game')go('game');render()}
@@ -1516,18 +1531,30 @@ function msStartSelected(){
   const ps=msPlayers().filter(p=>!p.spectator),start=MS_SELECTED_TABLE*2,table=ps.slice(start,start+2);
   if(!ROOM||myIdx!==0)return toast('Somente o anfitrião pode iniciar uma mesa.');
   if(table.length<2)return toast('É preciso ter dois jogadores sentados na Mesa '+(MS_SELECTED_TABLE+1)+'.');
-  ROOM.guest=table[1];ROOM.table=MS_SELECTED_TABLE;
-  REPL=[[],[]];P=[deal(ACTIVE_FORMAT==='custom'?ACTIVE_DECK_SPEC:null),deal()];PREV=[null,null];fxReset();
-  S={mp:true,v:0,log:['Rodada 1: vez de '+table[0].name+'.'],sel:null,swap:null,nsel:null,amb:null,nsUsed:false,dmgUsed:false,turn:0,act:2,round:1,over:false,win:null,names:[table[0].name,table[1].name]};
-  startTurn(0);go('game');render();sync();
+  const names=[table[0].name,table[1].name],c=msCreateInitialCanonical(names);ROOM.guest=table[1];ROOM.table=MS_SELECTED_TABLE;ROOM.activeTables=ROOM.activeTables||{};ROOM.activeTables[MS_SELECTED_TABLE]=true;
+  MS_CONNS.forEach(conn=>{conn._msTable=msTableOf(conn._msClientId);if(conn._msTable===MS_SELECTED_TABLE)msSend(conn,{type:'table-start',table:MS_SELECTED_TABLE,c})});
+  const mine=table.findIndex(p=>p.id===msClientId());if(mine>=0){MS_LOCAL_TABLE=MS_SELECTED_TABLE;MS_LOCAL_SIDE=mine;myIdx=mine;S.mp=true;PREV=[null,null];fxReset();fromCanon(c);go('game');msRenderGameMeta();render()}
+  toast('Mesa '+(MS_SELECTED_TABLE+1)+' iniciada.');
  }catch(e){console.error('Falha ao iniciar mesa',e);toast('Não foi possível iniciar a mesa: '+(e.message||'erro inesperado'));}
 }
+function msStartAll(){
+ try{
+  if(!ROOM||myIdx!==0)return toast('Somente o anfitrião pode iniciar as mesas.');
+  const ps=msPlayers().filter(p=>!p.spectator),full=[];ROOM.activeTables=ROOM.activeTables||{};
+  for(let table=0;table<2;table++){const pair=ps.slice(table*2,table*2+2);if(pair.length<2)continue;const c=msCreateInitialCanonical([pair[0].name,pair[1].name]);full.push({table,pair,c});ROOM.activeTables[table]=true;MS_CONNS.forEach(conn=>{conn._msTable=msTableOf(conn._msClientId);if(conn._msTable===table)msSend(conn,{type:'table-start',table,c})})}
+  if(!full.length)return toast('Nenhuma mesa está com dois jogadores.');
+  const mine=full.find(x=>x.pair.some(p=>p.id===msClientId()));if(mine){const side=mine.pair.findIndex(p=>p.id===msClientId());MS_LOCAL_TABLE=mine.table;MS_LOCAL_SIDE=side;myIdx=side;ROOM.guest=mine.pair[1];S.mp=true;PREV=[null,null];fxReset();fromCanon(mine.c);go('game');msRenderGameMeta();render()}
+  toast(full.length===2?'As duas mesas foram iniciadas.':'Mesa disponível iniciada.');
+ }catch(e){console.error('Falha ao iniciar mesas',e);toast('Não foi possível iniciar as mesas: '+(e.message||'erro inesperado'));}
+}
 window.msStartSelected=msStartSelected;
+window.msStartAll=msStartAll;
 if(document.getElementById('bg'))document.getElementById('bg').onclick=msStartSelected;
+if(document.getElementById('dc-start-all'))document.getElementById('dc-start-all').onclick=msStartAll;
 
 /* Instala a camada multi-sala sem alterar o motor das cartas. */
 window.addEventListener('load',()=>{
- $('bc').onclick=msHostCreate;$('bj').onclick=msJoin;$('dc-spectate').onclick=msToggleSpectator;$('bg').onclick=msStartSelected;
+ $('bc').onclick=msHostCreate;$('bj').onclick=msJoin;$('dc-spectate').onclick=msToggleSpectator;$('bg').onclick=msStartSelected;$('dc-start-all').onclick=msStartAll;
  const oldStart=startGame;startGame=function(){
   const ps=msPlayers().filter(p=>!p.spectator),start=MS_SELECTED_TABLE*2,table=ps.slice(start,start+2);
   if(!ROOM||myIdx!==0)return toast('Somente o anfitrião pode iniciar uma mesa.');
@@ -1535,8 +1562,8 @@ window.addEventListener('load',()=>{
   ROOM.guest=table[1];ROOM.table=MS_SELECTED_TABLE;
   return oldStart();
  };
- const oldSync=sync;sync=function(){oldSync();if(MS_HOST&&ROOM)msBroadcast({type:'state',c:toCanon()})};
- const oldRender=render;render=function(){oldRender();const over=!!S.over;const r=$('dc-rematch'),b=$('dc-back-room');if(r){r.hidden=!over||!ROOM;r.disabled=myIdx!==0}if(b)b.hidden=!over||!ROOM};
+ const oldSync=sync;sync=function(){oldSync();if(MS_HOST&&ROOM)msRouteState(MS_LOCAL_TABLE,toCanon())};
+ const oldRender=render;render=function(){oldRender();msRenderGameMeta();const over=!!S.over;const r=$('dc-rematch'),b=$('dc-back-room');if(r){r.hidden=!over||!ROOM;r.disabled=myIdx!==0}if(b)b.hidden=!over||!ROOM};
  $('dc-tables').onclick=e=>{const t=e.target.closest('[data-table]');if(!t)return;MS_SELECTED_TABLE=+t.dataset.table;msRenderRoom()};
  $('dc-rematch').onclick=()=>{if(myIdx===0)startGame()};$('dc-back-room').onclick=()=>{if(ROOM){S.over=false;S.mp=false;msRenderRoom()}};
  $('lv').addEventListener('click',()=>{if(ROOM&&S.over)msRenderRoom()});
