@@ -1,7 +1,8 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><script src="https://unpkg.com/peerjs@1.5.5/dist/peerjs.min.js"></script>
+</head><body>
 <title>Darwin Cards — edição cartas TXT</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='6' y='3' width='12' height='18' rx='2' fill='%230f3f9e'/%3E%3Ccircle cx='12' cy='12' r='3' fill='%23fdb927'/%3E%3C/svg%3E">
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABk0lEQVR4nO2bMVIDMQxFnQxFOjhBilTcIlS0cAUuBldIWiqOkSoFJ6BMBVQePEuSwbKkl0F6ZbJrfX1rvfaOPbteP3+VwMxpATRpAC2AJrwBVxqNHPZbjWZELFYPQ/cPGUAmPtUgNUL8CFxC8i1SPaIKmAY7vG9EwTVYLB9/dOy33ZUwPAiSyWvE7zag7X06+Uqro/dRCP8aTANoATRpAC2AJg2gBdCkAbQAGpXlsITP19tfv83vd+463A04lvj0P08j3Aw4l/ipaz2McBkDepLXuK+H8IOguQGjvWhdBVkBlo1r9Z5lFWQF0AJo0gBaAI2pAVozOcsZYVaAeYDB3rNeD2QFuAQR9qLHatBtOVyT+cus7l9+D6icMyLEF6EKkewxchCkBdCkAbQAGpNB8ObuxaLZUkopH29Pqu2Fr4A0gBZAYzIGaD+nloSvgDSAFkCTBtACaNKA3hva7ejtVnWSVof7dnnahNH4M+nByUs7MVKK7NiMuAJGDytpI9UzNBWuQcOeGtMSQZKvQVoATXgDvgGyM2GgiywRDQAAAABJRU5ErkJggg==">
 <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500&family=Exo+2:wght@500;600;700;800&family=Patrick+Hand&display=swap" rel="stylesheet">
 <style>
 :root{--blue:#0f3f9e;--blue2:#1c58c9;--navy:#071d4f;--yel:#fdb927;--gray:#7f7f7f;--bg:#f6f8fc;--fg:#0b1a3a;--mut:#5d6b86;--pan:rgba(15,63,158,.06);--bd:rgba(15,63,158,.18);color-scheme:light;box-sizing:border-box}
@@ -234,7 +235,7 @@ body.ingame .main{display:flex;flex-direction:column;justify-content:space-betwe
 <input class="big" id="nick" maxlength="14" placeholder="Seu apelido"><button class="big y" id="bl">Entrar</button></div></section>
 <section class="scr c" id="s-lobby"><div class="pnl"><img class="lg" alt="Darwin Cards"><p>Olá, <b id="hello"></b>!</p>
 <button class="big y" id="bc"><span data-ic="plus"></span>Criar sala</button><div class="or">ou entre na sala de um amigo</div>
-<input class="big" id="code" maxlength="4" placeholder="CÓDIGO"><button class="big" id="bj">Entrar na sala</button>
+<input class="big" id="code" maxlength="6" placeholder="CÓDIGO DE 6 LETRAS"><button class="big" id="bj">Entrar na sala</button>
 <button class="big g" id="bs"><span data-ic="bot" data-s="22"></span>Jogar solo (vs. computador)</button>
 <details><summary>Como jogar</summary><ul>
 <li>6 Alguém por jogador, 3 no terreno. 2 ações por turno: Hab¹, Hab² ou trocar com a mão (1 ação).</li>
@@ -242,11 +243,11 @@ body.ingame .main{display:flex;flex-direction:column;justify-content:space-betwe
 <li><b>Protetor:</b> 1×/rodada pode virar o alvo de uma habilidade no lugar do Alguém ao lado (escudo ligado/desligado na carta).</li>
 <li><b>Abusador:</b> 1×/jogo, o alvo não age na rodada seguinte.</li>
 <li><b>Ordem:</b> 1×/jogo, tira penalidades e cura 2 PV.</li>
-<li><b>Insano:</b> +2 de dano ao atacar, mas sofre 2.</li>
+<li><b>Insano:</b> +2 de dano ao atacar, mas sofre 2.</li><li><b>Invocações:</b> Dudu só vem sacrificando Isaque, Pietro e Michael Jackson no terreno; ELES exige Diego, Sâmia e João; Tche-Tche exige três cartas com a característica Tche-Tche. Elas não aparecem no sorteio inicial.</li>
 <li>Cartas Não-Alguém (ambiente, utensílio ou item): 1 por rodada, fora das 2 ações. Só existe 1 ambiente por vez. Utensílios são usados na hora; itens Gerais e Exclusivos são equipados (1 por Alguém).</li><li>Cada carta especial traz sua habilidade escrita.</li></ul></details>
 <button class="big g" id="ba" hidden><span data-ic="sliders" data-s="22"></span>Painel admin</button><button class="g" id="bo">Trocar apelido</button></div></section>
 <section class="scr c" id="s-room"><div class="pnl"><img class="lg" alt="Darwin Cards"><div class="sub">Código da sala</div><div class="code" id="rcode"></div>
-<p class="sub">Passe o código para o seu amigo entrar.</p><div id="rp"></div>
+<p class="sub">Passe o código para o seu amigo entrar. A partida é ponto a ponto; o código serve apenas para a sinalização inicial.</p><div id="rp"></div>
 <button class="big y" id="bg">Iniciar partida</button><button class="big g" id="bl2">Sair da sala</button></div></section>
 <section class="scr" id="s-game"><div class="board"><div class="main">
 <div class="pl"><div class="av" data-ic="bot" data-s="24"></div><b id="n1"></b><div class="tot" id="t1"></div><span id="rr"></span></div>
@@ -275,22 +276,25 @@ const POOL=[
 {n:'Isaque',c:'Insano',hp:12,d:2,t:'diabo',tg:['Diabo','Aluno','Autista'],ab:['nuvem_caspa','caspas'],x:'Nuvem de Caspas: −1 dano por 2 rodadas. Caspas Envenenadas: 2 dano por 2 rodadas.'},
 {n:'Kelvin',c:'Abusador',hp:12,d:2,t:'entrosa',tg:['Entrosa','Anjo','Aluno','Autista'],ab:['oracao','exatamente']},
 {n:'Gorreth',c:'Protetor',hp:20,d:2,t:'diabo',tg:['Diabo','Racista','Gordo'],ab:['vomito_quimico','quimica'],x:'Química Formada: a cada 2 rodadas cria Bebida Alcoólica.'},
-{n:'Tche-Tche',c:'Insano',hp:40,d:2,t:'diabo',tg:['Diabo','Macaco','Tche'],ab:['trixatombe','pisotear','tchezar'],x:'Trixatombe exige 3 Tche-Tche sacrificados no seu terreno.'},
 {n:'Fatori',c:'Protetor',hp:20,d:2,t:'diabo',tg:['Diabo','Professor','Aluno'],ab:['espancar','fisica']},
-{n:'ELES',c:'Ordem',hp:40,d:2,tg:[],ab:['trindade_eles','desligar','camera']},
 {n:'Pereira',c:'Abusador',hp:20,d:2,t:'diabo',tg:['Diabo','Macaco','Aluno'],ab:['agarrar','banana_cura']},
 {n:'Sâmia',c:'Ordem',hp:15,d:2,tg:['Anjo','Racista','Professor'],ab:['chicote','camera']},
 {n:'Cris',c:'Ordem',hp:15,d:2,tg:['Professor'],ab:['cansada','cansaco']},
 {n:'Pietro',c:'Ordem',hp:15,d:2,tg:['Aluno','Autista'],ab:['obs_c','oracao']},
 {n:'Michael Jackson',c:'Insano',hp:10,d:2,t:'entrosa',tg:['Entrosa','Autista'],ab:['insp','stress','assovio']},
 {n:'Gabriel Arthur',c:'Protetor',hp:15,d:2,tg:['Anjo','Femea'],ab:['cm','amorcar']},
-{n:'Dudu',c:'Insano',hp:60,d:5,tg:['Autista','Gordo'],w:2,ab:['trindade','punho','bigboy']},
 {n:'Nicole',c:'Insano',hp:12,d:2,tg:['Tche','Bebum'],ab:['chupetinha','chorar']},
 {n:'JP',c:'Abusador',hp:15,d:2,t:'diabo',tg:['Diabo','Tche','Bebum'],ab:['desmoralizar','lider']},
 {n:'Tche-Tche Fêmea',c:'Protetor',hp:10,d:2,tg:['Tche','Invocação'],ab:['choradeira','bebedeira']},
 {n:'Pessoal da Limpeza',c:'Protetor',hp:10,d:1,tg:['Invocação'],ab:['passar_pano','brilhar']},
 {n:'Câmera',c:'Ordem',hp:10,d:1,tg:['Racista','Invocação'],ab:['perceber','fabricar']}
 ];
+const SUMMONS=[
+{n:'Dudu',c:'Insano',hp:60,d:5,tg:['Autista','Gordo'],w:2,ab:['punho','bigboy'],x:'Invocado sacrificando Isaque, Pietro e Michael Jackson do terreno; ao surgir causa 5 de dano a todos os inimigos.'},
+{n:'ELES',c:'Ordem',hp:40,d:2,tg:[],ab:['desligar','camera'],x:'Invocado sacrificando Diego, Sâmia e João do terreno.'},
+{n:'Tche-Tche',c:'Insano',hp:40,d:2,t:'diabo',tg:['Diabo','Macaco','Tche'],ab:['pisotear','tchezar'],x:'Invocado sacrificando três cartas com a característica Tche-Tche.'}
+];
+const SUMMON_ONLY=new Set(SUMMONS.map(x=>x.n));
 const DEF=JSON.stringify(POOL);
 const CLS=[{id:'Protetor',n:'Protetor',ab:'guard'},{id:'Abusador',n:'Abusador',ab:'abuso'},{id:'Ordem',n:'Ordem',ab:'ordem'},{id:'Insano',n:'Insano',ab:'surto'}];
 const CLSDEF=JSON.stringify(CLS);
@@ -405,7 +409,7 @@ const shuf=a=>{const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(M
 const uid=()=>Math.random().toString(36).slice(2,8);
 const K2={Protetor:'guard',Abusador:'abuso',Ordem:'ordem',Insano:'surto'};
 const SUP=['¹','²','³','⁴','⁵','⁶','⁷'];
-const mk=p=>{const ab=p.ab?[...p.ab]:['atk',clsAb(p.c)];if(!ab.some(k=>AB[k]&&AB[k].dm))ab.unshift('atk');return {...p,id:uid(),cls:p.c,max:p.hp,used:{},blocked:false,lock:false,st:[],ab}};
+const mk=p=>{const ab=p.ab?[...p.ab]:['atk',clsAb(p.c)];if(!SUMMON_ONLY.has(p.n)){if(['Isaque','Pietro','Michael Jackson'].includes(p.n))ab.push('inv_dudu');if(['Diego','Sâmia','João'].includes(p.n))ab.push('inv_eles');if((p.tg||[]).some(x=>nk(x)==='tche'))ab.push('inv_tche')}if(!ab.some(k=>AB[k]&&AB[k].dm))ab.unshift('atk');return {...p,id:uid(),cls:p.c,max:p.hp,used:{},blocked:false,lock:false,st:[],ab}};
 let P=null,S={mp:false,v:0,log:[],sel:null,swap:null,nsel:null,amb:null,nsUsed:false,dmgUsed:false,turn:0,act:2,round:1,over:false,win:null,names:['Você','Rival']};
 let DB=null,USER=null,ME={id:'',name:''},ROOM=null,ref=null,unsub=null,myIdx=0,ISADMIN=false,cur='login',tt,PREV=[null,null];
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),3200)}
@@ -512,7 +516,10 @@ Object.assign(AB,{
  desmoralizar:{n:'Desmoralizar',t:'e',dm:()=>1,tk:[1,1]},lider:{n:'O Líder',t:'n',once:'game',v:'chance de obter Tche-Tche'},
  choradeira:{n:'Choradeira',pas:1,v:'passiva'},bebedeira:{n:'Bebedeira',t:'n',once:'round',v:'cria Álcool Caseiro'},
  passar_pano:{n:'Passar Pano',t:'n',once:'game',v:'remove uma penalidade'},brilhar:{n:'Fazer Brilhar',t:'a',v:'+1 dano por 1 rodada'},
- perceber:{n:'Perceber Movimento',pas:1,v:'50% redireciona ataque'},fabricar:{n:'Fabricar Provas',t:'e',dm:()=>1,sk:10},fisica:{n:'Física Filé',pas:1,v:'50% ignora efeitos'}
+ perceber:{n:'Perceber Movimento',pas:1,v:'50% redireciona ataque'},fabricar:{n:'Fabricar Provas',t:'e',dm:()=>1,sk:10},fisica:{n:'Física Filé',pas:1,v:'50% ignora efeitos'},
+ inv_dudu:{n:'Santa Trindade: invocar Dudu',t:'n',once:'game',v:'sacrifica Isaque + Pietro + Michael Jackson'},
+ inv_eles:{n:'Santa Trindade: invocar ELES',t:'n',once:'game',v:'sacrifica Diego + Sâmia + João'},
+ inv_tche:{n:'Trixatombe: invocar Tche-Tche',t:'n',once:'game',v:'sacrifica 3 Tche-Tche'}
 });
 
 const abl=c=>[...(c.ab||[]),...((c.item&&c.item.gr)||[])];
@@ -523,6 +530,9 @@ function avail(c,k,s){
  if(a.once==='game'&&c.used[k])return false;
  if(a.once==='round'&&c.used.im===S.round)return false;
  if(k==='trindade')return trOK(s);
+ if(k==='inv_dudu')return ['Isaque','Pietro','Michael Jackson'].every(n=>P[s].field.some(x=>x&&x.n===n));
+ if(k==='inv_eles')return ['Diego','Sâmia','João'].every(n=>P[s].field.some(x=>x&&x.n===n));
+ if(k==='inv_tche')return P[s].field.filter(x=>x&&has(x,'Tche')).length>=3;
  if(k==='trindade_eles')return ['Diego','Sâmia','João'].every(n=>P[s].field.some(x=>x&&x.n===n));
  if(k==='trixatombe')return P[s].field.filter(x=>x&&x.n==='Tche-Tche').length>=3;
  if(k==='obs_c'||k==='obs_d')return !c.obs;
@@ -624,6 +634,13 @@ function act(s,i,k,tg){
  if(amb('apagao')&&c.t!=='macaco'&&roll(c,ap('pct',10))){log(`Apagão: ${c.n} errou a habilidade.`);return}
  if(a.once==='game')c.used[k]=true;
  const T=(tg||[]).map(([ts,ti])=>({ts,ti,t:P[ts].field[ti]})).filter(x=>x.t);
+ if(k==='inv_dudu'||k==='inv_eles'||k==='inv_tche'){
+  const names=k==='inv_dudu'?['Isaque','Pietro','Michael Jackson']:k==='inv_eles'?['Diego','Sâmia','João']:P[s].field.filter(x=>x&&has(x,'Tche')).slice(0,3).map(x=>x.n);
+  for(const n of names){const j=P[s].field.findIndex(x=>x&&x.n===n);if(j>=0){P[s].out.push(P[s].field[j]);P[s].field[j]=null;log(`${n} foi sacrificado.`)}}
+  const reward=SUMMONS.find(x=>x.n===(k==='inv_dudu'?'Dudu':k==='inv_eles'?'ELES':'Tche-Tche'));
+  if(reward){P[s].reserve.push(mk(reward));log(`${reward.n} foi invocado e entrou na mão.`);if(k==='inv_dudu'){P[en].field.slice().forEach((x,j)=>{if(x&&P[en].field[j])dmgTo(en,j,5,{side:s,c})});S.dmgUsed=true}}
+  return;
+ }
  if(k==='trindade'){trindade(s,i);S.dmgUsed=true;return}
  if(k==='trindade_eles'||k==='trixatombe'){const req=k==='trindade_eles'?['Diego','Sâmia','João']:['Tche-Tche','Tche-Tche','Tche-Tche'];for(const n of req){const j=P[s].field.findIndex(x=>x&&x.n===n);if(j>=0){P[s].out.push(P[s].field[j]);P[s].field[j]=null}}log(`${c.n} realizou o sacrifício e permaneceu em campo.`);c.awake=true;if(k==='trindade_eles'){P[en].field.forEach((x,j)=>{if(x)dmgTo(en,j,5,{side:s,c})})}S.dmgUsed=true;return}
  if(k==='camera'||k==='chorar'){const nm=k==='camera'?'Câmera':'Tche-Tche Fêmea',src=POOL.find(x=>x.n===nm);if(src){const z=mk(src);P[s].reserve.push(z);log(`${c.n} invocou ${nm}.`)}return}
@@ -718,13 +735,13 @@ function fill(p,say){
   
 }
 function deal(){
- const res=shuf(POOL).slice(0,6).map(mk);
+ const res=shuf(POOL.filter(x=>!SUMMON_ONLY.has(x.n))).slice(0,6).map(mk);
  const ok=x=>!x.only||res.some(c=>c.n===x.only);
  const q=shuf(NS.filter(ok)).slice(0,8).map(x=>({...x}));
  const p={field:[null,null,null,null],reserve:res,out:[],ns:{pile:q.slice(3),hand:q.slice(0,3)}};fill(p);return p;
 }
 function canPlace(inc,ti){
- if(!inc)return false;if(ti===3)return inc.t==='entrosa';
+ if(!inc)return false;if(ti===3)return inc.t==='entrosa'&&!P[0].field[3];
  const old=P[0].field[ti];if(inc.t==='entrosa')return true;
  return 3-usedCap(P[0])+(old?W(old):0)>=W(inc);
 }
@@ -733,7 +750,7 @@ function checkWin(){
 }
 function toCanon(){return{P:myIdx===1?[P[1],P[0]]:P,turn:S.turn===0?myIdx:1-myIdx,act:S.act,round:S.round,over:S.over,win:S.win==null?null:(S.win===0?myIdx:1-myIdx),log:S.log,v:S.v,amb:S.amb||null,ns:!!S.nsUsed,du:!!S.dmgUsed}}
 function fromCanon(c){P=myIdx===0?c.P:[c.P[1],c.P[0]];S.turn=c.turn===myIdx?0:1;S.act=c.act;S.round=c.round;S.over=c.over;S.win=c.win==null?null:(c.win===myIdx?0:1);S.log=c.log;S.v=c.v;S.amb=c.amb||null;S.nsUsed=!!c.ns;S.dmgUsed=!!c.du;S.sel=S.swap=S.nsel=null}
-function sync(){if(!S.mp||!ref)return;S.v++;ref.update({state:JSON.stringify(toCanon()),status:S.over?'end':'play',t:Date.now()}).catch(e=>toast('Falha ao sincronizar ('+(e&&e.code)+')'))}
+function sync(){if(!S.mp)return;S.v++;const c=toCanon();if(PCONN&&PCONN.open){try{PCONN.send({type:'state',c})}catch(e){toast('Falha ao enviar estado da partida.')}}else if(ref)ref.update({state:JSON.stringify(c),status:S.over?'end':'play',t:Date.now()}).catch(e=>toast('Falha ao sincronizar ('+(e&&e.code)+')'))}
 function spend(){
  S.act--;S.sel=S.swap=S.nsel=null;checkWin();sync();render();
  if(!S.over&&S.turn===0&&S.act===0)setTimeout(endTurn,800);
@@ -828,12 +845,13 @@ function cardHTML(c,side,i){
  </div></div></div>`;
 }
 function slotEl(s,i,t){return `<div class="slot${t?' tgt':''}" data-side="${s}" data-i="${i}">vazio</div>`}
+function incCanEntrosa(s){return S.swap!==null&&s===0&&P[0].reserve[S.swap]&&P[0].reserve[S.swap].t==='entrosa'}
 function slotsHTML(s){
  const f=P[s].field;let cap=3-usedCap(P[s]),h='';
  f.forEach((c,i)=>{
   if(c){h+=cardHTML(c,s,i);return}
   const sw=s===0&&S.swap!==null&&canPlace(P[0].reserve[S.swap],i);
-  if(i===3){if(sw)h+=slotEl(s,i,1);return}
+  if(i===3){if(sw&&incCanEntrosa(s))h+=slotEl(s,i,1);return}
   if(cap>0){cap--;h+=slotEl(s,i,sw)}});
  return h;
 }
@@ -906,54 +924,45 @@ $('rst').onclick=startSolo;$('bs').onclick=startSolo;
 const NT=[['amb','Ambiente'],['ut','Utensílio'],['item','Item']];
 function ednRender(){$('edn').innerHTML=NS.map((c,i)=>`<div class="glass ed" data-n="${i}"><select data-g="type">${NT.map(([k,l])=>`<option value="${k}"${k===c.type?' selected':''}>${l}</option>`).join('')}</select><input data-g="n" value="${E(c.n)}" style="width:140px;font-weight:700">Exclusiva de<input data-g="only" value="${E(c.only||'')}" placeholder="nome do Alguém"><input data-g="d" value="${E(c.d)}" style="width:100%">${Object.entries(c.p||{}).map(([k,v])=>`${k}<input type="number" data-p="${k}" value="${v}">`).join('')}<button class="g" data-a="del">Remover</button></div>`).join('')}
 function readEdn(){document.querySelectorAll('#edn .ed').forEach(r=>{const c=NS[+r.dataset.n],g=f=>r.querySelector(`[data-g="${f}"]`).value;c.n=g('n').trim()||c.n;c.d=g('d');c.type=g('type');const o=g('only').trim();if(o)c.only=o;else delete c.only;c.p=c.p||{};r.querySelectorAll('[data-p]').forEach(x=>{c.p[x.dataset.p]=+x.value})})}
-/* ---- salas ---- */
-const rc=()=>Array.from({length:4},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(Math.random()*24)]).join('');
-function needDB(){if(DB)return false;toast('Salas exigem estar logado no claude.ai com permissão de Contribuidor.');return true}
+/* ---- salas temporárias ponto a ponto (PeerJS/WebRTC) ---- */
+let PEER=null,PCONN=null;
+const rc=()=>Array.from({length:6},()=>'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(Math.random()*24)]).join('');
+function roomUI(){
+ if(!ROOM)return;go('room');$('rcode').textContent=ROOM.code;
+ $('rp').innerHTML=`<div class="pp">${ico('crown',18)} <b>${E(ROOM.host.name)}</b> <span class="sub">(anfitrião)</span></div>`+(ROOM.guest?`<div class="pp">${ico('user',18)} <b>${E(ROOM.guest.name)}</b></div>`:`<div class="pp sub">Aguardando jogador…</div>`);
+ $('bg').hidden=myIdx!==0;$('bg').disabled=myIdx!==0||!ROOM.guest;
+}
+function peerError(e){const m=e&&e.type==='peer-unavailable'?'Sala não encontrada.':e&&e.type==='unavailable-id'?'Esse código já está em uso; tente criar outra sala.':'Não foi possível conectar ao serviço de salas. Verifique sua internet e tente novamente.';toast(m)}
+function bindPeerConn(conn,host){
+ PCONN=conn;
+ conn.on('open',()=>{if(host){roomUI()}else{conn.send({type:'hello',name:ME.name});toast('Conectando à sala…')}});
+ conn.on('data',d=>{
+  if(!d||typeof d!=='object')return;
+  if(d.type==='hello'&&host){ROOM.guest={id:conn.peer,name:String(d.name||'Amigo').slice(0,14)};roomUI();conn.send({type:'room',code:ROOM.code,host:ROOM.host.name,guest:ROOM.guest.name});return}
+  if(d.type==='room'&&!host){myIdx=1;ROOM={code:d.code,host:{id:'host',name:d.host||'Anfitrião'},guest:{id:ME.id,name:ME.name},status:'wait'};roomUI();return}
+  if(d.type==='state'&&d.c){const c=d.c;if(!S.mp||c.v>S.v){if(!S.mp){PREV=[null,null];fxReset()}S.mp=true;fromCanon(c);if(cur!=='game')go('game');render()}}
+ });
+ conn.on('close',()=>{if(S.mp&&!S.over){toast('O outro jogador saiu da partida.');S.over=true;S.win=myIdx===0?1:0;render()}else if(ROOM)toast('A conexão da sala foi encerrada.')});
+ conn.on('error',()=>toast('A conexão com o outro jogador falhou.'));
+}
 async function createRoom(){
- if(needDB())return;
- try{for(let k=0;k<6;k++){const code=rc(),r=DB.doc('rooms/'+code);
-  if(!(await r.get()).data()){await r.set({code,host:{id:ME.id,name:ME.name},guest:null,status:'wait',state:'',t:Date.now()});return enter(code)}}}
- catch(e){toast('Não consegui criar a sala ('+(e&&e.code)+').')}
+ if(!window.Peer)return toast('A biblioteca de conexão não carregou. Abra a página com internet e tente de novo.');
+ cleanup();const code=rc();myIdx=0;ROOM={code,host:{id:ME.id,name:ME.name},guest:null,status:'wait'};
+ try{PEER=new Peer('darwin-'+code);PEER.on('open',()=>roomUI());PEER.on('connection',c=>{if(PCONN){c.close();return}bindPeerConn(c,true)});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui abrir a sala. Confira se a página está em HTTPS.')}
 }
 async function joinRoom(){
- if(needDB())return;
- const code=$('code').value.trim().toUpperCase();if(code.length<4)return toast('Digite o código de 4 letras.');
- try{const r=DB.doc('rooms/'+code),d=(await r.get()).data();
-  if(!d)return toast('Sala não encontrada.');
-  if(d.host.id===ME.id||(d.guest&&d.guest.id===ME.id))return enter(code);
-  if(d.guest||d.status!=='wait')return toast('Sala cheia ou partida já começou.');
-  await r.update({guest:{id:ME.id,name:ME.name}});enter(code)}
- catch(e){toast('Não consegui entrar ('+(e&&e.code)+').')}
-}
-function enter(code){
- ref=DB.doc('rooms/'+code);S.mp=false;S.v=0;
- unsub=ref.onSnapshot(onRoom,e=>toast('Erro na sala ('+(e&&e.code)+')'));
-}
-function onRoom(snap){
- const d=snap.data();
- if(!d){cleanup();go('lobby');toast('A sala foi fechada.');return}
- ROOM=d;myIdx=d.host.id===ME.id?0:1;
- if(d.status==='wait'){
-  go('room');$('rcode').textContent=d.code;
-  $('rp').innerHTML=`<div class="pp">${ico('crown',18)} <b>${E(d.host.name)}</b> <span class="sub">(anfitrião)</span></div>`+(d.guest?`<div class="pp">${ico('user',18)} <b>${E(d.guest.name)}</b></div>`:`<div class="pp sub">Aguardando jogador…</div>`);
-  $('bg').hidden=myIdx!==0;$('bg').disabled=!d.guest;
- }else if(d.state){
-  const c=JSON.parse(d.state);
-  if(!S.mp||c.v>S.v){if(!S.mp){PREV=[null,null];fxReset()}S.mp=true;S.names=myIdx===0?[d.host.name,d.guest.name]:[d.guest.name,d.host.name];fromCanon(c);if(cur!=='game')go('game');render()}
- }
+ if(!window.Peer)return toast('A biblioteca de conexão não carregou. Abra a página com internet e tente de novo.');
+ const code=$('code').value.trim().toUpperCase();if(code.length!==6)return toast('Digite o código de 6 letras.');
+ cleanup();myIdx=1;
+ try{PEER=new Peer();PEER.on('open',()=>{PCONN=PEER.connect('darwin-'+code,{metadata:{name:ME.name},reliable:true});bindPeerConn(PCONN,false)});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui conectar. Confira se a página está em HTTPS.')}
 }
 async function startGame(){
- if(!ROOM||!ROOM.guest)return;
- const c={P:[deal(),deal()],turn:0,act:2,round:1,over:false,win:null,amb:null,ns:false,du:false,log:['Rodada 1: vez de '+ROOM.host.name+'.'],v:1};
- try{await ref.update({status:'play',state:JSON.stringify(c)})}catch(e){toast('Falha ao iniciar.')}
+ if(!ROOM||!ROOM.guest||myIdx!==0)return;
+ P=[deal(),deal()];PREV=[null,null];fxReset();S={mp:true,v:0,log:['Rodada 1: vez de '+ROOM.host.name+'.'],sel:null,swap:null,nsel:null,amb:null,nsUsed:false,dmgUsed:false,turn:0,act:2,round:1,over:false,win:null,names:[ROOM.host.name,ROOM.guest.name]};
+ go('game');render();sync();
 }
-function cleanup(){if(unsub)unsub();unsub=null;ref=null;ROOM=null;S.mp=false;S.v=0}
-async function leave(){
- const r=ref,w=ROOM&&ROOM.status==='wait';
- if(S.mp&&!S.over&&r){S.over=true;S.win=1;sync()}
- const mi=myIdx;cleanup();go('lobby');
- try{if(r&&w){if(mi===0)await r.delete();else await r.update({guest:null})}}catch(e){}
-}
+function cleanup(){if(PCONN){try{PCONN.close()}catch(e){} }PCONN=null;if(PEER){try{PEER.destroy()}catch(e){} }PEER=null;if(unsub)unsub();unsub=null;ref=null;ROOM=null;S.mp=false;S.v=0}
+async function leave(){if(S.mp&&!S.over){S.over=true;S.win=1-myIdx;sync()}cleanup();go('lobby')}
 $('bc').onclick=createRoom;$('bj').onclick=joinRoom;$('bg').onclick=startGame;$('bl2').onclick=leave;$('lv').onclick=leave;
 /* ---- login ---- */
 $('bl').onclick=()=>{
@@ -1032,7 +1041,7 @@ $('ba').onclick=()=>{allRender();go('admin')};$('bb').onclick=()=>go('lobby');
  let sv=null;
  if(DB){try{const d=(await DB.doc('config/pool').get()).data();if(d&&d.json)sv=JSON.parse(d.json)}catch(e){}}
  if(!sv){try{sv=JSON.parse(localStorage.getItem('darwin-pool'))}catch(e){}}
- if(Array.isArray(sv)&&sv.length&&sv.every(x=>x&&x.n&&x.hp)){POOL.splice(0,POOL.length,...sv);const names=new Set(POOL.map(x=>x.n));JSON.parse(DEF).forEach(x=>{if(!names.has(x.n))POOL.push(x)})}
+ if(Array.isArray(sv)&&sv.length&&sv.every(x=>x&&x.n&&x.hp)){POOL.splice(0,POOL.length,...sv);const names=new Set(POOL.map(x=>x.n));JSON.parse(DEF).forEach(x=>{if(!names.has(x.n))POOL.push(x)})}POOL.splice(0,POOL.length,...POOL.filter(x=>!SUMMON_ONLY.has(x.n)));
  let sn=null;
  if(DB){try{const d=(await DB.doc('config/ns').get()).data();if(d&&d.json)sn=JSON.parse(d.json)}catch(e){}}
  if(!sn){try{sn=JSON.parse(localStorage.getItem('darwin-ns'))}catch(e){}}
