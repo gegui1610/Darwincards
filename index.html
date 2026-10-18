@@ -1426,29 +1426,32 @@ $('ed').addEventListener('click',async e=>{const b=e.target.closest('[data-photo
 let MS_CONNS=[], MS_HOST=false, MS_SPECTATOR=false, MS_SELECTED_TABLE=0, MS_LOCAL_TABLE=0, MS_LOCAL_SIDE=0;
 function msClientId(){try{let id=localStorage.getItem('dc-client-id');if(!id){id='p-'+(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2));localStorage.setItem('dc-client-id',id)}return id}catch(e){return 'p-'+ME.name}}
 const msMe=()=>({id:ME.id||('local-'+ME.name),name:ME.name||'Jogador',spectator:!!MS_SPECTATOR});
-function msPlayers(){
+function msNormalizePlayers(){
  if(!ROOM)return [];
- if(Array.isArray(ROOM.players)&&ROOM.players.length)return ROOM.players;
- return [ROOM.host,...(ROOM.guest?[ROOM.guest]:[])].filter(Boolean);
+ const source=Array.isArray(ROOM.players)&&ROOM.players.length?ROOM.players:[ROOM.host,...(ROOM.guest?[ROOM.guest]:[])].filter(Boolean),seen=new Set(),out=[];
+ source.forEach(p=>{if(!p||seen.has(p.id))return;seen.add(p.id);out.push(p)});
+ const used=[0,0];out.forEach(p=>{if((p.table===0||p.table===1)&&!p.spectator)used[p.table]++});
+ out.forEach(p=>{if(p.table!==0&&p.table!==1){const t=used[0]<2?0:1;p.table=t;if(!p.spectator)used[t]++}});
+ ROOM.players=out.slice(0,4);return ROOM.players;
 }
-function msTables(){const ps=msPlayers(),playing=ps.filter(p=>!p.spectator);return [[playing[0]||null,playing[1]||null],[playing[2]||null,playing[3]||null]]}
+function msPlayers(){return msNormalizePlayers()}
+function msTables(){const ps=msPlayers(),tables=[[],[]];ps.filter(p=>!p.spectator).forEach(p=>{const t=p.table===1?1:0;if(tables[t].length<2)tables[t].push(p)});return tables}
 function msSyncIdentity(){
- const id=msClientId(),playing=msPlayers().filter(p=>!p.spectator),idx=playing.findIndex(p=>p.id===id);
- if(idx>=0){MS_LOCAL_TABLE=Math.floor(idx/2);MS_LOCAL_SIDE=idx%2;myIdx=MS_LOCAL_SIDE}
+ const id=msClientId(),tables=msTables();for(let t=0;t<2;t++){const idx=tables[t].findIndex(p=>p.id===id);if(idx>=0){MS_LOCAL_TABLE=t;MS_LOCAL_SIDE=idx;myIdx=idx;return}}
 }
-function msTableOf(id){const playing=msPlayers().filter(p=>!p.spectator),idx=playing.findIndex(p=>p.id===id);return idx<0?-1:Math.floor(idx/2)}
+function msTableOf(id){const p=msPlayers().find(x=>x.id===id);return !p||p.spectator?-1:(p.table===1?1:0)}
 function msRouteState(table,c){MS_CONNS.filter(x=>x._msTable===table).forEach(x=>msSend(x,{type:'table-state',table,c}))}
 function msRenderGameMeta(){
- const names=S.names||[];['0','1'].forEach((side)=>{const p=(ROOM&&msPlayers().filter(x=>!x.spectator)[MS_LOCAL_TABLE*2+Number(side)])||null;const av=document.getElementById('n'+side)?.parentElement?.querySelector('.av');const el=document.getElementById('n'+side);if(el)el.textContent=names[Number(side)]||p?.name||'';if(av&&av.classList.contains('av')){const url=p?.avatar||'';av.classList.toggle('has-photo',!!url);av.innerHTML=url?`<img src="${E(url)}" alt="${E(p.name)}">`:ico(side==='0'?'user':'user',24)}});
+ const names=S.names||[];['0','1'].forEach((side)=>{const p=(ROOM&&((msTables()[MS_LOCAL_TABLE]||[])[Number(side)]))||null;const av=document.getElementById('n'+side)?.parentElement?.querySelector('.av');const el=document.getElementById('n'+side);if(el)el.textContent=names[Number(side)]||p?.name||'';if(av&&av.classList.contains('av')){const url=p?.avatar||'';av.classList.toggle('has-photo',!!url);av.innerHTML=url?`<img src="${E(url)}" alt="${E(p.name)}">`:ico(side==='0'?'user':'user',24)}});
 }
-function msApplyTableState(table,c){MS_LOCAL_TABLE=table;const playing=msPlayers().filter(p=>!p.spectator),mine=playing.findIndex(p=>p.id===msClientId());MS_LOCAL_SIDE=mine>=0&&Math.floor(mine/2)===table?mine%2:0;myIdx=MS_LOCAL_SIDE;S.mp=true;PREV=[null,null];fxReset();fromCanon(c);if(cur!=='game')go('game');msRenderGameMeta();render()}
+function msApplyTableState(table,c){MS_LOCAL_TABLE=table;const mine=msTables()[table].findIndex(p=>p.id===msClientId());MS_LOCAL_SIDE=mine>=0?mine:0;myIdx=MS_LOCAL_SIDE;S.mp=true;PREV=[null,null];fxReset();fromCanon(c);if(cur!=='game')go('game');msRenderGameMeta();render()}
 function msCreateInitialCanonical(names){
  const save={P,S,myIdx,REPL,PREV};try{myIdx=0;REPL=[[],[]];P=[deal(ACTIVE_FORMAT==='custom'?ACTIVE_DECK_SPEC:null),deal()];PREV=[null,null];S={mp:true,v:0,log:['Rodada 1: vez de '+names[0]+'.'],sel:null,swap:null,nsel:null,amb:null,nsUsed:false,dmgUsed:false,turn:0,act:2,round:1,over:false,win:null,names};startTurn(0);return toCanon()}finally{P=save.P;S=save.S;myIdx=save.myIdx;REPL=save.REPL;PREV=save.PREV}}
 function msRoomPacket(){return {type:'room2',code:ROOM.code,deckMode:ROOM.deckMode||'ready',host:ROOM.host,players:msPlayers()}}
 function msSend(c,d){try{if(c&&c.open)c.send(d)}catch(e){console.warn('room send',e)}}
 function msBroadcast(d){MS_CONNS.forEach(c=>msSend(c,d))}
 function msRenderRoom(){
- if(!ROOM)return;go('room');$('rcode').textContent=ROOM.code;
+ if(!ROOM)return;msSyncIdentity();go('room');$('rcode').textContent=ROOM.code;
  const invite=new URL(location.href);invite.searchParams.set('room',ROOM.code);$('dc-invite-link').textContent=invite.href;
  $('dc-room-format').textContent='Formato escolhido: '+({'ready':'Clássico (baralho pronto)','random':'Aleatório','custom':'Meu baralho'}[ROOM.deckMode||ACTIVE_FORMAT]||'Clássico');
  const ps=msPlayers(), tables=msTables();
@@ -1463,12 +1466,12 @@ function msSetPlayers(players){
 function msHostAdd(conn,name,clientId,avatar){
  const stableId=String(clientId||conn.metadata?.clientId||conn.peer), label=String(name||'Amigo').slice(0,24), ps=msPlayers();
  let p=ps.find(x=>x.id===stableId);
- if(!p){if(ps.length>=4){msSend(conn,{type:'room-full'});try{conn.close()}catch(e){}return}p={id:stableId,name:label,avatar:avatar||'',spectator:false};ROOM.players=[...ps,p]}
- else{p.name=label;p.avatar=avatar||p.avatar||'';p.spectator=false}
+ if(!p){if(ps.length>=4){msSend(conn,{type:'room-full'});try{conn.close()}catch(e){}return}p={id:stableId,name:label,avatar:avatar||'',spectator:false,table:([0,1].find(t=>ps.filter(x=>!x.spectator&&x.table===t).length<2)??1)};ROOM.players=[...ps,p]}
+ else{p.name=label;p.avatar=avatar||p.avatar||'';p.spectator=false;if(p.table!==0&&p.table!==1)p.table=0}
  const old=MS_CONNS.find(x=>x._msClientId===stableId&&x!==conn);if(old){try{old.close()}catch(e){}MS_CONNS=MS_CONNS.filter(x=>x!==old)}
  conn._msClientId=stableId;conn._msTable=msTableOf(stableId);MS_CONNS.push(conn);roomUI=msRenderRoom;msRenderRoom();msBroadcast(msRoomPacket());msSend(conn,msRoomPacket());
- conn.on('data',d=>{if(d?.type==='spectator'){const q=ROOM.players.find(x=>x.id===stableId);if(q){q.spectator=!!d.value;conn._msTable=msTableOf(stableId);msBroadcast(msRoomPacket());msRenderRoom()}}else if(d?.type==='state'&&d.c){conn._msTable=msTableOf(stableId);if(conn._msTable>=0)msRouteState(conn._msTable,d.c)}});
- conn.on('close',()=>{const active=MS_CONNS.find(x=>x._msClientId===stableId);if(active&&active!==conn)return;ROOM.players=ROOM.players.filter(x=>x.id!==stableId);MS_CONNS=MS_CONNS.filter(x=>x!==conn);msBroadcast(msRoomPacket());msRenderRoom()});
+ conn.on('data',d=>{if(!ROOM)return;if(d?.type==='spectator'){const q=ROOM.players.find(x=>x.id===stableId);if(q){q.spectator=!!d.value;conn._msTable=msTableOf(stableId);msBroadcast(msRoomPacket());msRenderRoom()}}else if(d?.type==='state'&&d.c){conn._msTable=msTableOf(stableId);if(conn._msTable>=0)msRouteState(conn._msTable,d.c)}});
+ conn.on('close',()=>{const active=MS_CONNS.find(x=>x._msClientId===stableId);if(active&&active!==conn)return;if(!ROOM){MS_CONNS=MS_CONNS.filter(x=>x!==conn);return}ROOM.players=ROOM.players.filter(x=>x.id!==stableId);MS_CONNS=MS_CONNS.filter(x=>x!==conn);msBroadcast(msRoomPacket());msRenderRoom()});
 }
 function msHostCreate(){
  if(!window.Peer)return toast('A biblioteca de conexão não carregou. Abra a página com internet e tente de novo.');
@@ -1509,7 +1512,7 @@ function msJoin(){
    c.on('open',()=>{if(attempt===MS_ATTEMPT)msSend(c,{type:'hello2',name:ME.name,clientId:msClientId()})});
    c.on('data',d=>{
     if(attempt!==MS_ATTEMPT||!d)return;
-    if(d.type==='room2'){MS_JOINING=false;if(JOIN_TIMER){clearTimeout(JOIN_TIMER);JOIN_TIMER=null}ROOM={code:d.code,host:d.host,players:d.players||[],deckMode:d.deckMode||'ready',status:'wait'};msSyncIdentity();msRenderRoom();return}
+    if(d.type==='room2'){MS_JOINING=false;if(JOIN_TIMER){clearTimeout(JOIN_TIMER);JOIN_TIMER=null}ROOM={code:d.code,host:d.host,players:d.players||[],deckMode:d.deckMode||'ready',status:'wait'};msNormalizePlayers();msSyncIdentity();msRenderRoom();return}
     if(d.type==='table-start'){msApplyTableState(d.table,d.c);return}
     if(d.type==='table-state'){msApplyTableState(d.table,d.c);return}
     if(d.type==='room-full'){fail('A sala já está cheia. Tente a outra mesa ou entre como espectador.');return}
@@ -1528,7 +1531,7 @@ joinRoom=msJoin;
 
 function msStartSelected(){
  try{
-  const ps=msPlayers().filter(p=>!p.spectator),start=MS_SELECTED_TABLE*2,table=ps.slice(start,start+2);
+  const table=msTables()[MS_SELECTED_TABLE]||[];
   if(!ROOM||myIdx!==0)return toast('Somente o anfitrião pode iniciar uma mesa.');
   if(table.length<2)return toast('É preciso ter dois jogadores sentados na Mesa '+(MS_SELECTED_TABLE+1)+'.');
   const names=[table[0].name,table[1].name],c=msCreateInitialCanonical(names);ROOM.guest=table[1];ROOM.table=MS_SELECTED_TABLE;ROOM.activeTables=ROOM.activeTables||{};ROOM.activeTables[MS_SELECTED_TABLE]=true;
@@ -1540,8 +1543,8 @@ function msStartSelected(){
 function msStartAll(){
  try{
   if(!ROOM||myIdx!==0)return toast('Somente o anfitrião pode iniciar as mesas.');
-  const ps=msPlayers().filter(p=>!p.spectator),full=[];ROOM.activeTables=ROOM.activeTables||{};
-  for(let table=0;table<2;table++){const pair=ps.slice(table*2,table*2+2);if(pair.length<2)continue;const c=msCreateInitialCanonical([pair[0].name,pair[1].name]);full.push({table,pair,c});ROOM.activeTables[table]=true;MS_CONNS.forEach(conn=>{conn._msTable=msTableOf(conn._msClientId);if(conn._msTable===table)msSend(conn,{type:'table-start',table,c})})}
+  const full=[];ROOM.activeTables=ROOM.activeTables||{};
+  for(let table=0;table<2;table++){const pair=msTables()[table]||[];if(pair.length<2)continue;const c=msCreateInitialCanonical([pair[0].name,pair[1].name]);full.push({table,pair,c});ROOM.activeTables[table]=true;MS_CONNS.forEach(conn=>{conn._msTable=msTableOf(conn._msClientId);if(conn._msTable===table)msSend(conn,{type:'table-start',table,c})})}
   if(!full.length)return toast('Nenhuma mesa está com dois jogadores.');
   const mine=full.find(x=>x.pair.some(p=>p.id===msClientId()));if(mine){const side=mine.pair.findIndex(p=>p.id===msClientId());MS_LOCAL_TABLE=mine.table;MS_LOCAL_SIDE=side;myIdx=side;ROOM.guest=mine.pair[1];S.mp=true;PREV=[null,null];fxReset();fromCanon(mine.c);go('game');msRenderGameMeta();render()}
   toast(full.length===2?'As duas mesas foram iniciadas.':'Mesa disponível iniciada.');
@@ -1556,7 +1559,7 @@ if(document.getElementById('dc-start-all'))document.getElementById('dc-start-all
 window.addEventListener('load',()=>{
  $('bc').onclick=msHostCreate;$('bj').onclick=msJoin;$('dc-spectate').onclick=msToggleSpectator;$('bg').onclick=msStartSelected;$('dc-start-all').onclick=msStartAll;
  const oldStart=startGame;startGame=function(){
-  const ps=msPlayers().filter(p=>!p.spectator),start=MS_SELECTED_TABLE*2,table=ps.slice(start,start+2);
+  const table=msTables()[MS_SELECTED_TABLE]||[];
   if(!ROOM||myIdx!==0)return toast('Somente o anfitrião pode iniciar uma mesa.');
   if(table.length<2)return toast('É preciso ter dois jogadores sentados na Mesa '+(MS_SELECTED_TABLE+1)+'.');
   ROOM.guest=table[1];ROOM.table=MS_SELECTED_TABLE;
