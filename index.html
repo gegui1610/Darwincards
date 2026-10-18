@@ -258,7 +258,7 @@ img.lg{width:210px;max-width:60%;display:block;margin:0 auto 14px;filter:drop-sh
 body.ingame{max-width:none;padding-block:8px;padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))}
 body.ingame .board{min-height:calc(100vh - 16px)}
 body.ingame .main{display:flex;flex-direction:column;justify-content:space-between}
-@media(min-width:701px){body.ingame .card,body.ingame .slot{width:clamp(160px,14vw,250px)}body.ingame .card.big{width:calc(clamp(160px,14vw,250px)*2 + 8px)}body.ingame .chip.hcard{width:clamp(170px,13vw,230px);margin-left:calc(clamp(170px,13vw,230px)*-.5)}body.ingame .chip.hcard:first-child{margin-left:0}}
+@media(min-width:701px){body.ingame .card,body.ingame .slot{width:clamp(190px,17vw,300px)}body.ingame .card.big{width:calc(clamp(190px,17vw,300px)*2 + 8px)}body.ingame .chip.hcard{width:clamp(200px,15.5vw,280px);margin-left:calc(clamp(200px,15.5vw,280px)*-.5)}body.ingame .chip.hcard:first-child{margin-left:0}}
 .card.cl-Abusador{--cf:#c8201c;--cf0:#e0463f;--cf2:#8f1210;--cn:#b01a16}
 .card.cl-Insano{--cf:#1a1a1d;--cf0:#3a3a40;--cf2:#000;--cn:#111}
 .card.cl-Protetor{--cf:#f2b21c;--cf0:#ffd04d;--cf2:#c88a00;--cn:#7a5200;--ctx:#201600;--cs:#5a3d00}
@@ -330,7 +330,7 @@ body.ingame .main{display:flex;flex-direction:column;justify-content:space-betwe
 .trow.t5 .oc,.trow.t6 .oc,.trow.t7 .oc,.trow.t8 .oc{width:9cqw;height:9cqw}
 /* ---- mesa escolar ---- */
 #s-game .board{background-position:center 30%!important}
-#s-game .arena{transform:perspective(1300px) rotateX(24deg);transform-origin:50% 100%;transform-style:preserve-3d;margin-top:-10px}
+#s-game .arena{transform:perspective(1300px) rotateX(24deg);transform-origin:50% 100%;transform-style:preserve-3d;margin-top:calc(-10px - var(--dead,0px))}
 #s-game .arena .card{box-shadow:0 14px 18px rgba(0,0,0,.55),0 0 10px color-mix(in srgb,var(--nc) 40%,transparent)}
 #s-game .hand:not(.ns){transform:perspective(1300px) rotateX(10deg);transform-origin:50% 100%}
 
@@ -1076,6 +1076,11 @@ function nsRender(){
  $('amb').innerHTML=a?`<span class="ambp">${ico(a.icon||'cloud',16)} ${E(a.n)}${a.left?' ('+a.left+')':''}</span>`:'<span class="ambp off">Sem ambiente</span>';
  $('nsh').innerHTML=q.hand.map((c,i)=>NSIMG[c.id]?`<div class="chip nc has-img${S.nsel===i?' sel':''}${can?'':' dis'}" data-n="${i}" style="width:${NSIMG[c.id].ar<1?Math.round(190*NSIMG[c.id].ar):210}px" title="${E(c.n)}"><img src="${NSIMG[c.id].s}" alt="${E(c.n)}"></div>`:`<div class="chip nc${S.nsel===i?' sel':''}${can?'':' dis'}" data-n="${i}"><div class="mn">${E(c.n)}</div><div class="ms">${c.only?'Exclusivo: '+E(c.only):L[c.type]}</div><div class="nd">${E(c.d)}</div></div>`).join('')||'<span class="lbl" style="color:#cfd8ee">Sem cartas Não-Alguém</span>';
 }
+function fitArena(){const g=document.getElementById('s-game');if(!g)return;const a=g.querySelector('.arena');if(!a)return;
+ const d=Math.max(0,Math.round(a.offsetHeight-a.getBoundingClientRect().height))+'px';
+ if(a.style.getPropertyValue('--dead')!==d)a.style.setProperty('--dead',d);}
+let _fa=0;function queueFit(){if(_fa)return;_fa=requestAnimationFrame(()=>{_fa=0;fitArena()})}
+if(document.getElementById('s-game')){new MutationObserver(queueFit).observe(document.getElementById('s-game'),{childList:true,subtree:true,attributes:true});addEventListener('resize',queueFit);queueFit()}
 function render(){
  $('f0').innerHTML=slotsHTML(0);$('f1').innerHTML=slotsHTML(1);
  $('n0').textContent=S.names[0];$('n1').textContent=S.names[1];tot();fx();
