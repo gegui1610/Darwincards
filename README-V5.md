@@ -20,6 +20,8 @@ GIF/WebP podem ser animados. Upload máximo: 8 MB por imagem. O bucket `profile-
 
 Crie uma sala e compartilhe o link exibido. Ao abrir o endereço, o convidado é levado ao lobby e o código é aplicado automaticamente depois de entrar como visitante ou autenticar. A sala continua temporária e usa a sinalização já configurada no projeto; não há tabela SQL de salas.
 
+O `vercel.json` usa o padrão `api/*.js` para definir o tempo máximo da função `api/[...path].js`. O glob com o nome literal entre colchetes não é interpretado como um caminho literal pelo Vercel. Veja a [documentação oficial dos padrões de função no vercel.json](https://vercel.com/docs/project-configuration/vercel-json).
+
 ## Validação
 
 O código V5.0 foi revisado estaticamente e testado no navegador local. O fluxo real de e-mail, upload, banco e salas na produção depende de executar o SQL e publicar o pacote; não foi publicado nem conectado a uma conta externa nesta tarefa.
