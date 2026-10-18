@@ -76,6 +76,9 @@ select.big#dc-deck-select{appearance:none;-webkit-appearance:none;font-size:15px
 .dc-nspick.wide{grid-column:span 2}
 .dc-nspick{align-items:flex-start}
 
+</style><style id="dc-multimesas-css">
+.dc-room-tools{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:12px 0 8px;padding:10px;border:1px solid var(--bd);border-radius:14px;background:var(--pan);text-align:left}.dc-room-cap{display:flex;flex-direction:column;gap:3px}.dc-room-cap span{font-size:12px;color:var(--mut)}
+.dc-tables{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0;text-align:left}.dc-table{border:2px solid var(--bd);border-radius:16px;padding:10px;background:var(--pan);min-height:128px}.dc-table.live{border-color:var(--yel);box-shadow:0 0 0 2px #fdb92733}.dc-table h3{margin:0 0 8px;font-size:15px;display:flex;justify-content:space-between}.dc-table h3 span{font-size:11px;color:var(--mut);font-weight:500}.dc-seat{display:flex;align-items:center;gap:6px;padding:6px 8px;margin:4px 0;border-radius:9px;background:var(--panel);font-size:13px}.dc-seat.empty{border:1px dashed var(--bd);color:var(--mut);background:transparent}.dc-seat.viewer{opacity:.75}.dc-seat i{font-style:normal;margin-left:auto;font-size:11px;color:var(--mut)}.dc-room-help{margin:8px 0 12px}.dc-room-badge{display:inline-block;padding:2px 7px;border-radius:99px;background:var(--yel);color:#201600;font-size:10px;font-weight:800}.dc-spectator{border-color:#8d6bd1!important;color:#6543a8!important}@media(max-width:620px){.dc-tables{grid-template-columns:1fr}.dc-room-tools{align-items:stretch}.dc-room-tools button{width:100%}}
 </style></head><body><div id="dc-version">V5.3</div>
 
 
@@ -329,8 +332,7 @@ body.ingame .main{display:flex;flex-direction:column;justify-content:space-betwe
 <section class="scr c" id="s-profile"><div class="pnl"><h2>Meu perfil</h2><div class="dc-card" style="padding:0;overflow:hidden"><div class="dc-banner" id="dc-banner-preview"></div><div class="dc-profile-head"><img id="dc-avatar-preview" class="dc-avatar" alt="Avatar"><b id="dc-profile-name">Visitante</b></div></div><div class="dc-card"><label>Nome de exibição<input id="dc-display-name" maxlength="24"></label><label>Foto de perfil (GIF animado permitido)<input id="dc-avatar-file" type="file" accept="image/gif,image/webp,image/png,image/jpeg"></label><label>Banner (GIF animado permitido)<input id="dc-banner-file" type="file" accept="image/gif,image/webp,image/png,image/jpeg"></label><div class="dc-small">A imagem do banner se mistura ao fundo escuro com um degradê esfumaçado.</div><button class="big y" id="dc-profile-save">Salvar perfil</button><div id="dc-profile-msg" class="dc-notice"></div></div><button class="g" id="dc-profile-back">Voltar</button></div></section>
 <section class="scr c" id="s-decks"><div class="pnl dc-wide"><h2>Meus baralhos</h2><div class="dc-builder"><div class="dc-gal"><div class="dc-tabs"><button type="button" class="on" data-tab="p">Alguém <span id="dc-tab-p"></span></button><button type="button" data-tab="n">Não-Alguém <span id="dc-tab-n"></span></button></div><p class="dc-small" id="dc-gal-hint"></p><div class="dc-flt" id="dc-flt"></div><div id="dc-gal-people" class="dc-gallery"></div><div id="dc-gal-ns" class="dc-gallery" hidden></div></div><aside class="dc-side"><div class="dc-card"><input id="dc-deck-name" maxlength="40" placeholder="Nome do baralho"><div class="dc-sh"><b>Alguém</b><span id="dc-cnt-p">0/6</span></div><div id="dc-slots-people" class="dc-slots6"></div><div class="dc-sh"><b>Não-Alguém</b><span id="dc-cnt-n">0/13</span></div><div id="dc-slots-ns" class="dc-slotsns"></div><p class="dc-small">Toque numa carta da lista para adicionar. Toque numa carta do seu baralho para remover.</p><button class="big y" id="dc-deck-save">Salvar baralho</button><button class="g" id="dc-clear" type="button">Limpar seleção</button><div id="dc-deck-msg" class="dc-notice"></div></div><div class="dc-card"><b>Baralhos salvos</b><div id="dc-deck-list"></div></div></aside></div><button class="g" id="dc-decks-back">Voltar</button></div></section>
 <section class="scr c" id="s-room"><div class="pnl"><img class="lg" alt="Darwin Cards"><div class="sub">Código da sala</div><div class="code" id="rcode"></div>
-<p class="sub">Compartilhe o link ou o código. A conexão de jogo é ponto a ponto.</p><div class="dc-card"><div class="dc-link" id="dc-invite-link"></div><button class="g" id="dc-copy-invite">Copiar link</button><div class="dc-small" id="dc-room-format"></div></div><div id="rp"></div>
-<button class="big y" id="bg">Iniciar partida</button><button class="big g" id="bl2">Sair da sala</button></div></section>
+<p class="sub">Compartilhe o link ou o código. A conexão de jogo é ponto a ponto.</p><div class="dc-card"><div class="dc-link" id="dc-invite-link"></div><button class="g" id="dc-copy-invite">Copiar link</button><div class="dc-small" id="dc-room-format"></div></div><div class="dc-room-tools"><div class="dc-room-cap"><b>Configuração da sala</b><span>Até 4 jogadores · 2 mesas · espectadores livres</span></div><button class="g" id="dc-spectate" type="button">Entrar como espectador</button></div><div id="rp"></div><div id="dc-tables" class="dc-tables"></div><p class="dc-small dc-room-help">Os dois primeiros jogadores formam a Mesa 1; os próximos dois formam a Mesa 2. Quem não ocupar uma vaga pode assistir às duas mesas.</p><button class="big y" id="bg">Iniciar mesa</button><button class="big g" id="bl2">Sair da sala</button></div></section>
 <section class="scr" id="s-game"><div class="board"><div class="main">
 <div class="pl"><div class="av" data-ic="bot" data-s="24"></div><b id="n1"></b><div class="tot" id="t1"></div><span id="rr"></span></div>
 <div class="lane"><div class="row" id="f1"></div></div>
@@ -338,7 +340,7 @@ body.ingame .main{display:flex;flex-direction:column;justify-content:space-betwe
 <div class="lane"><div class="row" id="f0"></div></div>
 <div class="pl"><div class="av" data-ic="user" data-s="24"></div><b id="n0"></b><div class="tot" id="t0"></div><span id="pm"></span></div>
 <div class="hand" id="res"></div><div class="lbl" style="color:#cfd8ee">Cartas Não-Alguém · 1 por rodada, fora das 2 ações</div><div class="hand ns" id="nsh"></div></div>
-<aside class="side"><button id="end">Encerrar turno</button><button id="rst" class="g">Reiniciar</button><button id="lv" class="g">Sair da partida</button><div class="log" id="log"></div></aside></div></section>
+<aside class="side"><button id="end">Encerrar turno</button><button id="rst" class="g">Reiniciar</button><button id="dc-rematch" class="y" hidden>Jogar outra partida</button><button id="dc-back-room" class="g" hidden>Voltar à sala</button><button id="lv" class="g">Sair da partida</button><div class="log" id="log"></div></aside></div></section>
 <section class="scr" id="s-admin"><div class="wide"><h2>Painel admin</h2>
 <p class="sub">Edite classes e cartas: nome, classe, PV, dano, habilidades, texto, etiquetas e bônus. Dá para adicionar, duplicar e remover. Salvar vale para todos os jogadores.</p>
 <h2>Classes</h2><div id="edc" class="grid"></div><div class="cta"><button id="adc" class="g">+ Classe</button></div><h2 style="margin-top:18px">Características</h2><div id="edh" class="grid"></div><div class="cta"><button id="adh" class="g">+ Característica</button></div><h2 style="margin-top:18px">Cartas de Alguém</h2><p class="sub">Para trocar a foto, escolha uma imagem na linha do personagem. GIF e WebP animados são aceitos. A imagem fica salva neste navegador.</p><div id="ed" class="grid"></div><div class="cta"><button id="adp" class="g">+ Carta de Alguém</button></div><h2 style="margin-top:18px">Cartas Não-Alguém</h2><div id="edn" class="grid"></div><div class="cta"><button id="adn" class="g">+ Carta Não-Alguém</button></div><div class="cta"><button id="sv">Salvar</button><button id="df" class="g">Restaurar padrão</button><button id="bb" class="g">← Voltar</button></div></div></section>
@@ -1418,4 +1420,53 @@ $('ed').addEventListener('click',async e=>{const b=e.target.closest('[data-photo
  catch(err){badCode(err);toast('Erro: '+(err.message||err))}});
 })();
 </script>
-</body></html>
+<script id="dc-multimesas-js">
+/* Sala ampliada: até 4 participantes, duas mesas e espectadores. */
+let MS_CONNS=[], MS_HOST=false, MS_SPECTATOR=false, MS_SELECTED_TABLE=0;
+const msMe=()=>({id:ME.id||('local-'+ME.name),name:ME.name||'Jogador',spectator:!!MS_SPECTATOR});
+function msPlayers(){
+ if(!ROOM)return [];
+ if(Array.isArray(ROOM.players)&&ROOM.players.length)return ROOM.players;
+ return [ROOM.host,...(ROOM.guest?[ROOM.guest]:[])].filter(Boolean);
+}
+function msTables(){const ps=msPlayers(),playing=ps.filter(p=>!p.spectator);return [[playing[0]||null,playing[1]||null],[playing[2]||null,playing[3]||null]]}
+function msRoomPacket(){return {type:'room2',code:ROOM.code,deckMode:ROOM.deckMode||'ready',host:ROOM.host,players:msPlayers()}}
+function msSend(c,d){try{if(c&&c.open)c.send(d)}catch(e){console.warn('room send',e)}}
+function msBroadcast(d){MS_CONNS.forEach(c=>msSend(c,d))}
+function msRenderRoom(){
+ if(!ROOM)return;go('room');$('rcode').textContent=ROOM.code;
+ const invite=new URL(location.href);invite.searchParams.set('room',ROOM.code);$('dc-invite-link').textContent=invite.href;
+ $('dc-room-format').textContent='Formato escolhido: '+({'ready':'Clássico (baralho pronto)','random':'Aleatório','custom':'Meu baralho'}[ROOM.deckMode||ACTIVE_FORMAT]||'Clássico');
+ const ps=msPlayers(), tables=msTables();
+ $('rp').innerHTML=ps.map((p,i)=>`<div class="pp"><span>${i===0?ico('crown',18):ico(p.spectator?'eye':'user',18)}</span><b>${E(p.name)}</b>${i===0?'<span class="sub">(anfitrião)</span>':''}${p.spectator?'<span class="dc-room-badge">ESPECTADOR</span>':''}</div>`).join('')||'<div class="pp sub">Aguardando participantes…</div>';
+ $('dc-tables').innerHTML=tables.map((t,i)=>`<div class="dc-table${MS_SELECTED_TABLE===i?' live':''}"><h3>Mesa ${i+1}<span>${t.filter(Boolean).length}/2 jogadores</span></h3>${t.map((p,j)=>p?`<div class="dc-seat">${ico('user',15)}<b>${E(p.name)}</b>${p.id===ME.id?'<i>você</i>':''}</div>`:'<div class="dc-seat empty">Vaga disponível</div>').join('')}<div class="dc-seat viewer">${ico('eye',15)} Espectadores acompanham esta mesa</div></div>`).join('');
+ $('bg').hidden=myIdx!==0;$('bg').disabled=myIdx!==0||!tables[MS_SELECTED_TABLE][0]||!tables[MS_SELECTED_TABLE][1];
+ const sb=$('dc-spectate');sb.textContent=MS_SPECTATOR?'Voltar a procurar vaga':'Entrar como espectador';sb.classList.toggle('dc-spectator',MS_SPECTATOR);
+}
+function msSetPlayers(players){
+ if(!ROOM)return;ROOM.players=(players||[]).slice(0,4);ROOM.host=ROOM.players[0]||ROOM.host;ROOM.guest=ROOM.players[1]||null;msRenderRoom();
+}
+function msHostAdd(conn,name){
+ const ps=msPlayers();if(ps.length>=4){msSend(conn,{type:'room-full'});conn.close();return}
+ const p={id:conn.peer,name:String(name||'Amigo').slice(0,24),spectator:false};ROOM.players=[...ps,p];MS_CONNS.push(conn);roomUI=msRenderRoom;msRenderRoom();msBroadcast(msRoomPacket());msSend(conn,msRoomPacket());
+ conn.on('data',d=>{if(d?.type==='spectator'){const q=ROOM.players.find(x=>x.id===conn.peer);if(q){q.spectator=!!d.value;msBroadcast(msRoomPacket());msRenderRoom()}}else if(d?.type==='state'&&d.c){/* espectadores recebem a mesa ativa */msBroadcast(d)}});
+ conn.on('close',()=>{ROOM.players=ROOM.players.filter(x=>x.id!==conn.peer);MS_CONNS=MS_CONNS.filter(x=>x!==conn);msBroadcast(msRoomPacket());msRenderRoom()});
+}
+function msHostCreate(){
+ cleanup();MS_HOST=true;MS_SPECTATOR=false;const code=rc();myIdx=0;ROOM={code,host:{id:ME.id||'host',name:ME.name,spectator:false},guest:null,players:[{id:ME.id||'host',name:ME.name,spectator:false}],status:'wait',deckMode:ACTIVE_FORMAT};
+ PEER=makeDarwinPeer('darwin-'+code);PEER.on('open',msRenderRoom);PEER.on('connection',c=>{c.on('open',()=>msHostAdd(c,c.metadata?.name||'Amigo'))});PEER.on('error',peerError);
+}
+function msJoin(){
+ const code=$('code').value.trim().toUpperCase();if(code.length!==6)return toast('Digite o código de 6 letras que aparece na sala do anfitrião.');cleanup();MS_HOST=false;MS_SPECTATOR=false;myIdx=1;PEER=makeDarwinPeer();PEER.on('open',()=>{PCONN=PEER.connect('darwin-'+code,{metadata:{name:ME.name},reliable:true});PCONN.on('open',()=>msSend(PCONN,{type:'hello2',name:ME.name}));PCONN.on('data',d=>{if(d?.type==='room2'){ROOM=ROOM||{};ROOM.code=d.code;ROOM.host=d.host;ROOM.players=d.players||[];ROOM.deckMode=d.deckMode||'ready';msRenderRoom()}else if(d?.type==='room-full')toast('Esta sala já está cheia (4 jogadores).') ;else if(d?.type==='state'&&d.c){if(!S.mp){S.mp=true;PREV=[null,null];fxReset()}fromCanon(d.c);if(cur!=='game')go('game');render()}});PCONN.on('close',()=>toast('A conexão com a sala foi encerrada.'))});PEER.on('error',peerError);
+}
+function msToggleSpectator(){MS_SPECTATOR=!MS_SPECTATOR;if(MS_HOST){const p=ROOM.players.find(x=>x.id===ME.id);if(p)p.spectator=MS_SPECTATOR;msBroadcast(msRoomPacket());msRenderRoom()}else msSend(PCONN,{type:'spectator',value:MS_SPECTATOR})}
+/* Instala a camada multi-sala sem alterar o motor das cartas. */
+window.addEventListener('load',()=>{
+ $('bc').onclick=msHostCreate;$('bj').onclick=msJoin;$('dc-spectate').onclick=msToggleSpectator;
+ const oldStart=startGame;startGame=function(){const ps=msPlayers().filter(p=>!p.spectator);if(!ROOM||myIdx!==0||ps.length<2)return toast('É preciso ter dois jogadores sentados em uma mesa.');ROOM.guest=ps[1];return oldStart()};
+ const oldSync=sync;sync=function(){oldSync();if(MS_HOST&&ROOM)msBroadcast({type:'state',c:toCanon()})};
+ const oldRender=render;render=function(){oldRender();const over=!!S.over;const r=$('dc-rematch'),b=$('dc-back-room');if(r){r.hidden=!over||!ROOM;r.disabled=myIdx!==0}if(b)b.hidden=!over||!ROOM};
+ $('dc-rematch').onclick=()=>{if(myIdx===0)startGame()};$('dc-back-room').onclick=()=>{if(ROOM){S.over=false;S.mp=false;msRenderRoom()}};
+ $('lv').addEventListener('click',()=>{if(ROOM&&S.over)msRenderRoom()});
+});
+</script></body></html>
