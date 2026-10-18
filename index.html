@@ -1316,16 +1316,18 @@ document.getElementById('bg').onclick=startGame;
 <div id="dc-adm-gate" hidden role="dialog" aria-modal="true" aria-labelledby="dc-adm-t"><div class="box"><h3 id="dc-adm-t">Painel admin</h3><p>Digite a senha para continuar.</p><input id="dc-adm-pass" type="password" autocomplete="off" placeholder="Senha"><div class="err" id="dc-adm-err"></div><div class="row"><button type="button" class="g" id="dc-adm-cancel">Cancelar</button><button type="button" class="y" id="dc-adm-ok">Entrar</button></div></div></div><style>
 #dc-crop{position:fixed;inset:0;z-index:9999;background:rgba(5,8,18,.82);display:flex;align-items:center;justify-content:center;padding:16px}
 #dc-crop[hidden]{display:none!important}
-#dc-crop .box{background:#151c31;color:#fff;border-radius:16px;padding:16px;max-width:360px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+#dc-crop .box{background:#151c31;color:#fff;border-radius:16px;padding:16px;max-width:520px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.5)}
 #dc-crop h3{margin:0 0 8px}
-#dc-crop canvas{width:100%;aspect-ratio:3/4;border-radius:12px;background:#000;touch-action:none;cursor:grab;display:block}
+#dc-crop .frm{aspect-ratio:1.85/1;padding:1.2%;background:#0a3596;clip-path:polygon(4% 0,96% 0,100% 7.4%,100% 92.6%,96% 100%,4% 100%,0 92.6%,0 7.4%);position:relative}
+#dc-crop .frm::before{content:"";position:absolute;left:0;top:0;width:8%;height:15%;z-index:1;pointer-events:none;background:linear-gradient(135deg,#fdb927 0 37%,transparent 37%)}
+#dc-crop canvas{width:100%;height:100%;background:#000;touch-action:none;cursor:grab;display:block;clip-path:polygon(3.2% 0,96.8% 0,100% 6%,100% 94%,96.8% 100%,3.2% 100%,0 94%,0 6%)}
 #dc-crop .row{display:flex;gap:8px;align-items:center;margin-top:10px}
 #dc-crop input[type=range]{flex:1}
 #dc-crop .hint{font-size:12px;opacity:.75;margin-top:6px}
 </style>
 <div id="dc-crop" hidden role="dialog" aria-modal="true"><div class="box"><h3 id="dc-crop-t">Ajustar foto</h3>
-<canvas id="dc-crop-cv" width="600" height="800"></canvas>
-<div class="hint">Arraste a foto para escolher a parte. Use o zoom para aproximar.</div>
+<div class="frm"><canvas id="dc-crop-cv" width="925" height="500"></canvas></div>
+<div class="hint">Assim fica na carta. Arraste a foto para escolher a parte. Use o zoom para aproximar.</div>
 <div class="row">Zoom <input id="dc-crop-z" type="range" min="1" max="5" step="0.01" value="1"><span id="dc-crop-zv">1.0x</span></div>
 <div class="row" style="justify-content:flex-end"><button type="button" class="g" id="dc-crop-cancel">Cancelar</button><button type="button" class="y" id="dc-crop-ok">Salvar para todos</button></div>
 </div></div>
