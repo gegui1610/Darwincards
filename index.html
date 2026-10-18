@@ -908,8 +908,8 @@ function canPlace(inc,ti){
 function checkWin(){
  for(const s of [0,1])if(!P[s].field.some(Boolean)&&!P[s].reserve.length){S.over=true;S.win=1-s}
 }
-function toCanon(){return{P:myIdx===1?[P[1],P[0]]:P,repl:myIdx===1?[REPL[1],REPL[0]]:REPL,turn:S.turn===0?myIdx:1-myIdx,act:S.act,round:S.round,over:S.over,win:S.win==null?null:(S.win===0?myIdx:1-myIdx),log:S.log,v:S.v,amb:S.amb||null,ns:!!S.nsUsed,du:!!S.dmgUsed,names:myIdx===1?[S.names[1],S.names[0]]:S.names}}
-function fromCanon(c){P=myIdx===0?c.P:[c.P[1],c.P[0]];REPL=myIdx===0?(c.repl||[[],[]]):[(c.repl||[[],[]])[1]||[],(c.repl||[[],[]])[0]||[]];S.names=myIdx===0?(c.names||S.names):((c.names&&[c.names[1],c.names[0]])||S.names);S.turn=c.turn===myIdx?0:1;S.act=c.act;S.round=c.round;S.over=c.over;S.win=c.win==null?null:(c.win===myIdx?0:1);S.log=c.log;S.v=c.v;S.amb=c.amb||null;S.nsUsed=!!c.ns;S.dmgUsed=!!c.du;S.sel=S.swap=S.nsel=null}
+function toCanon(){const pair=typeof msTables==='function'?(msTables()[MS_LOCAL_TABLE]||[]):[],canonicalTurn=S.turn===0?myIdx:1-myIdx;return{P:myIdx===1?[P[1],P[0]]:P,repl:myIdx===1?[REPL[1],REPL[0]]:REPL,turn:canonicalTurn,turnId:pair[canonicalTurn]?.id||null,gameId:MS_GAME_ID||null,act:S.act,round:S.round,over:S.over,win:S.win==null?null:(S.win===0?myIdx:1-myIdx),log:S.log,v:S.v,amb:S.amb||null,ns:!!S.nsUsed,du:!!S.dmgUsed,names:myIdx===1?[S.names[1],S.names[0]]:S.names}}
+function fromCanon(c){P=myIdx===0?c.P:[c.P[1],c.P[0]];REPL=myIdx===0?(c.repl||[[],[]]):[(c.repl||[[],[]])[1]||[],(c.repl||[[],[]])[0]||[]];S.names=myIdx===0?(c.names||S.names):((c.names&&[c.names[1],c.names[0]])||S.names);S.turnId=c.turnId||null;S.turn=c.turnId?(c.turnId===msClientId()?0:1):(c.turn===myIdx?0:1);S.act=c.act;S.round=c.round;S.over=c.over;S.win=c.win==null?null:(c.win===myIdx?0:1);S.log=c.log;S.v=c.v;S.amb=c.amb||null;S.nsUsed=!!c.ns;S.dmgUsed=!!c.du;S.sel=S.swap=S.nsel=null}
 function sync(){if(!S.mp)return;S.v++;const c=toCanon();if(PCONN&&PCONN.open){try{PCONN.send({type:'state',c})}catch(e){toast('Falha ao enviar estado da partida.')}}else if(ref)ref.update({state:JSON.stringify(c),status:S.over?'end':'play',t:Date.now()}).catch(e=>toast('Falha ao sincronizar ('+(e&&e.code)+')'))}
 function spend(){
  S.act--;S.sel=S.swap=S.nsel=null;checkWin();sync();render();
@@ -1039,7 +1039,7 @@ function render(){
  $('log').innerHTML=S.log.map(t=>`<div>${E(t)}</div>`).join('');
  $('end').disabled=S.turn!==0||S.over;nsRender();$('rst').hidden=S.mp;
  $('orb').innerHTML=[0,1].map(i=>`<i class="orb${S.turn===0&&i<S.act&&!S.over?' on':''}"></i>`).join('');
- $('msg').innerHTML=S.over?(S.win===0?ico('trophy',18)+' Você venceu!':ico('x',18)+' '+E(S.names[1])+' venceu.'):S.turn===1?`Vez de ${E(S.names[1])}…`:hasReplacementAvailable()?`Escolha na mão quem entra no lugar do personagem desligado (não gasta ação).`:S.sel?'Escolha o alvo.':S.swap!==null?'Escolha o espaço do terreno.':S.nsel!=null?'Escolha o Alguém.':`Rodada ${S.round} · Ações: ${S.act}/2${S.nsUsed?'':' · Não-Alguém disponível'}`;
+ $('msg').innerHTML=S.over?(S.win===0?ico('trophy',18)+' Você venceu!':ico('x',18)+' '+E(S.names[1])+' venceu.'):S.mp?`Vez de ${E(S.names[S.turn===0?0:1])}`:S.turn===1?`Vez de ${E(S.names[1])}…`:hasReplacementAvailable()?`Escolha na mão quem entra no lugar do personagem desligado (não gasta ação).`:S.sel?'Escolha o alvo.':S.swap!==null?'Escolha o espaço do terreno.':S.nsel!=null?'Escolha o Alguém.':`Rodada ${S.round} · Ações: ${S.act}/2${S.nsUsed?'':' · Não-Alguém disponível'}`;
 }
 function exec(i,k,tg){act(0,i,k,tg);S.sel=null;spend()}
 function clickNS(i){
@@ -1423,7 +1423,7 @@ $('ed').addEventListener('click',async e=>{const b=e.target.closest('[data-photo
 </script>
 <script id="dc-multimesas-js">
 /* Sala ampliada: até 4 participantes, duas mesas e espectadores. */
-let MS_CONNS=[], MS_HOST=false, MS_SPECTATOR=false, MS_SELECTED_TABLE=0, MS_LOCAL_TABLE=0, MS_LOCAL_SIDE=0;
+let MS_CONNS=[], MS_HOST=false, MS_SPECTATOR=false, MS_SELECTED_TABLE=0, MS_LOCAL_TABLE=0, MS_LOCAL_SIDE=0, MS_GAME_ID=null;
 function msAccountName(){return String(DC_PROFILE?.username||ME.name||'Jogador').trim().slice(0,24)||'Jogador'}
 function msClientId(){try{let id=localStorage.getItem('dc-client-id');if(!id){id='p-'+(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2));localStorage.setItem('dc-client-id',id)}return id}catch(e){return 'p-'+ME.name}}
 const msMe=()=>({id:ME.id||('local-'+ME.name),name:ME.name||'Jogador',spectator:!!MS_SPECTATOR});
@@ -1441,12 +1441,12 @@ function msSyncIdentity(){
  const id=msClientId(),tables=msTables();for(let t=0;t<2;t++){const idx=tables[t].findIndex(p=>p.id===id);if(idx>=0){MS_LOCAL_TABLE=t;MS_LOCAL_SIDE=idx;myIdx=idx;return}}
 }
 function msTableOf(id){const p=msPlayers().find(x=>x.id===id);return !p||p.spectator?-1:(p.table===1?1:0)}
-function msRouteState(table,c){const pair=msTables()[table]||[];MS_CONNS.filter(x=>x._msTable===table).forEach(x=>{const side=pair.findIndex(p=>p.id===x._msClientId);msSend(x,{type:'table-state',table,side:side<0?0:side,c})})}
+function msRouteState(table,c){const pair=msTables()[table]||[],gameId=ROOM?.activeGames?.[table]||c.gameId||null;MS_CONNS.filter(x=>x._msTable===table).forEach(x=>{const side=pair.findIndex(p=>p.id===x._msClientId);msSend(x,{type:'table-state',table,gameId,side:side<0?0:side,c})})}
 function msRenderGameMeta(){
  const pair=ROOM?(msTables()[MS_LOCAL_TABLE]||[]):[],local=[pair[MS_LOCAL_SIDE]||null,pair[1-MS_LOCAL_SIDE]||null];
  ['0','1'].forEach(side=>{const p=local[Number(side)],av=document.getElementById('n'+side)?.parentElement?.querySelector('.av'),el=document.getElementById('n'+side);if(el)el.textContent=S.names?.[Number(side)]||p?.name||'Jogador';if(av&&av.classList.contains('av')){const url=p?.avatar||'';av.classList.toggle('has-photo',!!url);av.innerHTML=url?`<img src="${E(url)}" alt="${E(p?.name||'Jogador')}">`:ico('user',24)}});
 }
-function msApplyTableState(table,c,side){MS_LOCAL_TABLE=table;const pair=msTables()[table]||[],mine=pair.findIndex(p=>p.id===msClientId());MS_LOCAL_SIDE=Number.isInteger(side)?side:(mine>=0?mine:0);myIdx=MS_LOCAL_SIDE;S.mp=true;PREV=[null,null];fxReset();if(!c.names)c={...c,names:pair.map(p=>p?.name||'Jogador')};fromCanon(c);if(cur!=='game')go('game');msRenderGameMeta();render()}
+function msApplyTableState(table,c,side,gameId){if(gameId&&MS_GAME_ID&&gameId!==MS_GAME_ID)return;if(gameId&&c.v!=null&&S.mp&&c.gameId===MS_GAME_ID&&Number(c.v)<Number(S.v||0))return;MS_GAME_ID=gameId||c.gameId||MS_GAME_ID;MS_LOCAL_TABLE=table;const pair=msTables()[table]||[],mine=pair.findIndex(p=>p.id===msClientId());MS_LOCAL_SIDE=Number.isInteger(side)?side:(mine>=0?mine:0);myIdx=MS_LOCAL_SIDE;S.mp=true;PREV=[null,null];fxReset();if(!c.names)c={...c,names:pair.map(p=>p?.name||'Jogador')};fromCanon(c);if(cur!=='game')go('game');msRenderGameMeta();render()}
 function msCreateInitialCanonical(names){
  const save={P,S,myIdx,REPL,PREV};try{myIdx=0;REPL=[[],[]];P=[deal(ACTIVE_FORMAT==='custom'?ACTIVE_DECK_SPEC:null),deal()];PREV=[null,null];S={mp:true,v:0,log:['Rodada 1: vez de '+names[0]+'.'],sel:null,swap:null,nsel:null,amb:null,nsUsed:false,dmgUsed:false,turn:0,act:2,round:1,over:false,win:null,names};startTurn(0);return toCanon()}finally{P=save.P;S=save.S;myIdx=save.myIdx;REPL=save.REPL;PREV=save.PREV}}
 function msRoomPacket(){return {type:'room2',code:ROOM.code,deckMode:ROOM.deckMode||'ready',host:ROOM.host,players:msPlayers()}}
@@ -1459,7 +1459,7 @@ function msRenderRoom(){
  const ps=msPlayers(), tables=msTables();
  $('rp').innerHTML=ps.map((p,i)=>`<div class="pp"><span>${i===0?ico('crown',18):ico(p.spectator?'eye':'user',18)}</span><b>${E(p.name)}</b>${i===0?'<span class="sub">(anfitrião)</span>':''}${p.spectator?'<span class="dc-room-badge">ESPECTADOR</span>':''}</div>`).join('')||'<div class="pp sub">Aguardando participantes…</div>';
  $('dc-tables').innerHTML=tables.map((t,i)=>`<div class="dc-table${MS_SELECTED_TABLE===i?' live':''}" data-table="${i}"><h3>Mesa ${i+1}<span>${t.filter(Boolean).length}/2 jogadores</span></h3>${t.map((p,j)=>p?`<div class="dc-seat">${ico('user',15)}<b>${E(p.name)}</b>${p.id===ME.id?'<i>você</i>':''}</div>`:'<div class="dc-seat empty">Vaga disponível</div>').join('')}<div class="dc-seat viewer">${ico('eye',15)} Espectadores acompanham esta mesa</div></div>`).join('');
- $('bg').hidden=true;const allBtn=$('dc-start-all');if(allBtn){allBtn.hidden=false;allBtn.disabled=myIdx!==0||tables.some(t=>t.length<2);allBtn.textContent=allBtn.disabled?'Aguardando 4 jogadores':'Iniciar as duas mesas';}
+ $('bg').hidden=true;const allBtn=$('dc-start-all'),occupied=tables.filter(t=>t.length===2).length;if(allBtn){allBtn.hidden=false;allBtn.disabled=myIdx!==0||occupied===0;allBtn.textContent=occupied===2?'Iniciar as duas mesas':occupied===1?'Iniciar mesa ocupada':'Aguardando jogadores';}
  const sb=$('dc-spectate');sb.textContent=MS_SPECTATOR?'Voltar a procurar vaga':'Entrar como espectador';sb.classList.toggle('dc-spectator',MS_SPECTATOR);
 }
 function msSetPlayers(players){
@@ -1515,8 +1515,8 @@ function msJoin(){
    c.on('data',d=>{
     if(attempt!==MS_ATTEMPT||!d)return;
     if(d.type==='room2'){MS_JOINING=false;if(JOIN_TIMER){clearTimeout(JOIN_TIMER);JOIN_TIMER=null}ROOM={code:d.code,host:d.host,players:d.players||[],deckMode:d.deckMode||'ready',status:'wait'};msNormalizePlayers();msSyncIdentity();msRenderRoom();return}
-    if(d.type==='table-start'){msApplyTableState(d.table,d.c,d.side);return}
-    if(d.type==='table-state'){msApplyTableState(d.table,d.c,d.side);return}
+    if(d.type==='table-start'){msApplyTableState(d.table,d.c,d.side,d.gameId||d.launch);return}
+    if(d.type==='table-state'){msApplyTableState(d.table,d.c,d.side,d.gameId||d.launch);return}
     if(d.type==='room-full'){fail('A sala já está cheia. Tente a outra mesa ou entre como espectador.');return}
     if(d.type==='room-busy'){fail('A sala está temporariamente ocupada. Tente novamente em alguns segundos.');return}
    });
@@ -1544,11 +1544,12 @@ function msStartSelected(){
 function msStartAll(){
  try{
   if(!ROOM||myIdx!==0)return toast('Somente o anfitrião pode iniciar as mesas.');
-  const tables=msTables();if(tables.some(t=>t.length<2))return toast('As duas mesas precisam ter dois jogadores: são necessários 4 participantes.');
-  const full=[];ROOM.activeTables=ROOM.activeTables||{};
-  for(let table=0;table<2;table++){const pair=tables[table],c=msCreateInitialCanonical([pair[0].name,pair[1].name]);full.push({table,pair,c});ROOM.activeTables[table]=true;MS_CONNS.forEach(conn=>{conn._msTable=msTableOf(conn._msClientId);if(conn._msTable===table){const side=pair.findIndex(p=>p.id===conn._msClientId);msSend(conn,{type:'table-start',table,side:side<0?0:side,c})}})}
-  const mine=full.find(x=>x.pair.some(p=>p.id===msClientId()));if(mine){const side=mine.pair.findIndex(p=>p.id===msClientId());MS_LOCAL_TABLE=mine.table;MS_LOCAL_SIDE=side;myIdx=side;ROOM.guest=mine.pair[1];S.mp=true;PREV=[null,null];fxReset();fromCanon(mine.c);go('game');msRenderGameMeta();render()}
-  toast(full.length===2?'As duas mesas foram iniciadas.':'Mesa disponível iniciada.');
+  const tables=msTables(),launch=Date.now(),full=[];ROOM.activeTables=ROOM.activeTables||{};ROOM.activeGames=ROOM.activeGames||{};
+  for(let table=0;table<2;table++){const pair=tables[table]||[];if(pair.length<2)continue;const c=msCreateInitialCanonical([pair[0].name,pair[1].name]);c.turnId=pair[0].id;c.gameId=launch;full.push({table,pair,c});ROOM.activeTables[table]=true;ROOM.activeGames[table]=launch}
+  if(!full.length)return toast('É preciso ter pelo menos uma mesa com dois jogadores.');
+  full.forEach(({table,pair,c})=>{MS_CONNS.forEach(conn=>{conn._msTable=msTableOf(conn._msClientId);if(conn._msTable===table){const side=pair.findIndex(p=>p.id===conn._msClientId);msSend(conn,{type:'table-start',launch,gameId:launch,table,side:side<0?0:side,c})}})});
+  const mine=full.find(x=>x.pair.some(p=>p.id===msClientId()));if(mine){MS_GAME_ID=mine.c.gameId;const side=mine.pair.findIndex(p=>p.id===msClientId());MS_LOCAL_TABLE=mine.table;MS_LOCAL_SIDE=side;myIdx=side;ROOM.guest=mine.pair[1];S.mp=true;PREV=[null,null];fxReset();fromCanon(mine.c);go('game');msRenderGameMeta();render()}
+  toast(full.length===2?'As duas mesas foram iniciadas ao mesmo tempo.':'A mesa ocupada foi iniciada.');
  }catch(e){console.error('Falha ao iniciar mesas',e);toast('Não foi possível iniciar as mesas: '+(e.message||'erro inesperado'));}
 }
 window.msStartSelected=msStartSelected;
