@@ -76,7 +76,7 @@ select.big#dc-deck-select{appearance:none;-webkit-appearance:none;font-size:15px
 .dc-nspick.wide{grid-column:span 2}
 .dc-nspick{align-items:flex-start}
 
-</style></head><body><div id="dc-version">V5.0</div>
+</style></head><body><div id="dc-version">V5.1</div>
 
 
 
@@ -970,7 +970,7 @@ function cardHTML(c,side,i){
   if(a.tog){const on=a.tog==='noGuard'?!c.noGuard:!!c.surto;val=a.tog==='noGuard'&&c.used.guard?'usado':(on?'ligado':'desligado');cl+=mt?' tog':' pas'}
   else if(a.pas)cl+=' pas';
   else{if(!(mine&&avail(c,k,side)))cl+=' off';
-   if(a.dm&&!val)val=String(a.dm(c));
+   if(a.dm&&!val){try{val=String(a.dm(c))}catch(_){val='dano variável'}}
    if(a.once==='game'&&c.used[k])val='usado';
    if(a.once==='round'&&c.used.im===S.round)val='usada'}
   if(S.sel&&side===0&&S.sel.i===i&&S.sel.k===k)cl+=' sel';
@@ -1022,7 +1022,7 @@ function tot(){[0,1].forEach(s=>{
 function nsRender(){
  const a=S.amb,q=P[0].ns||{hand:[],pile:[]},can=S.turn===0&&!S.over&&!S.nsUsed,L={amb:'Ambiente',ut:'Utensílio',item:'Geral'};
  $('amb').innerHTML=a?`<span class="ambp">${ico(a.icon||'cloud',16)} ${E(a.n)}${a.left?' ('+a.left+')':''}</span>`:'<span class="ambp off">Sem ambiente</span>';
- $('nsh').innerHTML=q.hand.map((c,i)=>NSIMG[c.id]?`<div class="chip nc has-img${S.nsel===i?' sel':''}${can?'':' dis'}" data-n="${i}" style="width:210px" title="${E(c.n)}"><img src="${NSIMG[c.id].s}" alt="${E(c.n)}"></div>`:`<div class="chip nc${S.nsel===i?' sel':''}${can?'':' dis'}" data-n="${i}"><div class="mn">${E(c.n)}</div><div class="ms">${c.only?'Exclusivo: '+E(c.only):L[c.type]}</div><div class="nd">${E(c.d)}</div></div>`).join('')||'<span class="lbl" style="color:#cfd8ee">Sem cartas Não-Alguém</span>';
+ $('nsh').innerHTML=q.hand.map((c,i)=>NSIMG[c.id]?`<div class="chip nc has-img${S.nsel===i?' sel':''}${can?'':' dis'}" data-n="${i}" style="width:${NSIMG[c.id].ar<1?Math.round(190*NSIMG[c.id].ar):210}px" title="${E(c.n)}"><img src="${NSIMG[c.id].s}" alt="${E(c.n)}"></div>`:`<div class="chip nc${S.nsel===i?' sel':''}${can?'':' dis'}" data-n="${i}"><div class="mn">${E(c.n)}</div><div class="ms">${c.only?'Exclusivo: '+E(c.only):L[c.type]}</div><div class="nd">${E(c.d)}</div></div>`).join('')||'<span class="lbl" style="color:#cfd8ee">Sem cartas Não-Alguém</span>';
 }
 function render(){
  $('f0').innerHTML=slotsHTML(0);$('f1').innerHTML=slotsHTML(1);
@@ -1103,7 +1103,7 @@ function bindPeerConn(conn,host){
  conn.on('close',()=>{if(S.mp&&!S.over){toast('O outro jogador saiu da partida.');S.over=true;S.win=myIdx===0?1:0;render()}else if(ROOM)toast('A conexão da sala foi encerrada.')});
  conn.on('error',e=>{console.warn('Peer connection error:',e);toast('A conexão com o jogador falhou ('+(e&&e.type||'erro')+').')});
 }
-function makeDarwinPeer(id){/* Vercel não suporta WebSocket em Functions: usa o servidor público do PeerJS (0.peerjs.com). Para usar servidor próprio, abra a página com ?signal=self */const own=new URLSearchParams(location.search).get('signal')==='self';const opts=own?{host:location.hostname,port:location.port?Number(location.port):(location.protocol==='https:'?443:80),secure:location.protocol==='https:',path:'/api',key:'peerjs',debug:1}:{debug:1};return id?new Peer(id,opts):new Peer(opts)} async function createRoom(){
+function makeDarwinPeer(id){/* Padrão: sinalização PeerJS pública. ?signal=self usa /api; Vercel exige Fluid Compute e o estado local do PeerJS pode não ser compartilhado entre instâncias. */const own=new URLSearchParams(location.search).get('signal')==='self';const opts=own?{host:location.hostname,port:location.port?Number(location.port):(location.protocol==='https:'?443:80),secure:location.protocol==='https:',path:'/api',key:'peerjs',debug:1}:{debug:1};return id?new Peer(id,opts):new Peer(opts)} async function createRoom(){
  if(!window.Peer)return toast('A biblioteca de conexão não carregou. Abra a página com internet e tente de novo.');
  cleanup();const code=rc();myIdx=0;ROOM={code,host:{id:ME.id,name:ME.name},guest:null,status:'wait',deckMode:ACTIVE_FORMAT};
  try{PEER=makeDarwinPeer('darwin-'+code);PEER.on('open',()=>roomUI());PEER.on('connection',c=>{if(PCONN){c.close();return}bindPeerConn(c,true)});PEER.on('error',peerError)}catch(e){cleanup();toast('Não consegui abrir a sala. Confira se a página está em HTTPS.')}
@@ -1224,7 +1224,7 @@ $('ba').onclick=()=>{dcAdminGate(()=>{allRender();go('admin')})};$('bb').onclick
 
 
 </script><script>
-/* Complemento Darwin Cards V5.0 — requer supabase-js v2 carregado no HTML. */
+/* Complemento Darwin Cards V5.1 — requer supabase-js v2 carregado no HTML. */
 const DC_SB_URL_KEY='dc-supabase-url', DC_SB_ANON_KEY='dc-supabase-anon';
 const DC_DEFAULT_SUPABASE_URL='https://zhdcmgznpdhdnalxxbxf.supabase.co';
 const DC_DEFAULT_PUBLISHABLE_KEY='sb_publishable_AZu14hh0XUx6a700mSwnWg_DZ0zfTPs';
