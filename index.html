@@ -1154,7 +1154,7 @@ const abOpt=x=>'<option value="">—</option>'+Object.entries(AB).map(([k,a])=>`
 const clsOpt=x=>CLS.map(o=>`<option value="${E(o.id)}"${o.id===x?' selected':''}>${E(o.n)}</option>`).join('');
 const gv=(r,f)=>r.querySelector(`[data-f="${f}"]`).value;
 function edRender(){$('ed').innerHTML=POOL.map((p,i)=>{const ab=p.ab||['atk',clsAb(p.c)];
- return `<div class="glass ed" data-i="${i}"><input data-f="n" value="${E(p.n)}" style="width:130px;font-weight:700"><select data-f="c" data-o="${E(p.c)}">${clsOpt(p.c)}</select>PV<input type="number" data-f="hp" value="${p.hp}">Dano<input type="number" data-f="d" value="${p.d}">Espaços<input type="number" min="1" max="2" data-f="w" value="${p.w||1}"><span style="flex-basis:100%">Habilidades</span>${[0,1,2,3,4].map(j=>`<select data-f="a${j}" style="width:130px">${abOpt(ab[j])}</select>`).join('')}<span>Efeito</span><select data-f="t" style="width:150px">${TR.map(([k,l])=>`<option value="${k}"${k===(p.t||'')?' selected':''}>${l}</option>`).join('')}</select>Bônus +<input type="number" data-f="vb" value="${p.vs?p.vs.b:0}">contra<input data-f="vn" value="${E(p.vs?p.vs.n:'')}">Outras etiquetas<input data-f="tg" value="${E((p.tg||[]).filter(g=>!CHR.some(x=>(x.g||x.id)===g)).join(','))}"><span style="flex-basis:100%">Características</span>${CHR.map(x=>`<label><input type="checkbox" data-h="${E(x.id)}"${chrOn(x,p)?' checked':''} style="width:auto"> ${E(x.n)}</label>`).join('')}<input data-f="x" placeholder="Texto da carta" value="${E(p.x||'')}" style="width:100%"><label class="g dc-photo-label">Trocar foto<input type="file" data-photo-file accept="image/gif,image/webp,image/png,image/jpeg" aria-label="Trocar foto de ${E(p.n)}"></label><button type="button" class="g" data-photo-reset>Foto padrão</button><button class="g" data-a="dup">Duplicar</button><button class="g" data-a="del">Remover</button></div>`}).join('')}
+ return `<div class="glass ed" data-i="${i}"><input data-f="n" value="${E(p.n)}" style="width:130px;font-weight:700"><select data-f="c" data-o="${E(p.c)}">${clsOpt(p.c)}</select>PV<input type="number" data-f="hp" value="${p.hp}">Dano<input type="number" data-f="d" value="${p.d}">Espaços<input type="number" min="1" max="2" data-f="w" value="${p.w||1}"><span style="flex-basis:100%">Habilidades</span>${[0,1,2,3,4].map(j=>`<select data-f="a${j}" style="width:130px">${abOpt(ab[j])}</select>`).join('')}<span>Efeito</span><select data-f="t" style="width:150px">${TR.map(([k,l])=>`<option value="${k}"${k===(p.t||'')?' selected':''}>${l}</option>`).join('')}</select>Bônus +<input type="number" data-f="vb" value="${p.vs?p.vs.b:0}">contra<input data-f="vn" value="${E(p.vs?p.vs.n:'')}">Outras etiquetas<input data-f="tg" value="${E((p.tg||[]).filter(g=>!CHR.some(x=>(x.g||x.id)===g)).join(','))}"><span style="flex-basis:100%">Características</span>${CHR.map(x=>`<label><input type="checkbox" data-h="${E(x.id)}"${chrOn(x,p)?' checked':''} style="width:auto"> ${E(x.n)}</label>`).join('')}<input data-f="x" placeholder="Texto da carta" value="${E(p.x||'')}" style="width:100%"><label class="g dc-photo-label">Trocar foto<input type="file" data-photo-file accept="image/gif,image/webp,image/png,image/jpeg" aria-label="Trocar foto de ${E(p.n)}"></label><button type="button" class="g" data-photo-reset>Foto padrão</button><button class="g" data-a="dup">Duplicar</button><button class="g" data-a="del">Remover</button></div>`}).join('')+SUMMONS.map(p=>`<div class="glass dc-summon-photo" data-photo-name="${E(p.n)}"><b>${E(p.n)}</b><label class="g dc-photo-label">Trocar foto<input type="file" data-photo-file accept="image/gif,image/webp,image/png,image/jpeg" aria-label="Trocar foto de ${E(p.n)}"></label><button type="button" class="g" data-photo-reset>Foto padrão</button></div>`).join('')}
 function readEd(){document.querySelectorAll('#ed .ed').forEach(r=>{const p=POOL[+r.dataset.i],v=f=>gv(r,f);
  p.n=v('n').trim()||p.n;p.c=v('c');p.hp=Math.max(1,+v('hp')||1);p.d=Math.max(0,+v('d')||0);
  const w=Math.min(2,Math.max(1,+v('w')||1));if(w>1)p.w=w;else delete p.w;
@@ -1337,10 +1337,12 @@ document.getElementById('bg').onclick=startGame;
 const SB=()=>DC_SB;
 let ADM=null;try{ADM=sessionStorage.getItem('dc-adm-code')}catch(e){}
 const PHOTOS=new Map();
-const DEFIMG=n=>{const b=JSON.parse(DEF).find(x=>x.n===n);return b&&b.img};
+const SUMMON_PHOTO_DEFAULTS=new Map(SUMMONS.map(p=>[p.n,p.img]));
+const photoTarget=input=>{const row=input.closest('[data-photo-name]');return row?SUMMONS.find(p=>p.n===row.dataset.photoName):POOL[+input.closest('.ed').dataset.i]};
+const DEFIMG=n=>{if(SUMMON_PHOTO_DEFAULTS.has(n))return SUMMON_PHOTO_DEFAULTS.get(n);const b=JSON.parse(DEF).find(x=>x.n===n);return b&&b.img};
 const clean=a=>a.map(p=>{const o={...p};delete o.img;delete o._dcCustomPhoto;return o});
 async function rpc(fn,args){if(!SB())throw Error('Supabase não configurado.');const {data,error}=await SB().rpc(fn,args);if(error)throw error;return data}
-function applyPhotos(){POOL.forEach(p=>{const u=PHOTOS.get(p.n);if(u){p.img=u;p._dcCustomPhoto=true}})}
+function applyPhotos(){[...POOL,...SUMMONS].forEach(p=>{const u=PHOTOS.get(p.n);if(u){p.img=u;p._dcCustomPhoto=true}else if(p._dcCustomPhoto){const d=DEFIMG(p.n);if(d)p.img=d;else delete p.img;delete p._dcCustomPhoto}})}
 async function load(){if(!SB())return;try{
  const {data,error}=await SB().from('darwin_config').select('key,value');
  if(!error&&data){const m=Object.fromEntries(data.map(r=>[r.key,r.value]));
@@ -1398,9 +1400,9 @@ cv.onpointermove=e=>{if(!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,pt(e)
  else if(drag){const p=pt(e);OX=drag.ox+p[0]-drag.p[0];OY=drag.oy+p[1]-drag.p[1];draw()}};
 cv.onpointerup=cv.onpointercancel=e=>{ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=null;if(ptrs.size===0)drag=null};
 cv.onwheel=e=>{e.preventDefault();const p=pt(e);zoomTo(Z*(e.deltaY<0?1.1:1/1.1),p[0],p[1])};
-function openCrop(file,index){if(!['image/gif','image/webp','image/png','image/jpeg'].includes(file.type))return toast('Use GIF, WebP, PNG ou JPEG.');
+function openCrop(file,p){if(!['image/gif','image/webp','image/png','image/jpeg'].includes(file.type))return toast('Use GIF, WebP, PNG ou JPEG.');
  if(file.size>15*1024*1024)return toast('A imagem precisa ter até 15 MB.');
- const p=POOL[index];if(!p)return;TARGET=p.n;$('dc-crop-t').textContent='Foto de '+p.n;
+ if(!p)return;TARGET=p.n;$('dc-crop-t').textContent='Foto de '+p.n;
  const url=URL.createObjectURL(file),im=new Image();im.onload=()=>{IMG=im;Z=1;zr.value=1;const s=base();OX=(W-im.width*s)/2;OY=(H-im.height*s)/2;draw();$('dc-crop').hidden=false;URL.revokeObjectURL(url)};
  im.onerror=()=>toast('Não foi possível abrir a imagem.');im.src=url}
 $('dc-crop-cancel').onclick=()=>{$('dc-crop').hidden=true;IMG=null};
@@ -1409,9 +1411,9 @@ $('dc-crop-ok').onclick=async()=>{if(!IMG||!TARGET)return;if(!needAdm())return;
  const btn=$('dc-crop-ok');btn.disabled=true;btn.textContent='Salvando…';
  try{await rpc('dc_set_photo',{p_code:ADM,p_name:TARGET,p_image:data});PHOTOS.set(TARGET,data);allEd();applyPhotos();allRender();$('dc-crop').hidden=true;IMG=null;toast('Foto de '+TARGET+' salva para todos.')}
  catch(e){badCode(e);toast('Não salvou: '+(e.message||e))}finally{btn.disabled=false;btn.textContent='Salvar para todos'}};
-$('ed').addEventListener('change',e=>{const input=e.target.closest('[data-photo-file]');if(!input)return;const f=input.files&&input.files[0];if(f){allEd();openCrop(f,+input.closest('.ed').dataset.i)}input.value=''});
+$('ed').addEventListener('change',e=>{const input=e.target.closest('[data-photo-file]');if(!input)return;const f=input.files&&input.files[0];if(f){allEd();openCrop(f,photoTarget(input))}input.value=''});
 $('ed').addEventListener('click',async e=>{const b=e.target.closest('[data-photo-reset]');if(!b)return;e.preventDefault();if(!needAdm())return;allEd();
- const p=POOL[+b.closest('.ed').dataset.i];if(!p)return;
+ const p=photoTarget(b);if(!p)return;
  try{await rpc('dc_delete_photo',{p_code:ADM,p_name:p.n});PHOTOS.delete(p.n);const d=DEFIMG(p.n);if(d)p.img=d;else delete p.img;delete p._dcCustomPhoto;allRender();toast('Foto padrão de '+p.n+' restaurada para todos.')}
  catch(err){badCode(err);toast('Erro: '+(err.message||err))}});
 })();
