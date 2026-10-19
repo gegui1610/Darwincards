@@ -107,6 +107,9 @@ select.big#dc-deck-select{appearance:none;-webkit-appearance:none;font-size:15px
 .card .cart{flex:1;min-height:0;height:auto;aspect-ratio:auto!important;background:rgba(2,8,17,.45)!important;border-color:#2769bd!important}
 .card .ccl{background:rgba(3,9,20,.82);border-color:#2769bd!important;color:#eef5ff!important}
 .card .ccl b{color:#69a9ff!important;letter-spacing:.08cqw}
+.card .ci>.itsym{position:absolute!important;top:1.5cqw!important;left:1.5cqw!important;width:13cqw!important;height:13cqw!important;object-fit:contain;padding:1.6cqw;background:rgba(3,9,20,.94);border:.65cqw solid #e7a936;border-radius:50%;z-index:12;pointer-events:none;filter:drop-shadow(0 .8cqw 1.2cqw rgba(0,0,0,.72))}
+.card .cab.has-it .cnm{margin-left:12.5cqw}
+
 .card .cabs{display:none!important}
 .dcopph .ob{background-image:var(--dc-back)!important;background-position:center!important;background-size:100% 100%!important}
 .card .trow{z-index:4}
@@ -118,7 +121,7 @@ select.big#dc-deck-select{appearance:none;-webkit-appearance:none;font-size:15px
 .dcr-panel.on{opacity:1;pointer-events:auto;transform:translateY(-50%) translateX(0)}
 .dcr-head{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(81,151,235,.45);padding-bottom:10px;margin-bottom:12px}
 .dcr-title{font-size:22px;letter-spacing:.08em;text-transform:uppercase;color:#fff}
-.dcr-close{border:1px solid #e7a936;background:transparent;color:#e7a936;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:18px;line-height:1}
+.dcr-close{border:1px solid #e7a936;background:rgba(231,169,54,.10);color:#ffd06b;border-radius:50%;width:40px;height:40px;display:grid;place-items:center;cursor:pointer;font:600 24px/1 system-ui,sans-serif;transition:transform .18s ease,background .18s ease,box-shadow .18s ease}.dcr-close:hover{transform:rotate(90deg) scale(1.08);background:rgba(231,169,54,.24);box-shadow:0 0 16px rgba(231,169,54,.32)}
 .dcr-meta{font-size:12px;color:#75adf5;margin-bottom:14px;letter-spacing:.06em}
 .dcr-skill{padding:11px 12px;margin:9px 0;border-left:3px solid #e7a936;background:linear-gradient(90deg,rgba(35,91,161,.28),rgba(5,14,28,.18));border-radius:0 9px 9px 0}
 .dcr-skill strong{display:block;color:#ffd06b;font-size:15px;letter-spacing:.05em;margin-bottom:4px}
@@ -126,7 +129,11 @@ select.big#dc-deck-select{appearance:none;-webkit-appearance:none;font-size:15px
 .dcr-empty{color:#9bb4d2;font:500 14px/1.4 'Inter Tight',system-ui,sans-serif}
 @media(max-width:700px){.dcr-panel{right:10px;left:10px;top:auto;bottom:10px;transform:translateY(20px);width:auto;max-height:55vh}.dcr-panel.on{transform:translateY(0)}}
 
-.card.inspecting{transform:perspective(900px) translateY(-16px) scale(1.12) translateZ(36px) rotateX(var(--dcr-rx,0deg)) rotateY(var(--dcr-ry,0deg));transform-style:preserve-3d;will-change:transform;}
+.card.inspecting{position:fixed!important;left:calc(50% - 245px)!important;top:50%!important;width:min(300px,38vw)!important;z-index:1100!important;transform:perspective(1100px) translate(-50%,-50%) scale(1.08) rotateX(var(--dcr-rx,0deg)) rotateY(var(--dcr-ry,0deg));transform-origin:center center!important;transform-style:preserve-3d!important;will-change:transform,opacity;animation:dcrCardToFront .42s cubic-bezier(.18,.78,.24,1) both,dcrCardFloat 3.6s ease-in-out .42s infinite;}
+@keyframes dcrCardToFront{0%{opacity:.55;transform:translate(-50%,calc(-50% + 32px)) scale(.88)}100%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}}
+@keyframes dcrCardFloat{0%,100%{translate:0 0}50%{translate:0 -7px}}
+@media(max-width:700px){.card.inspecting{left:50%!important;top:34%!important;width:min(240px,56vw)!important;transform:perspective(900px) translate(-50%,-50%) scale(1.02) rotateX(var(--dcr-rx,0deg)) rotateY(var(--dcr-ry,0deg));animation:dcrCardToFrontMobile .42s cubic-bezier(.18,.78,.24,1) both,dcrCardFloat 3.6s ease-in-out .42s infinite}}
+@keyframes dcrCardToFrontMobile{0%{opacity:.55;transform:translate(-50%,calc(-50% + 28px)) scale(.88)}100%{opacity:1;transform:translate(-50%,-50%) scale(1.02)}}
 .dcr-panel{right:auto;top:0;transition:opacity .22s ease,transform .22s cubic-bezier(.2,.8,.2,1)}
 .dcr-skill{position:relative;transition:transform .18s ease,background .18s ease,box-shadow .18s ease;}
 .dcr-skill:hover{transform:translateX(4px);background:linear-gradient(90deg,rgba(43,110,192,.42),rgba(5,14,28,.22));}
@@ -140,6 +147,17 @@ select.big#dc-deck-select{appearance:none;-webkit-appearance:none;font-size:15px
 .dcr-panel.skill-chosen{animation:dcrPanelPick .48s ease}
 @keyframes dcrSkillPick{0%{transform:scale(1);filter:brightness(1)}38%{transform:scale(1.035);filter:brightness(1.5)}100%{transform:scale(1);filter:brightness(1)}}
 @media(max-width:700px){.dcr-panel{right:10px;left:10px;top:auto;bottom:10px;transform:translateY(24px);width:auto;max-height:55vh}.dcr-panel.on{transform:translateY(0)}}
+</style><style id="dcr-audio-result-style">
+.dcr-audio-btn{right:108px!important;font:700 21px/1 'Exo 2',system-ui,sans-serif;color:#ffd06b}
+.dcr-audio-pop{position:fixed;z-index:1300;right:108px;top:58px;width:250px;padding:15px 16px;border:1px solid #3a80d9;border-radius:14px;background:rgba(3,10,22,.97);box-shadow:0 14px 45px rgba(0,0,0,.55);color:#eaf3ff;font:500 13px 'Inter Tight',system-ui,sans-serif}
+.dcr-audio-pop[hidden]{display:none!important}.dcr-audio-pop b{display:block;color:#ffd06b;font:700 15px 'Exo 2',system-ui,sans-serif;margin-bottom:11px}.dcr-audio-pop label{display:flex;justify-content:space-between;gap:10px;margin-bottom:8px}.dcr-audio-pop input{width:100%;accent-color:#3c82df}.dcr-audio-pop small{display:block;color:#9ab2cf;line-height:1.35;margin-top:8px}
+.dcr-result{position:fixed;inset:0;z-index:1500;display:grid;place-items:center;padding:24px;background:rgba(1,5,12,.78);backdrop-filter:blur(10px);opacity:0;transition:opacity .3s ease}.dcr-result[hidden]{display:none!important}.dcr-result.on{opacity:1}
+.dcr-result-card{width:min(660px,94vw);padding:clamp(28px,6vw,58px) 24px;text-align:center;border:1px solid #4389e0;border-radius:28px;background:radial-gradient(ellipse at 50% 0,rgba(47,115,204,.27),transparent 62%),linear-gradient(155deg,#07152a,#020711 78%);box-shadow:0 28px 100px rgba(0,0,0,.72),0 0 48px rgba(40,118,222,.22);animation:dcrResultIn .65s cubic-bezier(.18,.78,.24,1) both}
+.dcr-result.win .dcr-result-card{border-color:#e7b44c;box-shadow:0 28px 100px rgba(0,0,0,.72),0 0 58px rgba(231,180,76,.28)}
+.dcr-result-mark{font-size:clamp(54px,11vw,90px);line-height:1;color:#ffd06b;text-shadow:0 0 30px rgba(255,208,107,.35);margin-bottom:12px}.dcr-result.lose .dcr-result-mark{color:#86b7ff;text-shadow:0 0 30px rgba(100,160,255,.35)}
+.dcr-result-kicker{margin:0 0 9px;color:#a7c3e8;font:700 13px 'Exo 2',system-ui,sans-serif;letter-spacing:.28em;text-transform:uppercase}.dcr-result-title{margin:0;color:#fff;font:800 clamp(38px,8vw,76px)/1 'Exo 2',system-ui,sans-serif;letter-spacing:.035em;text-shadow:0 5px 24px rgba(52,130,231,.28)}.dcr-result.lose .dcr-result-title{color:#dce9fb}.dcr-result-copy{margin:16px 0 26px;color:#b7c9df;font:500 16px/1.5 'Inter Tight',system-ui,sans-serif}.dcr-result-close{padding:12px 22px;border:1px solid #e7b44c;border-radius:10px;background:linear-gradient(100deg,#173a66,#0c1c32);color:#fff;font:700 14px 'Exo 2',system-ui,sans-serif;cursor:pointer;transition:transform .18s,filter .18s}.dcr-result-close:hover{transform:translateY(-2px);filter:brightness(1.2)}
+@keyframes dcrResultIn{0%{opacity:0;transform:translateY(25px) scale(.92)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:700px){.dcr-audio-btn{right:108px!important}.dcr-audio-pop{right:10px;top:58px}}
 </style></head><body><div id="dc-version">V5.7</div>
 
 
@@ -569,7 +587,7 @@ function snd(k){
  }catch(e){}
 }
 function paintMu(){document.getElementById('mu').innerHTML=ico(MUTE?'mute':'vol',20)}
-document.getElementById('mu').onclick=()=>{MUTE=!MUTE;try{localStorage.setItem('dc-mute',MUTE?'1':'0')}catch(e){}paintMu();snd('click')};
+document.getElementById('mu').onclick=()=>{MUTE=!MUTE;try{localStorage.setItem('dc-mute',MUTE?'1':'0')}catch(e){}paintMu();const bg=document.getElementById('dcr-bgm');if(bg)bg.muted=MUTE;snd('click')};
 paintMu();
 document.addEventListener('click',e=>{if(e.target.closest('button'))snd('click');else if(e.target.closest('.hab:not(.off):not(.pas),.chip,.tgt'))snd('select')},true);
 function pop(el,cls,d){if(!el)return;el.classList.add(cls);const s=document.createElement('span');s.className='dn '+(d<0?'m':'p');s.textContent=(d<0?'−':'+')+Math.abs(d);el.appendChild(s);setTimeout(()=>s.remove(),900)}
@@ -1686,10 +1704,25 @@ window.addEventListener('load',()=>{
  $('dc-rematch').onclick=()=>{if(MS_HOST&&myIdx===0)msStartTables([MS_LOCAL_TABLE])};$('dc-back-room').onclick=()=>{if(ROOM){S.over=false;S.mp=false;msRenderRoom()}};
  $('lv').addEventListener('click',()=>{if(ROOM&&S.over)msRenderRoom()});
 });
-</script><div id="dcr-panel" class="dcr-panel" aria-live="polite"><div class="dcr-head"><div id="dcr-title" class="dcr-title"></div><button id="dcr-close" class="dcr-close" type="button" aria-label="Fechar">×</button></div><div id="dcr-meta" class="dcr-meta"></div><div id="dcr-skills"></div></div>
+</script><audio id="dcr-bgm" src="darwin-battle-theme.mp3" preload="auto" loop></audio>
+<button id="dcr-audio-btn" class="thm dcr-audio-btn" type="button" aria-label="Configurações de trilha" aria-expanded="false">♫</button>
+<div id="dcr-audio-pop" class="dcr-audio-pop" hidden><b>Trilha da batalha</b><label for="dcr-volume">Volume <span id="dcr-volume-label">24%</span></label><input id="dcr-volume" type="range" min="0" max="100" value="24" step="1"><small>O botão de som geral também silencia a trilha.</small></div>
+<div id="dcr-result" class="dcr-result" hidden role="dialog" aria-modal="true" aria-live="assertive"><div class="dcr-result-card"><div id="dcr-result-mark" class="dcr-result-mark"></div><p id="dcr-result-kicker" class="dcr-result-kicker"></p><h2 id="dcr-result-title" class="dcr-result-title"></h2><p id="dcr-result-copy" class="dcr-result-copy"></p><button id="dcr-result-close" type="button" class="dcr-result-close">Voltar ao campo</button></div></div>
+<div id="dcr-panel" class="dcr-panel" aria-live="polite"><div class="dcr-head"><div id="dcr-title" class="dcr-title"></div><button id="dcr-close" class="dcr-close" type="button" aria-label="Fechar">×</button></div><div id="dcr-meta" class="dcr-meta"></div><div id="dcr-skills"></div></div>
 <script id="darwin-card-redesign-js">
 (function(){
  const panel=document.getElementById('dcr-panel'),title=document.getElementById('dcr-title'),meta=document.getElementById('dcr-meta'),skills=document.getElementById('dcr-skills');
+ const bgm=document.getElementById('dcr-bgm'),vol=document.getElementById('dcr-volume'),volLabel=document.getElementById('dcr-volume-label'),audioPop=document.getElementById('dcr-audio-pop'),result=document.getElementById('dcr-result');
+ let resultSeen=null,fadeTimer=0;let musicVolume=.24;
+ try{const saved=localStorage.getItem('dc-music-volume');if(saved!==null)musicVolume=Math.max(0,Math.min(1,+saved));}catch(_){}
+ vol.value=Math.round(musicVolume*100);volLabel.textContent=Math.round(musicVolume*100)+'%';bgm.volume=musicVolume;
+ if(typeof TN!=='undefined'){TN.inspect=[[660,0,.08,'sine',.035],[880,.06,.14,'sine',.025]];TN.ability=[[523,0,.08,'triangle',.04],[784,.07,.12,'sine',.035]];}
+ function startMusic(){if(!bgm||typeof S==='undefined'||S.over||cur!=='game')return;clearTimeout(fadeTimer);bgm.volume=musicVolume;bgm.muted=!!MUTE;bgm.play().catch(()=>{});}
+ function stopMusic(){if(!bgm||bgm.paused)return;const initial=bgm.volume,started=performance.now();function fade(now){const q=Math.min(1,(now-started)/500);bgm.volume=Math.max(0,initial*(1-q));if(q<1)requestAnimationFrame(fade);else{bgm.pause();bgm.volume=musicVolume}}requestAnimationFrame(fade)}
+ document.getElementById('dcr-audio-btn').addEventListener('click',e=>{const open=audioPop.hidden;audioPop.hidden=!open;e.currentTarget.setAttribute('aria-expanded',String(open))});
+ vol.addEventListener('input',()=>{musicVolume=+vol.value/100;bgm.volume=musicVolume;volLabel.textContent=vol.value+'%';try{localStorage.setItem('dc-music-volume',String(musicVolume))}catch(_){}if(musicVolume>0&&cur==='game'&&typeof S!=='undefined'&&!S.over)startMusic()});
+ document.getElementById('dcr-result-close').addEventListener('click',()=>{result.classList.remove('on');setTimeout(()=>{result.hidden=true},320)});
+ document.addEventListener('pointerdown',()=>{if(cur==='game'&&typeof S!=='undefined'&&!S.over)startMusic()},{passive:true});
  let active=null;
  function cardFor(side,idx){return Array.from(document.querySelectorAll('.card')).find(x=>+x.dataset.side===side&&+x.dataset.i===idx)||null;}
  function close(){active=null;panel.classList.remove('on','target-mode');document.querySelectorAll('.card.inspecting').forEach(x=>{x.classList.remove('inspecting');x.style.removeProperty('--dcr-rx');x.style.removeProperty('--dcr-ry')});}
@@ -1725,26 +1758,34 @@ window.addEventListener('load',()=>{
   const card=e.target.closest('.card');if(!card||card.classList.contains('tgt'))return;
   const side=+card.dataset.side,idx=+card.dataset.i;
   if(typeof P==='undefined'||!P[side]||!P[side].field||!P[side].field[idx])return;
-  show(side,idx,card);
+  show(side,idx,card);if(typeof snd==='function')snd('inspect');
  },true);
  skills.addEventListener('click',function(e){
   const btn=e.target.closest('[data-use]');if(!btn||btn.disabled||!active)return;
   const key=btn.dataset.use,card=cardFor(active.side,active.idx);if(!card)return;
   const source=Array.from(card.querySelectorAll('.hab')).find(h=>h.dataset.k===key);if(!source)return;
-  const row=btn.closest('.dcr-skill');row.classList.remove('chosen');void row.offsetWidth;row.classList.add('chosen');panel.classList.remove('skill-chosen');void panel.offsetWidth;panel.classList.add('skill-chosen');setTimeout(()=>panel.classList.remove('skill-chosen'),650);
+  const row=btn.closest('.dcr-skill');row.classList.remove('chosen');void row.offsetWidth;row.classList.add('chosen');if(typeof snd==='function')snd('ability');panel.classList.remove('skill-chosen');void panel.offsetWidth;panel.classList.add('skill-chosen');setTimeout(()=>panel.classList.remove('skill-chosen'),650);
   setTimeout(()=>source.click(),100);
  });
  document.addEventListener('pointermove',function(e){
   if(e.pointerType==='touch'||!active)return;const card=cardFor(active.side,active.idx);if(!card)return;
-  const r=card.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){card.style.setProperty('--dcr-rx','0deg');card.style.setProperty('--dcr-ry','0deg');return;}const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
-  card.style.setProperty('--dcr-rx',(-y*12).toFixed(2)+'deg');card.style.setProperty('--dcr-ry',(x*14).toFixed(2)+'deg');position(card);
+  const r=card.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){card.style.setProperty('--dcr-rx','0deg');card.style.setProperty('--dcr-ry','0deg');return;}
+  const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+  // A face tilts subtly away from the cursor: top-right moves back at that corner.
+  card.style.setProperty('--dcr-rx',(-y*7).toFixed(2)+'deg');card.style.setProperty('--dcr-ry',(x*8).toFixed(2)+'deg');
  },{passive:true});
  document.addEventListener('pointerout',function(e){const card=e.target.closest&&e.target.closest('.card.inspecting');if(card&&!card.contains(e.relatedTarget)){card.style.setProperty('--dcr-rx','0deg');card.style.setProperty('--dcr-ry','0deg')}},true);
  window.addEventListener('resize',()=>{if(active)position(cardFor(active.side,active.idx))});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('on'))close()});
  // Reattach the highlight and refresh status after game renders (ability selection/target choice).
  const baseRender=render;
- render=function(){baseRender();if(active){if(cur!=='game'){close();return}show(active.side,active.idx)}};
+ render=function(){
+  baseRender();
+  if(cur==='game'&&typeof S!=='undefined'&&S.over){
+   stopMusic();close();const outcome=S.win===0?'win':'lose';
+   if(resultSeen!==outcome){resultSeen=outcome;result.hidden=false;result.className='dcr-result '+outcome;document.getElementById('dcr-result-mark').textContent=outcome==='win'?'🏆':'✦';document.getElementById('dcr-result-kicker').textContent=outcome==='win'?'Vitória':'Fim de jogo';document.getElementById('dcr-result-title').textContent=outcome==='win'?'VOCÊ VENCEU!':'VOCÊ PERDEU';document.getElementById('dcr-result-copy').textContent=outcome==='win'?'Mandou bem. A arena é sua.':'A batalha terminou. Tente outra estratégia na próxima rodada.';requestAnimationFrame(()=>result.classList.add('on'));if(typeof snd==='function')snd(outcome);}
+  }else{resultSeen=null;result.hidden=true;result.classList.remove('on');if(cur==='game')startMusic();else stopMusic();if(active){if(cur!=='game'){close();return}show(active.side,active.idx)}}
+ };
  window.dcrClose=close;
 })();
 </script></body></html>
