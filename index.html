@@ -125,6 +125,21 @@ select.big#dc-deck-select{appearance:none;-webkit-appearance:none;font-size:15px
 .dcr-skill span{display:block;color:#d8e7fa;font:500 14px/1.4 'Inter Tight',system-ui,sans-serif}
 .dcr-empty{color:#9bb4d2;font:500 14px/1.4 'Inter Tight',system-ui,sans-serif}
 @media(max-width:700px){.dcr-panel{right:10px;left:10px;top:auto;bottom:10px;transform:translateY(20px);width:auto;max-height:55vh}.dcr-panel.on{transform:translateY(0)}}
+
+.card.inspecting{transform:perspective(900px) translateY(-16px) scale(1.12) translateZ(36px) rotateX(var(--dcr-rx,0deg)) rotateY(var(--dcr-ry,0deg));transform-style:preserve-3d;will-change:transform;}
+.dcr-panel{right:auto;top:0;transition:opacity .22s ease,transform .22s cubic-bezier(.2,.8,.2,1)}
+.dcr-skill{position:relative;transition:transform .18s ease,background .18s ease,box-shadow .18s ease;}
+.dcr-skill:hover{transform:translateX(4px);background:linear-gradient(90deg,rgba(43,110,192,.42),rgba(5,14,28,.22));}
+.dcr-skill.chosen{animation:dcrSkillPick .42s ease both;box-shadow:0 0 20px rgba(44,132,255,.42);}
+.dcr-use{display:block;width:100%;margin-top:9px;padding:8px 10px;border:1px solid #3a80d9;border-radius:8px;background:linear-gradient(100deg,#143b70,#0a1c36);color:#e9f3ff;font:700 12px 'Exo 2',system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:transform .16s,filter .16s,box-shadow .16s;}
+.dcr-use:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.25);box-shadow:0 5px 16px rgba(40,120,230,.3)}
+.dcr-use:disabled{opacity:.45;cursor:not-allowed}
+.dcr-panel.target-mode{border-color:#e7a936;box-shadow:0 20px 70px rgba(0,0,0,.7),0 0 30px rgba(231,169,54,.27)}
+.dcr-panel.target-mode .dcr-meta{color:#ffd06b}
+@keyframes dcrPanelPick{0%{filter:brightness(1);transform:translateY(-50%) scale(1)}45%{filter:brightness(1.35);transform:translateY(-50%) scale(1.025)}100%{filter:brightness(1);transform:translateY(-50%) scale(1)}}
+.dcr-panel.skill-chosen{animation:dcrPanelPick .48s ease}
+@keyframes dcrSkillPick{0%{transform:scale(1);filter:brightness(1)}38%{transform:scale(1.035);filter:brightness(1.5)}100%{transform:scale(1);filter:brightness(1)}}
+@media(max-width:700px){.dcr-panel{right:10px;left:10px;top:auto;bottom:10px;transform:translateY(24px);width:auto;max-height:55vh}.dcr-panel.on{transform:translateY(0)}}
 </style></head><body><div id="dc-version">V5.7</div>
 
 
@@ -1675,24 +1690,61 @@ window.addEventListener('load',()=>{
 <script id="darwin-card-redesign-js">
 (function(){
  const panel=document.getElementById('dcr-panel'),title=document.getElementById('dcr-title'),meta=document.getElementById('dcr-meta'),skills=document.getElementById('dcr-skills');
- function close(){panel.classList.remove('on');document.querySelectorAll('.card.inspecting').forEach(x=>x.classList.remove('inspecting'));}
+ let active=null;
+ function cardFor(side,idx){return Array.from(document.querySelectorAll('.card')).find(x=>+x.dataset.side===side&&+x.dataset.i===idx)||null;}
+ function close(){active=null;panel.classList.remove('on','target-mode');document.querySelectorAll('.card.inspecting').forEach(x=>{x.classList.remove('inspecting');x.style.removeProperty('--dcr-rx');x.style.removeProperty('--dcr-ry')});}
+ function position(card){
+  if(!card)return; if(innerWidth<=700){panel.style.left='';panel.style.top='';return;}
+  const r=card.getBoundingClientRect(),w=Math.min(390,innerWidth-28),left=r.right+w+22<=innerWidth?r.right+18:Math.max(14,r.left-w-18);
+  panel.style.left=left+'px';panel.style.top=Math.max(14,Math.min(innerHeight-120,r.top+r.height/2))+'px';
+ }
+ function skillText(a,c){let v=a.v||'';if(!v&&a.dm){try{v=String(a.dm(c))}catch(_){v='Dano variável'}}return v||'Habilidade passiva ou efeito especial.';}
+ function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+ function show(side,idx,card){
+  const c=typeof P!=='undefined'&&P[side]&&P[side].field&&P[side].field[idx];if(!c)return;
+  active={side,idx};card=card||cardFor(side,idx);
+  document.querySelectorAll('.card.inspecting').forEach(x=>{x.classList.remove('inspecting');x.style.removeProperty('--dcr-rx');x.style.removeProperty('--dcr-ry')});
+  if(card)card.classList.add('inspecting');
+  title.textContent=c.n||'Personagem';
+  meta.textContent=typeof S!=='undefined'&&S.sel?'Escolha a carta-alvo no campo.':'PV '+(+c.hp)+'/'+(+c.max)+'  •  '+(typeof clsN==='function'?clsN(c.cls):'Classe');
+  panel.classList.toggle('target-mode',!!(typeof S!=='undefined'&&S.sel));
+  const ks=typeof abl==='function'?abl(c):[];
+  const list=ks.map(k=>({k,a:typeof AB!=='undefined'?AB[k]:null})).filter(x=>x.a);
+  skills.innerHTML=list.length?list.map(({k,a})=>{
+   const source=card&&Array.from(card.querySelectorAll('.hab')).find(h=>h.dataset.k===k);
+   const allowed=side===0&&typeof S!=='undefined'&&S.turn===0&&!S.over;
+   const usable=allowed&&source&&!source.classList.contains('off')&&!source.classList.contains('pas');
+   const canToggle=allowed&&source&&source.classList.contains('tog');
+   return '<div class="dcr-skill" data-skill="'+esc(k)+'"><strong>'+esc(a.n||'Habilidade')+'</strong><span>'+esc(skillText(a,c))+'</span>'+(side===0&&!a.pas?'<button type="button" class="dcr-use" data-use="'+esc(k)+'"'+(usable||canToggle?'':' disabled')+'>'+(usable||canToggle?'Escolher habilidade':'Indisponível agora')+'</button>':'')+'</div>';
+  }).join(''):'<div class="dcr-empty">Este personagem não possui habilidades visíveis.</div>';
+  panel.classList.add('on');position(card);
+ }
  document.getElementById('dcr-close').onclick=close;
  document.addEventListener('click',function(e){
   if(e.target.closest('#dcr-panel')||e.target.closest('.hab'))return;
-  const card=e.target.closest('.card'); if(!card)return;
+  const card=e.target.closest('.card');if(!card||card.classList.contains('tgt'))return;
   const side=+card.dataset.side,idx=+card.dataset.i;
-  if(!window.P||!P[side]||!P[side].field||!P[side].field[idx])return;
-  const c=P[side].field[idx];
-  document.querySelectorAll('.card.inspecting').forEach(x=>x.classList.remove('inspecting'));
-  card.classList.add('inspecting');
-  title.textContent=c.n||'Personagem';
-  meta.textContent='PV '+(+c.hp)+'/'+(+c.max)+'  •  '+(typeof clsN==='function'?clsN(c.cls):'Classe');
-  const list=(typeof abl==='function'?abl(c):[]).map(k=>window.AB&&AB[k]).filter(Boolean);
-  skills.innerHTML=list.length?list.map(a=>'<div class="dcr-skill"><strong>'+esc(a.n||'Habilidade')+'</strong><span>'+esc(skillText(a,c))+'</span></div>').join(''):'<div class="dcr-empty">Este personagem não possui habilidades visíveis.</div>';
-  panel.classList.add('on');
+  if(typeof P==='undefined'||!P[side]||!P[side].field||!P[side].field[idx])return;
+  show(side,idx,card);
  },true);
- function skillText(a,c){let v=a.v||'';if(!v&&a.dm){try{v=String(a.dm(c))}catch(_){v='Dano variável'}}return v||'Habilidade passiva ou efeito especial.';}
- function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
+ skills.addEventListener('click',function(e){
+  const btn=e.target.closest('[data-use]');if(!btn||btn.disabled||!active)return;
+  const key=btn.dataset.use,card=cardFor(active.side,active.idx);if(!card)return;
+  const source=Array.from(card.querySelectorAll('.hab')).find(h=>h.dataset.k===key);if(!source)return;
+  const row=btn.closest('.dcr-skill');row.classList.remove('chosen');void row.offsetWidth;row.classList.add('chosen');panel.classList.remove('skill-chosen');void panel.offsetWidth;panel.classList.add('skill-chosen');setTimeout(()=>panel.classList.remove('skill-chosen'),650);
+  setTimeout(()=>source.click(),100);
+ });
+ document.addEventListener('pointermove',function(e){
+  if(e.pointerType==='touch'||!active)return;const card=cardFor(active.side,active.idx);if(!card)return;
+  const r=card.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){card.style.setProperty('--dcr-rx','0deg');card.style.setProperty('--dcr-ry','0deg');return;}const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+  card.style.setProperty('--dcr-rx',(-y*12).toFixed(2)+'deg');card.style.setProperty('--dcr-ry',(x*14).toFixed(2)+'deg');position(card);
+ },{passive:true});
+ document.addEventListener('pointerout',function(e){const card=e.target.closest&&e.target.closest('.card.inspecting');if(card&&!card.contains(e.relatedTarget)){card.style.setProperty('--dcr-rx','0deg');card.style.setProperty('--dcr-ry','0deg')}},true);
+ window.addEventListener('resize',()=>{if(active)position(cardFor(active.side,active.idx))});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('on'))close()});
+ // Reattach the highlight and refresh status after game renders (ability selection/target choice).
+ const baseRender=render;
+ render=function(){baseRender();if(active){if(cur!=='game'){close();return}show(active.side,active.idx)}};
  window.dcrClose=close;
 })();
 </script></body></html>
