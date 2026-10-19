@@ -158,6 +158,17 @@ select.big#dc-deck-select{appearance:none;-webkit-appearance:none;font-size:15px
 .dcr-result-kicker{margin:0 0 9px;color:#a7c3e8;font:700 13px 'Exo 2',system-ui,sans-serif;letter-spacing:.28em;text-transform:uppercase}.dcr-result-title{margin:0;color:#fff;font:800 clamp(38px,8vw,76px)/1 'Exo 2',system-ui,sans-serif;letter-spacing:.035em;text-shadow:0 5px 24px rgba(52,130,231,.28)}.dcr-result.lose .dcr-result-title{color:#dce9fb}.dcr-result-copy{margin:16px 0 26px;color:#b7c9df;font:500 16px/1.5 'Inter Tight',system-ui,sans-serif}.dcr-result-close{padding:12px 22px;border:1px solid #e7b44c;border-radius:10px;background:linear-gradient(100deg,#173a66,#0c1c32);color:#fff;font:700 14px 'Exo 2',system-ui,sans-serif;cursor:pointer;transition:transform .18s,filter .18s}.dcr-result-close:hover{transform:translateY(-2px);filter:brightness(1.2)}
 @keyframes dcrResultIn{0%{opacity:0;transform:translateY(25px) scale(.92)}100%{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:700px){.dcr-audio-btn{right:108px!important}.dcr-audio-pop{right:10px;top:58px}}
+</style><style id="dcr-inspector-refine">
+.dcr-inspect-backdrop{position:fixed;inset:0;z-index:1080;background:rgba(1,4,10,.70);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);opacity:0;pointer-events:none;transition:opacity .28s ease}
+.dcr-inspect-backdrop.on{opacity:1;pointer-events:auto}
+.card.inspecting{left:calc(50% - 350px)!important;top:50%!important;width:min(340px,35vw)!important;z-index:1100!important;transform:perspective(1000px) translate(-50%,-50%) scale(1.08) rotateX(var(--dcr-rx,0deg)) rotateY(var(--dcr-ry,0deg));transform-origin:var(--dcr-ox,50%) var(--dcr-oy,50%)!important;transform-style:preserve-3d!important;animation:dcrCardToFront .42s cubic-bezier(.18,.78,.24,1) both,dcrCardFloat 3.6s ease-in-out .42s infinite}
+.dcr-panel{z-index:1102!important}
+.dcr-close{position:relative!important;width:38px!important;height:38px!important;min-width:38px;padding:0!important;border:1px solid rgba(255,208,107,.85)!important;border-radius:50%!important;background:rgba(231,169,54,.10)!important;color:transparent!important;font-size:0!important;line-height:0!important;box-shadow:inset 0 0 0 3px rgba(255,255,255,.035),0 3px 10px rgba(0,0,0,.32);transition:background .18s ease,box-shadow .18s ease,transform .18s ease!important}
+.dcr-close::before,.dcr-close::after{content:"";position:absolute;width:14px;height:2px;border-radius:2px;background:#ffd06b;left:50%;top:50%;margin:-1px 0 0 -7px}
+.dcr-close::before{transform:rotate(45deg)}.dcr-close::after{transform:rotate(-45deg)}
+.dcr-close:hover{transform:scale(1.06)!important;background:rgba(231,169,54,.24)!important;box-shadow:0 0 18px rgba(231,169,54,.38)}
+.card.dcr-closing{position:fixed!important;left:calc(50% - 350px)!important;top:50%!important;width:min(340px,35vw)!important;z-index:1100!important;opacity:0;transform:perspective(1000px) translate(-50%,-50%) scale(.96)!important;transition:opacity .2s ease,transform .2s ease!important;pointer-events:none}
+@media(max-width:700px){.card.inspecting{left:50%!important;top:34%!important;width:min(260px,58vw)!important;transform:perspective(900px) translate(-50%,-50%) scale(1.04) rotateX(var(--dcr-rx,0deg)) rotateY(var(--dcr-ry,0deg));transform-origin:var(--dcr-ox,50%) var(--dcr-oy,50%)!important}.card.dcr-closing{left:50%!important;top:34%!important;width:min(260px,58vw)!important}}
 </style></head><body><div id="dc-version">V5.7</div>
 
 
@@ -1706,12 +1717,13 @@ window.addEventListener('load',()=>{
 });
 </script><audio id="dcr-bgm" src="darwin-battle-theme.mp3" preload="auto" loop></audio>
 <button id="dcr-audio-btn" class="thm dcr-audio-btn" type="button" aria-label="Configurações de trilha" aria-expanded="false">♫</button>
+<div id="dcr-inspect-backdrop" class="dcr-inspect-backdrop" aria-hidden="true"></div>
 <div id="dcr-audio-pop" class="dcr-audio-pop" hidden><b>Trilha da batalha</b><label for="dcr-volume">Volume <span id="dcr-volume-label">24%</span></label><input id="dcr-volume" type="range" min="0" max="100" value="24" step="1"><small>O botão de som geral também silencia a trilha.</small></div>
 <div id="dcr-result" class="dcr-result" hidden role="dialog" aria-modal="true" aria-live="assertive"><div class="dcr-result-card"><div id="dcr-result-mark" class="dcr-result-mark"></div><p id="dcr-result-kicker" class="dcr-result-kicker"></p><h2 id="dcr-result-title" class="dcr-result-title"></h2><p id="dcr-result-copy" class="dcr-result-copy"></p><button id="dcr-result-close" type="button" class="dcr-result-close">Voltar ao campo</button></div></div>
 <div id="dcr-panel" class="dcr-panel" aria-live="polite"><div class="dcr-head"><div id="dcr-title" class="dcr-title"></div><button id="dcr-close" class="dcr-close" type="button" aria-label="Fechar">×</button></div><div id="dcr-meta" class="dcr-meta"></div><div id="dcr-skills"></div></div>
 <script id="darwin-card-redesign-js">
 (function(){
- const panel=document.getElementById('dcr-panel'),title=document.getElementById('dcr-title'),meta=document.getElementById('dcr-meta'),skills=document.getElementById('dcr-skills');
+ const panel=document.getElementById('dcr-panel'),title=document.getElementById('dcr-title'),meta=document.getElementById('dcr-meta'),skills=document.getElementById('dcr-skills'),backdrop=document.getElementById('dcr-inspect-backdrop');
  const bgm=document.getElementById('dcr-bgm'),vol=document.getElementById('dcr-volume'),volLabel=document.getElementById('dcr-volume-label'),audioPop=document.getElementById('dcr-audio-pop'),result=document.getElementById('dcr-result');
  let resultSeen=null,fadeTimer=0;let musicVolume=.24;
  try{const saved=localStorage.getItem('dc-music-volume');if(saved!==null)musicVolume=Math.max(0,Math.min(1,+saved));}catch(_){}
@@ -1725,7 +1737,7 @@ window.addEventListener('load',()=>{
  document.addEventListener('pointerdown',()=>{if(cur==='game'&&typeof S!=='undefined'&&!S.over)startMusic()},{passive:true});
  let active=null;
  function cardFor(side,idx){return Array.from(document.querySelectorAll('.card')).find(x=>+x.dataset.side===side&&+x.dataset.i===idx)||null;}
- function close(){active=null;panel.classList.remove('on','target-mode');document.querySelectorAll('.card.inspecting').forEach(x=>{x.classList.remove('inspecting');x.style.removeProperty('--dcr-rx');x.style.removeProperty('--dcr-ry')});}
+ function close(){active=null;panel.classList.remove('on','target-mode');backdrop.classList.remove('on');document.querySelectorAll('.card.inspecting').forEach(x=>{x.classList.add('dcr-closing');x.classList.remove('inspecting');x.style.removeProperty('--dcr-rx');x.style.removeProperty('--dcr-ry');x.style.removeProperty('--dcr-ox');x.style.removeProperty('--dcr-oy');setTimeout(()=>x.classList.remove('dcr-closing'),220)});}
  function position(card){
   if(!card)return; if(innerWidth<=700){panel.style.left='';panel.style.top='';return;}
   const r=card.getBoundingClientRect(),w=Math.min(390,innerWidth-28),left=r.right+w+22<=innerWidth?r.right+18:Math.max(14,r.left-w-18);
@@ -1750,7 +1762,7 @@ window.addEventListener('load',()=>{
    const canToggle=allowed&&source&&source.classList.contains('tog');
    return '<div class="dcr-skill" data-skill="'+esc(k)+'"><strong>'+esc(a.n||'Habilidade')+'</strong><span>'+esc(skillText(a,c))+'</span>'+(side===0&&!a.pas?'<button type="button" class="dcr-use" data-use="'+esc(k)+'"'+(usable||canToggle?'':' disabled')+'>'+(usable||canToggle?'Escolher habilidade':'Indisponível agora')+'</button>':'')+'</div>';
   }).join(''):'<div class="dcr-empty">Este personagem não possui habilidades visíveis.</div>';
-  panel.classList.add('on');position(card);
+  panel.classList.add('on');backdrop.classList.add('on');position(card);
  }
  document.getElementById('dcr-close').onclick=close;
  document.addEventListener('click',function(e){
@@ -1765,16 +1777,16 @@ window.addEventListener('load',()=>{
   const key=btn.dataset.use,card=cardFor(active.side,active.idx);if(!card)return;
   const source=Array.from(card.querySelectorAll('.hab')).find(h=>h.dataset.k===key);if(!source)return;
   const row=btn.closest('.dcr-skill');row.classList.remove('chosen');void row.offsetWidth;row.classList.add('chosen');if(typeof snd==='function')snd('ability');panel.classList.remove('skill-chosen');void panel.offsetWidth;panel.classList.add('skill-chosen');setTimeout(()=>panel.classList.remove('skill-chosen'),650);
-  setTimeout(()=>source.click(),100);
+  setTimeout(()=>{source.click();if(typeof S!=='undefined'&&S.sel)close()},100);
  });
  document.addEventListener('pointermove',function(e){
   if(e.pointerType==='touch'||!active)return;const card=cardFor(active.side,active.idx);if(!card)return;
-  const r=card.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){card.style.setProperty('--dcr-rx','0deg');card.style.setProperty('--dcr-ry','0deg');return;}
+  const r=card.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){card.style.setProperty('--dcr-rx','0deg');card.style.setProperty('--dcr-ry','0deg');card.style.setProperty('--dcr-ox','50%');card.style.setProperty('--dcr-oy','50%');return;}
   const x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
   // A face tilts subtly away from the cursor: top-right moves back at that corner.
-  card.style.setProperty('--dcr-rx',(-y*7).toFixed(2)+'deg');card.style.setProperty('--dcr-ry',(x*8).toFixed(2)+'deg');
+  card.style.setProperty('--dcr-rx',(-y*7).toFixed(2)+'deg');card.style.setProperty('--dcr-ry',(x*8).toFixed(2)+'deg');card.style.setProperty('--dcr-ox',((1-(x+.5))*100).toFixed(1)+'%');card.style.setProperty('--dcr-oy',((1-(y+.5))*100).toFixed(1)+'%');
  },{passive:true});
- document.addEventListener('pointerout',function(e){const card=e.target.closest&&e.target.closest('.card.inspecting');if(card&&!card.contains(e.relatedTarget)){card.style.setProperty('--dcr-rx','0deg');card.style.setProperty('--dcr-ry','0deg')}},true);
+ document.addEventListener('pointerout',function(e){const card=e.target.closest&&e.target.closest('.card.inspecting');if(card&&!card.contains(e.relatedTarget)){card.style.setProperty('--dcr-rx','0deg');card.style.setProperty('--dcr-ry','0deg');card.style.setProperty('--dcr-ox','50%');card.style.setProperty('--dcr-oy','50%')}},true);
  window.addEventListener('resize',()=>{if(active)position(cardFor(active.side,active.idx))});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('on'))close()});
  // Reattach the highlight and refresh status after game renders (ability selection/target choice).
