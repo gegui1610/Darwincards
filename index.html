@@ -169,6 +169,20 @@ select.big#dc-deck-select{appearance:none;-webkit-appearance:none;font-size:15px
 .dcr-close:hover{transform:scale(1.06)!important;background:rgba(231,169,54,.24)!important;box-shadow:0 0 18px rgba(231,169,54,.38)}
 .card.dcr-closing{position:fixed!important;left:50%!important;top:50%!important;width:min(340px,35vw)!important;z-index:1100!important;opacity:0;transform:perspective(1000px) translate(-50%,-50%) scale(.96)!important;transition:opacity .2s ease,transform .2s ease!important;pointer-events:none}
 @media(max-width:700px){.card.inspecting{left:50%!important;top:34%!important;width:min(260px,58vw)!important;transform:translate(-50%,-50%) scale(1.04);transform-origin:center center!important;transform-style:flat!important}.card.dcr-closing{left:50%!important;top:34%!important;width:min(260px,58vw)!important}}
+</style><style id="dcr-inspector-front-layer">
+#dcr-inspect-stage{position:fixed;inset:0;z-index:1100;perspective:1200px;pointer-events:none}
+#dcr-inspect-stage>.card.inspecting{position:absolute!important;left:50%!important;top:50%!important;width:min(340px,35vw)!important;height:auto!important;z-index:1!important;pointer-events:auto!important;filter:drop-shadow(0 22px 45px rgba(0,0,0,.72)) drop-shadow(0 0 24px rgba(45,125,230,.3))!important;transform:translate(-50%,-50%) scale(1.1);transform-origin:center center!important;transform-style:flat!important;animation:dcrCardToFront .42s cubic-bezier(.18,.78,.24,1) both,dcrCardFloat 3.6s ease-in-out .42s infinite!important;backface-visibility:visible!important;}
+#dcr-inspect-stage>.card.dcr-closing{position:absolute!important;left:50%!important;top:50%!important;width:min(340px,35vw)!important;z-index:1!important;opacity:0!important;transform:translate(-50%,-50%) scale(.94)!important;filter:none!important;transition:opacity .2s ease,transform .2s ease!important;}
+#dcr-inspect-backdrop{z-index:1080}
+.dcr-panel{z-index:1102!important;backdrop-filter:none!important;filter:none!important}
+@media(max-width:700px){#dcr-inspect-stage>.card.inspecting{left:50%!important;top:34%!important;width:min(260px,58vw)!important;transform:translate(-50%,-50%) scale(1.04);animation:dcrCardToFrontMobile .42s cubic-bezier(.18,.78,.24,1) both,dcrCardFloat 3.6s ease-in-out .42s infinite!important}#dcr-inspect-stage>.card.dcr-closing{left:50%!important;top:34%!important;width:min(260px,58vw)!important}}
+</style><style id="dcr-flight-sequence">
+#dcr-inspect-stage>.card.inspecting{left:50%!important;top:50%!important;width:var(--dcr-target-w,340px)!important;height:var(--dcr-target-h,500px)!important;transform:translate(-50%,-50%) scale(1.08)!important;transform-origin:center center!important;transform-style:flat!important;animation:none!important;transition:left .54s cubic-bezier(.2,.78,.25,1),top .54s cubic-bezier(.2,.78,.25,1),width .54s cubic-bezier(.2,.78,.25,1),height .54s cubic-bezier(.2,.78,.25,1),transform .54s cubic-bezier(.2,.78,.25,1),filter .3s ease!important;}
+#dcr-inspect-stage>.card.inspecting.dcr-arriving{left:var(--dcr-start-left)!important;top:var(--dcr-start-top)!important;width:var(--dcr-start-w)!important;height:var(--dcr-start-h)!important;transform:none!important;opacity:1!important;animation:none!important;transition:none!important;}
+#dcr-inspect-stage>.card.inspecting.dcr-arrived{animation:dcrCardFloat 3.6s ease-in-out infinite!important;}
+#dcr-inspect-stage>.card.dcr-closing{left:50%!important;top:50%!important;width:var(--dcr-target-w,340px)!important;height:var(--dcr-target-h,500px)!important;}
+.dcr-panel{transition-delay:0s!important;}
+@media(max-width:700px){#dcr-inspect-stage>.card.inspecting{left:50%!important;top:34%!important;width:var(--dcr-target-w,260px)!important;height:var(--dcr-target-h,382px)!important;transform:translate(-50%,-50%) scale(1.04)!important}#dcr-inspect-stage>.card.inspecting.dcr-arriving{left:var(--dcr-start-left)!important;top:var(--dcr-start-top)!important;width:var(--dcr-start-w)!important;height:var(--dcr-start-h)!important;transform:none!important}#dcr-inspect-stage>.card.dcr-closing{left:50%!important;top:34%!important}}
 </style></head><body><div id="dc-version">V5.7</div>
 
 
@@ -1717,13 +1731,14 @@ window.addEventListener('load',()=>{
 });
 </script><audio id="dcr-bgm" src="darwin-battle-theme.mp3" preload="auto" loop></audio>
 <button id="dcr-audio-btn" class="thm dcr-audio-btn" type="button" aria-label="Configurações de trilha" aria-expanded="false">♫</button>
+<div id="dcr-inspect-stage" aria-hidden="false"></div>
 <div id="dcr-inspect-backdrop" class="dcr-inspect-backdrop" aria-hidden="true"></div>
 <div id="dcr-audio-pop" class="dcr-audio-pop" hidden><b>Trilha da batalha</b><label for="dcr-volume">Volume <span id="dcr-volume-label">24%</span></label><input id="dcr-volume" type="range" min="0" max="100" value="24" step="1"><small>O botão de som geral também silencia a trilha.</small></div>
 <div id="dcr-result" class="dcr-result" hidden role="dialog" aria-modal="true" aria-live="assertive"><div class="dcr-result-card"><div id="dcr-result-mark" class="dcr-result-mark"></div><p id="dcr-result-kicker" class="dcr-result-kicker"></p><h2 id="dcr-result-title" class="dcr-result-title"></h2><p id="dcr-result-copy" class="dcr-result-copy"></p><button id="dcr-result-close" type="button" class="dcr-result-close">Voltar ao campo</button></div></div>
 <div id="dcr-panel" class="dcr-panel" aria-live="polite"><div class="dcr-head"><div id="dcr-title" class="dcr-title"></div><button id="dcr-close" class="dcr-close" type="button" aria-label="Fechar">×</button></div><div id="dcr-meta" class="dcr-meta"></div><div id="dcr-skills"></div></div>
 <script id="darwin-card-redesign-js">
 (function(){
- const panel=document.getElementById('dcr-panel'),title=document.getElementById('dcr-title'),meta=document.getElementById('dcr-meta'),skills=document.getElementById('dcr-skills'),backdrop=document.getElementById('dcr-inspect-backdrop');
+ const panel=document.getElementById('dcr-panel'),title=document.getElementById('dcr-title'),meta=document.getElementById('dcr-meta'),skills=document.getElementById('dcr-skills'),backdrop=document.getElementById('dcr-inspect-backdrop'),stage=document.getElementById('dcr-inspect-stage');
  const bgm=document.getElementById('dcr-bgm'),vol=document.getElementById('dcr-volume'),volLabel=document.getElementById('dcr-volume-label'),audioPop=document.getElementById('dcr-audio-pop'),result=document.getElementById('dcr-result');
  let resultSeen=null,fadeTimer=0;let musicVolume=.24;
  try{const saved=localStorage.getItem('dc-music-volume');if(saved!==null)musicVolume=Math.max(0,Math.min(1,+saved));}catch(_){}
@@ -1737,7 +1752,7 @@ window.addEventListener('load',()=>{
  document.addEventListener('pointerdown',()=>{if(cur==='game'&&typeof S!=='undefined'&&!S.over)startMusic()},{passive:true});
  let active=null;
  function cardFor(side,idx){return Array.from(document.querySelectorAll('.card')).find(x=>+x.dataset.side===side&&+x.dataset.i===idx)||null;}
- function close(){active=null;panel.classList.remove('on','target-mode');backdrop.classList.remove('on');document.querySelectorAll('.card.inspecting').forEach(x=>{x.classList.add('dcr-closing');x.classList.remove('inspecting');x.style.removeProperty('--dcr-rx');x.style.removeProperty('--dcr-ry');x.style.removeProperty('--dcr-ox');x.style.removeProperty('--dcr-oy');setTimeout(()=>x.classList.remove('dcr-closing'),220)});}
+ function close(){active=null;panel.classList.remove('on','target-mode');backdrop.classList.remove('on');const staged=Array.from(stage.querySelectorAll('.card'));staged.forEach(x=>{x.classList.add('dcr-closing');x.classList.remove('inspecting');x.style.removeProperty('--dcr-rx');x.style.removeProperty('--dcr-ry');x.style.removeProperty('--dcr-ox');x.style.removeProperty('--dcr-oy');x.style.removeProperty('--dcr-start-left');x.style.removeProperty('--dcr-start-top');x.style.removeProperty('--dcr-start-w');x.style.removeProperty('--dcr-start-h');x.style.removeProperty('--dcr-target-w');x.style.removeProperty('--dcr-target-h');setTimeout(()=>{x.remove();if(cur==='game'&&typeof P!=='undefined')render()},220)});}
  function position(card){
   if(!card)return; if(innerWidth<=700){panel.style.left='';panel.style.top='';return;}
   const r=card.getBoundingClientRect(),left=Math.min(innerWidth-190,r.right+18),w=Math.max(180,Math.min(390,innerWidth-left-14));
@@ -1748,8 +1763,17 @@ window.addEventListener('load',()=>{
  function show(side,idx,card){
   const c=typeof P!=='undefined'&&P[side]&&P[side].field&&P[side].field[idx];if(!c)return;
   active={side,idx};card=card||cardFor(side,idx);
-  document.querySelectorAll('.card.inspecting').forEach(x=>{x.classList.remove('inspecting');x.style.removeProperty('--dcr-rx');x.style.removeProperty('--dcr-ry')});
-  if(card)card.classList.add('inspecting');
+  const startRect=card?card.getBoundingClientRect():null;
+  Array.from(stage.querySelectorAll('.card')).forEach(x=>{if(x!==card)x.remove()});
+  if(card&&card.parentElement!==stage)stage.appendChild(card);
+  document.querySelectorAll('.card.inspecting').forEach(x=>{x.classList.remove('inspecting','dcr-arriving','dcr-arrived');x.style.removeProperty('--dcr-rx');x.style.removeProperty('--dcr-ry')});
+  if(card){
+   const mobile=innerWidth<=700,targetW=mobile?Math.min(260,innerWidth*.58):Math.min(340,innerWidth*.35),targetH=targetW/.68;
+   card.style.setProperty('--dcr-start-left',(startRect?startRect.left:innerWidth/2)+'px');card.style.setProperty('--dcr-start-top',(startRect?startRect.top:innerHeight/2)+'px');card.style.setProperty('--dcr-start-w',(startRect?startRect.width:targetW)+'px');card.style.setProperty('--dcr-start-h',(startRect?startRect.height:targetH)+'px');card.style.setProperty('--dcr-target-w',targetW+'px');card.style.setProperty('--dcr-target-h',targetH+'px');
+   card.classList.add('inspecting','dcr-arriving');card.getBoundingClientRect();requestAnimationFrame(()=>{if(stage.contains(card))card.classList.remove('dcr-arriving')});
+   setTimeout(()=>{if(!active||active.side!==side||active.idx!==idx||!stage.contains(card))return;card.classList.add('dcr-arrived');position(card);panel.classList.add('on')},570);
+  }
+  panel.classList.remove('on');
   title.textContent=c.n||'Personagem';
   meta.textContent=typeof S!=='undefined'&&S.sel?'Escolha a carta-alvo no campo.':'PV '+(+c.hp)+'/'+(+c.max)+'  •  '+(typeof clsN==='function'?clsN(c.cls):'Classe');
   panel.classList.toggle('target-mode',!!(typeof S!=='undefined'&&S.sel));
@@ -1762,9 +1786,10 @@ window.addEventListener('load',()=>{
    const canToggle=allowed&&source&&source.classList.contains('tog');
    return '<div class="dcr-skill" data-skill="'+esc(k)+'"><strong>'+esc(a.n||'Habilidade')+'</strong><span>'+esc(skillText(a,c))+'</span>'+(side===0&&!a.pas?'<button type="button" class="dcr-use" data-use="'+esc(k)+'"'+(usable||canToggle?'':' disabled')+'>'+(usable||canToggle?'Escolher habilidade':'Indisponível agora')+'</button>':'')+'</div>';
   }).join(''):'<div class="dcr-empty">Este personagem não possui habilidades visíveis.</div>';
-  panel.classList.add('on');backdrop.classList.add('on');position(card);
+  backdrop.classList.add('on');
  }
  document.getElementById('dcr-close').onclick=close;
+ backdrop.addEventListener('click',close);
  document.addEventListener('click',function(e){
   if(e.target.closest('#dcr-panel')||e.target.closest('.hab'))return;
   const card=e.target.closest('.card');if(!card||card.classList.contains('tgt'))return;
