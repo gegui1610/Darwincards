@@ -521,14 +521,20 @@ const POOL=[
 {n:'Oscar',c:'Insano',hp:25,d:2,tg:['Fundador','Gordo'],ab:['vendedor','amizades']},
 {n:'Jaja',c:'Protetor',hp:12,d:2,tg:['Gordo','Bebum'],ab:['jaja_passar','jaja_salgado']},
 {n:'Lobo',c:'Protetor',hp:10,d:2,tg:['Aluno','Tche','Bebum'],ab:['lobo_cabecada','lobo_bolo','lobo_es']},
-{n:'Ramira',c:'Insano',hp:15,d:2,tg:['Racista','Predador'],ab:['ramira_invocar','ramira_discurso']}
+{n:'Ramira',c:'Insano',hp:15,d:2,tg:['Racista','Predador'],ab:['ramira_invocar','ramira_discurso']},
+{n:'Renoir',c:'Protetor',hp:20,d:3,tg:['Macaco','Gordo','Professor'],ab:['conhecimento_mistico','ritual']},
+{n:'Lemes',c:'Insano',hp:15,d:2,tg:['Macaco','Professor'],ab:['no_nao','filho_azul']},
+{n:'Gleen',c:'Abusador',hp:15,d:2,tg:['Professor','Racista','Gordo'],ab:['chamar_diego','pancada_gleen']},
+{n:'Raquel',c:'Ordem',hp:12,d:2,tg:['Professor','Gordo','Femea'],ab:['continue_exu','mil_toneladas']},
+{n:'Rayssa',c:'Protetor',hp:15,d:2,tg:['Professor','Femea'],ab:['medo_rayssa','livrada','trabalho_cansativo']}
 ];
-const GENDER={Yarlon:'Macho',Alex:'Macho','Ângelo':'Macho',João:'Macho',Catunda:'Macho',Hugão:'Macho',Diego:'Macho',Isaque:'Macho',Kelvin:'Macho',Fatori:'Macho',Pereira:'Macho',Pietro:'Macho','Michael Jackson':'Macho','Gabriel Arthur':'Macho',JP:'Macho','João Filho':'Macho','Mârdonio Paz':'Macho',Ximenes:'Macho',Werley:'Macho',Oscar:'Macho',Dudu:'Macho',Jaja:'Macho',Lobo:'Macho',Duda:'Fêmea',Gorreth:'Fêmea',Sâmia:'Fêmea',Cris:'Fêmea',Nicole:'Fêmea','Tche-Tche Fêmea':'Fêmea','Pessoal da Limpeza':'NB',Câmera:'NB',ELES:'NB','Tche-Tche':'NB'};
+const GENDER={Yarlon:'Macho',Alex:'Macho','Ângelo':'Macho',João:'Macho',Catunda:'Macho',Hugão:'Macho',Diego:'Macho',Isaque:'Macho',Kelvin:'Macho',Fatori:'Macho',Pereira:'Macho',Pietro:'Macho','Michael Jackson':'Macho','Gabriel Arthur':'Macho',JP:'Macho','João Filho':'Macho','Mârdonio Paz':'Macho',Ximenes:'Macho',Werley:'Macho',Oscar:'Macho',Dudu:'Macho',Jaja:'Macho',Lobo:'Macho',Renoir:'Macho',Lemes:'Macho',Gleen:'Macho',Raquel:'Fêmea',Rayssa:'Fêmea',Duda:'Fêmea',Gorreth:'Fêmea',Sâmia:'Fêmea',Cris:'Fêmea',Nicole:'Fêmea','Tche-Tche Fêmea':'Fêmea','Pessoal da Limpeza':'NB',Câmera:'NB',ELES:'NB','Tche-Tche':'NB'};
 POOL.forEach(p=>{p.gender=GENDER[p.n]||'NB'});
 const SUMMONS=[
-{n:'Dudu',c:'Insano',hp:20,d:5,tg:['Autista','Gordo','Rico','Invocação'],w:2,ab:['punho','bigboy'],x:'Invocado com o sacrifício de Isaque, Pietro e Michael Jackson; ao surgir causa 5 de dano a todos os inimigos.'},
-{n:'ELES',c:'Ordem',hp:40,d:2,tg:['Rico','Invocação'],ab:['desligar','supervisionar'],x:'Invocado com o sacrifício de Diego, Sâmia e João.'},
-{n:'Tche-Tche',c:'Nenhuma',hp:40,d:2,t:'diabo',tg:['Diabo','Macaco','Tche','Invocação'],ab:['pisotear','tchezar','inv_tche'],x:'Invocado sacrificando três Alguém com a característica Tche-Tche.'}
+{n:'Dudu',c:'Insano',hp:20,d:5,tg:['Autista','Gordo','Rico'],w:2,ab:['punho','bigboy'],x:'Obtido pela Santa Trindade; ao surgir causa 5 de dano a todos os inimigos.'},
+{n:'ELES',c:'Ordem',hp:40,d:2,tg:['Rico'],ab:['desligar','supervisionar'],x:'Obtido pela Santa Trindade de Diego, Sâmia e João.'},
+{n:'Tche-Tche-Re-Re-Tche-Tche',c:'Nenhuma',hp:40,d:2,t:'diabo',tg:['Diabo','Macaco','Tche','Invocação'],ab:['pisotear','tchezar'],x:'Invocado sacrificando três Alguém com a característica Tche-Tche.'},
+{n:'Filho Azul',c:'Nenhuma',hp:10,d:1,tg:['Macaco','Invocação'],ab:['filho_professor','filho_soco'],x:'Invocado por Lemes; age independentemente.'}
 ];
 SUMMONS.forEach(p=>{p.gender=GENDER[p.n]||'NB'});
 const SUMMON_ONLY=new Set([...SUMMONS.map(x=>x.n),'Tche-Tche Fêmea','Pessoal da Limpeza','Câmera']);
@@ -680,12 +686,16 @@ const NS=[
 {id:'molotov',n:'Coquetel Molotov',type:'item',icon:'flame',tag:'arma',gr:['molotov'],d:'3 dano em até 2 alvos; 25% queimadura. Consumido no uso.'},
 {id:'moletom',n:'Moletom manchado de sangue',type:'item',icon:'shirt',d:'Recebe −1 dano; 10% próximo ataque do alvo causa metade.'},
 {id:'cordao',n:'Cordão de Autismo',type:'item',icon:'lanyard',d:'Autista/Ordem sofre 2 ao atacar você; seu ataque causa −3.'},
-{id:'chapeu_isaque',n:'Chapéu do Pescador',type:'item',icon:'hat',tag:'chapeu',only:'Isaque',gr:['pesc_a','pesc_i','pesc_m'],d:'Uma vez por cena, Isaque pode pescar Alguém, item ou ambiente. Desliga após uso.'},
+{id:'chapeu_isaque',n:'Chapéu do Pescador',type:'item',icon:'hat',tag:'chapeu',only:'Isaque',gr:['pescaria'],d:'Uma vez por cena, recebe um Alguém Autista ou Insano. Desliga após uso.'},
 {id:'chapeu_kelvin',n:'Chapéu de Cowboy',type:'item',icon:'cowboy',tag:'chapeu',only:'Kelvin',gr:['disparo'],d:'Disparo: 3 dano (+2 contra Macaco ou Professor).'},
 {id:'luva',n:'Luva do P.P.',type:'item',icon:'glove',only:'Pereira',gr:['agarrar','amor'],d:'Agarrar +2; Amor Irrestrito dá mais +2 contra alvo amado.'},
 {id:'totem',n:'Totem do Darwin',type:'item',icon:'cross',req:['Aluno','Professor','Ordem'],d:'Exclusivo para Aluno, Professor e/ou Ordem. A cada rodada, 1% de chance de desligar um Alguém no terreno ativo.'},
 {id:'camiseta_terceirao',n:'Camiseta do Terceirão',type:'item',icon:'shirt',only:'Hugão',gr:['vermelhinha'],d:'Hugão causa +1 dano (+2 contra Fêmea) e recebe Você fica Vermelhinha: cura 2 PV (+2 se Fêmea).'},
-{id:'botton',n:'Botton do Dudu',type:'item',icon:'badge',d:'Sofre −1 dano e causa +1 dano. Dudu recebe Tua Alma é Imunda: 2 dano por 3 rodadas e −1 dano ao alvo na próxima rodada.'}
+{id:'botton',n:'Botton do Dudu',type:'item',icon:'badge',d:'Sofre −1 dano e causa +1 dano. Dudu recebe Tua Alma é Imunda: 2 dano por 3 rodadas e −1 dano ao alvo na próxima rodada.'},
+{id:'moletom_famoso',n:'Moletom Famoso',type:'item',icon:'shirt',d:'O usuário sofre +1 dano; 25% de redirecionar dano e penalidades para um aliado adjacente.'},
+{id:'farda_darwin',n:'Farda do Darwin',type:'item',icon:'shirt',all:['Ordem','Aluno'],gr:['paz_mundo'],d:'Exclusiva de Ordem e Aluno. Paz pela Paz: anula todo dano e penalidade; consumida após uso.'},
+{id:'colar_exu',n:'Colar de Exu',type:'item',icon:'lanyard',only:'Renoir',gr:['protecao_exu'],d:'Renoir causa +1 dano; Proteção de Exu faz o alvo causar −2 dano por uma rodada.'},
+{id:'celular',n:'Celular',type:'item',icon:'phone',req:['Tche'],gr:['x1_apostado'],d:'Exclusivo Tche-Tche. 50% causa 5 dano ao alvo escolhido ou 5 dano ao usuário.'}
 ];
 
 const NS_TEXT_FIXES={"apagao": "Todos os Alguém têm 10% de chance de errar suas habilidades. Alguém com a característica Macaco é imune ao Apagão.", "punk": "Todos os Alguém causam +1 de dano e têm 25% de chance de sofrer 50% de dano adicional. Cada pessoa deve usar pelo menos uma habilidade que cause dano.", "apoc": "A cada rodada, todo Alguém no terreno tem 25% de chance de ser desligado. Dura 3 rodadas e suprime todos os outros ambientes durante esse período.", "met": "Todos os Alguém têm 75% de chance de sofrer 3 de dano. Com Chapéu de Cone Cortado ou uma variante de chapéu: 2 de dano e 50% de chance.", "pol": "Alguém com item variante de arma, como Faca, Pistola ou Coquetel Molotov, sofre 2 de dano e tem a arma desligada.", "bebida": "Recupera 4 PV. Tem 25% de chance de provocar vômito: o usuário e um aliado adjacente sofrem 1 de dano e causam −1 de dano por 2 rodadas.", "virgem": "Recupera 8 PV, mas faz o usuário causar −1 de dano pelas próximas 6 rodadas.", "tarado": "Recupera 3 PV, mas faz o usuário causar +1 de dano pelas próximas 3 rodadas.", "pacoca": "Recupera 2 PV.", "papel": "“Papeeeeeeeellllllllllllllllllllllll”. Easter egg: aparentemente nem tudo precisa ser útil.", "alcool_caseiro": "Cura 1; Bêbum ganha +2 PV; 10% de chance de causar −1 de dano por 1 rodada.", "um_real": "50% de chance de conceder uma carta Alguém ao usuário e 50% de concedê-la ao oponente.", "admissao": "Concede uma carta Alguém aleatória.", "demissao": "Após 3 rodadas, desliga um Alguém escolhido. Não afeta Catunda, ELES, Dudu ou Tche-Tche.", "pistola": "Permite usar Tiro de 9mm: 2 de dano (+2 contra Macaco) e 10% de chance de causar 1 de dano por 4 rodadas.", "faca": "Permite usar Facada: 2 de dano e 25% de chance de causar 1 de dano por 2 rodadas.", "cone": "Reduz em um nível as chances percentuais de efeitos: 75% → 50% → 25% → 10% → 5%.", "botton": "O usuário sofre −1 de dano e causa +1 de dano.", "oculos": "Tem 25% de chance de causar 10% de dano adicional. Se o usuário tiver a característica Professor, causa +1 de dano.", "adesivo": "Uma vez por adesivo, permite sofrer metade do dano de uma habilidade. Após o uso, o adesivo é desligado.", "molotov": "Permite usar Jorrada de Fogo: causa 3 de dano a 2 Alguém escolhidos e tem 25% de chance de causar 2 de dano por 3 rodadas. Após o primeiro uso, o item é desligado.", "moletom": "O usuário sofre −1 de dano. Ao atacar, tem 10% de chance de fazer o próximo ataque do alvo causar metade do dano.", "cordao": "Alguém com a característica Autista ou da classe Ordem sofre 2 de dano ao atacar o usuário e causa −3 de dano contra ele.", "chapeu_isaque": "Concede Pescaria. Uma vez por cena, Isaque escolhe um tipo de carta para pescar: Alguém, Item ou Ambiente. Após o uso, o chapéu é desligado.", "chapeu_kelvin": "Concede Disparo: 3 de dano, com +2 de dano contra Macaco ou Professor.", "xadrez": "Isaque sofre −2 de dano.", "luva": "Pereira causa +2 de dano com Agarrar e recebe Amor Irrestrito. Com ela, pode se apaixonar por um Alguém Fêmea e causar +2 de dano com Agarrar contra ela pelo resto do jogo. Se perder as luvas, perde os benefícios do Amor Irrestrito."};
@@ -700,8 +710,10 @@ const TAGIMG={"rico":"data:image/webp;base64,UklGRo4eAABXRUJQVlA4WAoAAAAQAAAAfwA
 const nk=s=>String(s==null?'':s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
 const has=(c,t)=>!!c&&Array.isArray(c.tg)&&c.tg.some(x=>nk(x)===nk(t));
 const isFemale=c=>!!c&&(c.gender==='Fêmea'||c.gender==='NB'||has(c,'Fêmea')||has(c,'Femea'));
-const canEquip=(c,x)=>!!c&&(!x.only||c.n===x.only)&&(!x.req||x.req.some(r=>has(c,r)||nk(c.c)===nk(r)));
-const canEquipFrom=(x,roster)=>!x.only&&!x.req||roster.some(c=>canEquip(c,x));
+const UT_IDS=new Set(['bebida','virgem','tarado','pacoca','papel','salgado','bolo_pote','alcool_caseiro','um_real','admissao','demissao']);
+const isUt=x=>!!x&&(x.type==='ut'||UT_IDS.has(x.id));
+const canEquip=(c,x)=>!!c&&(!x.only||c.n===x.only)&&(!x.req||x.req.some(r=>has(c,r)||nk(c.c)===nk(r)))&&(!x.all||x.all.every(r=>has(c,r)||nk(c.c)===nk(r)));
+const canEquipFrom=(x,roster)=>!x.only&&!x.req&&!x.all||roster.some(c=>canEquip(c,x));
 const SYM={diabo:'demonio',Rico:'rico',Fundador:'fundador','Invocação':'invocacao',Anjo:'anjo',Macaco:'macaco',Racista:'racista',Aluno:'aluno',Professor:'professor',entrosa:'entrosa',Tche:'tiete',Bebum:'bebum',Autista:'autista',Gordo:'gordo'};
 function tagHTML(x){
  const k=SYM[x.id];
@@ -712,7 +724,7 @@ const W=c=>c.t==='entrosa'||has(c,'Entrosa')||has(c,'Invocação')?0:(c.w||1);
 const usedCap=p=>p.field.reduce((a,c)=>a+(c?W(c):0),0);
 const stSum=(c,k)=>(c.st||[]).filter(x=>x.k===k&&(!x.fromNext||S.round>x.fromRound)).reduce((a,x)=>a+x.v,0);
 const isPen=x=>(x.k==='dm'&&x.v<0)||(x.k==='hm'&&x.v<0)||x.k==='dot'||x.k==='tk'||x.k==='half'||x.k==='vs'||x.k==='dismiss'||x.k==='repeat';
-const addSt=(t,x)=>{(t.st=t.st||[]).push(x)};
+const addSt=(t,x)=>{if(amb('paz')){log('A Paz no Mundo anulou uma penalidade.');return}(t.st=t.st||[]).push(x)};
 const LV=[75,50,25,10,5];
 const pc=(c,p)=>{if(c&&c.item&&c.item.id==='cone'){const j=LV.indexOf(p);return j>=0&&j<LV.length-1?LV[j+1]:p}return p};
 const roll=(c,p)=>Math.random()*100<pc(c,p);
@@ -760,7 +772,7 @@ Object.assign(AB,{
  espancar:{n:'Espancar / Porrada',t:'e',dm:()=>2,bn:(c,t)=>has(t,'Aluno')?2:0},nerd:{n:'Nerd',t:'any',v:'+2 contra alvo marcado'},
  confiscar:{n:'Confiscar',t:'n',once:'game',v:'rouba carta aleatória'},tarrindo:{n:'Tá rindo do quê?',t:'e',dm:()=>1,sk:50},
  nuvem_caspa:{n:'Nuvem de Caspas',t:'e',dw:[100,1,2]},caspas:{n:'Caspas Envenenadas',t:'e',dot:[100,2,2]},
- exatamente:{n:'Exatamente!',t:'e',once:'round',v:'força o alvo a atacar Kelvin'},vomito_quimico:{n:'Vômito Químico',t:'e',dm:()=>2},quimica:{n:'Química Formada',t:'n',once:'round',v:'cria Bebida Alcoólica'},
+ exatamente:{n:'Exatamente!',t:'e',once:'round',v:'força o alvo a atacar Kelvin'},vomito_quimico:{n:'Vômito Químico',t:'e',dm:()=>1},quimica:{n:'Química Formada',t:'n',once:'round',v:'cria Bebida Alcoólica'},
  trixatombe:{n:'Trixatombe',t:'n',once:'game',v:'sacrifica 3 Tche-Tche'},pisotear:{n:'Pisotear',t:'e',dm:()=>4,sk:25},tchezar:{n:'Tche-Tche-zar',t:'e',dm:()=>0,v:'−2 dano/cura e recebe −2 por 3 rodadas'},
  trindade_eles:{n:'Santa Trindade (ELES)',t:'n',once:'game',v:'sacrifício Diego, Sâmia e João'},desligar:{n:'Desligar',t:'e',once:'game',dm:(c,t)=>t?t.hp:'PV do alvo'},
  banana_cura:{n:'Comer Banana',t:'a',h:3},chicote:{n:'Chicote',t:'e',dm:()=>2,dot:[50,1,2]},
@@ -788,7 +800,24 @@ Object.assign(AB,{
  ramira_discurso:{n:'Discurso Supremacista',t:'e',dm:()=>2,bn:(c,t)=>(has(t,'Macaco')||t.c==='Ordem')?2:0,v:'2 dano; +2 contra Macaco e Ordem; Ramira cura 1 PV'},
  granada:{n:'Granada',t:'e2',dm:()=>2,bn:(c,t)=>has(t,'Professor')?1:0,dot:[25,1,3],v:'2 dano a todos os oponentes; +1 contra Professor; 25% sangramento'},
  tua_alma:{n:'Tua Alma é Imunda',t:'e',dm:()=>2,dot:[100,2,3],dw:[100,1,2],v:'2 dano por 3 rodadas; alvo causa −1 dano na próxima rodada'},
- vermelhinha:{n:'Você fica Vermelhinha',t:'a',h:2,v:'Cura 2 PV; +2 PV se o alvo for Fêmea'}
+ vermelhinha:{n:'Você fica Vermelhinha',t:'a',h:2,v:'Cura 2 PV; +2 PV se o alvo for Fêmea'},
+ conhecimento_mistico:{n:'Conhecimento Místico',t:'e',dm:()=>3,tk:[1,3]},
+ ritual:{n:'Ritual',t:'a',h:2,v:'Cura 2 PV; alvo +1 dano por uma rodada'},
+ no_nao:{n:'No-Não',t:'e',once:'round',dm:()=>1,bn:(c,t)=>has(t,'Aluno')?1:0,sk:100,skRounds:1},
+ filho_azul:{n:'Filho Azul',t:'n',once:'game',v:'Invoca Filho Azul'},
+ filho_professor:{n:'O Filho do Professor',t:'a',h:1,bn:(c,t)=>has(t,'Professor')?3:0},
+ filho_soco:{n:'Soco',t:'e',dm:()=>1},
+ chamar_diego:{n:'Eu vou chamar o Diego',t:'n',once:'game'},
+ pancada_gleen:{n:'Pancada',t:'e',dm:()=>2,sk:100,skRounds:1,f:t=>has(t,'Macaco')},
+ continue_exu:{n:'Continue com Exu',t:'any',dm:()=>2},
+ mil_toneladas:{n:'1000 toneladas',t:'e',dm:()=>2,bn:(c,t)=>has(t,'Racista')?2:0},
+ medo_rayssa:{n:'Eu quem boto medo',pas:1,v:'75% de impedir quem usa habilidade contra Rayssa por 1 rodada'},
+ livrada:{n:'Livrada',t:'e',dm:()=>1,bn:(c,t)=>has(t,'Aluno')?2:0},
+ trabalho_cansativo:{n:'Trabalho Cansativo',t:'a',h:1,bn:(c,t)=>has(t,'Aluno')?1:0},
+ paz_mundo:{n:'Paz pela Paz',t:'n',once:'game',v:'Anula dano e penalidades; consome a Farda'},
+ protecao_exu:{n:'Proteção de Exu',t:'e',dw:[100,2,1]},
+ x1_apostado:{n:'1x1 apostado',t:'any'},
+ pescaria:{n:'Pescaria',t:'n',once:'game',v:'Recebe Alguém Autista ou Insano; chapéu consumido'}
 });
 const abl=c=>[...(c.ab||[]),...((c.item&&c.item.gr)||[])];
 const hasLoboEs=c=>!!c&&abl(c).includes('lobo_es');
@@ -806,9 +835,13 @@ function avail(c,k,s){
  if(k==='inv_eles')return ['Diego','Sâmia','João'].every(n=>P[s].field.some(x=>x&&x.n===n));
  if(k==='inv_tche')return P[s].field.filter(x=>x&&has(x,'Tche')).length>=3;
  if(k==='trindade_eles')return ['Diego','Sâmia','João'].every(n=>P[s].field.some(x=>x&&x.n===n));
- if(k==='trixatombe')return P[s].field.filter(x=>x&&x.n==='Tche-Tche').length>=3;
+ if(k==='trixatombe')return P[s].field.filter(x=>x&&has(x,'Tche')).length>=3;
  if(k==='obs_c'||k==='obs_d')return !c.obs;
  if(k==='amor')return !c.love;
+ if(k==='pescaria')return !!(c.item&&c.item.id==='chapeu_isaque');
+ if(k==='paz_mundo')return !!(c.item&&c.item.id==='farda_darwin');
+ if(k==='protecao_exu')return !!(c.item&&c.item.id==='colar_exu');
+ if(k==='x1_apostado')return !!(c.item&&c.item.id==='celular');
  if(k==='roubar'||k==='confiscar')return P[1-s].reserve.length>0||((P[1-s].ns||{}).hand||[]).length>0;
  if(k==='lucidez')return !!c.blocked||(c.st||[]).some(isPen);
  if(a.t==='e'||a.t==='e2')return P[1-s].field.some(Boolean);
@@ -827,7 +860,7 @@ function outDmg(c,k,t,sg){
  const na=(c.st||[]).findIndex(x=>x.k==='nextattack');if(na>=0){d+=c.st[na].v;c.st.splice(na,1)}
  (c.st||[]).forEach(x=>{if(x.k==='vs'&&x.nm===t.n)d+=x.v});
  const it=c.item&&c.item.id;
- if(it==='botton')d++;
+ if(it==='botton')d++;if(it==='colar_exu')d++;
  if(it==='camiseta_terceirao'){d++;if(isFemale(t))d+=2}
  if(it==='oculos'){if(has(c,'Professor'))d++;if(Math.random()<.25)d+=Math.max(1,Math.ceil(d*.1))}
  const hf=(c.st||[]).findIndex(x=>x.k==='half');
@@ -837,7 +870,7 @@ function outDmg(c,k,t,sg){
 function queueReplacement(side,i){if(side<0||side>1||!P[side]?.reserve?.length)return;REPL[side]=REPL[side]||[];if(!REPL[side].includes(i))REPL[side].push(i)}
 function hasReplacementAvailable(side=0){const p=P&&P[side];if(!p||side!==0||!p.reserve.length)return false;return (REPL[side]||[]).some(i=>!p.field[i]&&p.reserve.some(c=>canPlace(c,i)))}
 function hit(side,i,amt,src){
- const c=P[side].field[i];if(!c)return;
+ const c=P[side].field[i];if(!c)return;if(amb('paz')){log('A Paz no Mundo anulou o dano.');return}
  if(!src?.force&&(c.st||[]).some(x=>x.k==='immune')){log(`${c.n} está protegido e não sofreu dano.`);return}
  if(src&&src.environment&&hasLoboEs(c)&&roll(c,10)){log(`${c.n} anulou o efeito do ambiente (E Se…).`);return}
  if((c.ab||[]).includes('fisica')&&amt>0&&roll(c,50)){healC(null,c,2);log(`Física Filé: ${c.n} recuperou 2 PV.`)}
@@ -855,8 +888,9 @@ function dmgTo(side,i,amt,src){
   if(p&&(p.ab||[]).includes('guard')&&!p.used.guard&&!p.lock&&!p.noGuard){p.used.guard=true;t=a;log(`${p.n} (Protetor) assumiu o alvo no lugar de ${f[i].n}.`);break}}
  if(t===i){const bi=f.findIndex((y,j)=>y&&(y.ab||[]).includes('bigboy')&&j!==i&&!y.lock);if(bi>=0&&Math.random()<.25){t=bi;bb=true;log(`Big Boy: ${f[bi].n} virou o alvo.`)}}
  const tc=f[t];if(!tc)return;
+ if((tc.ab||[]).includes('medo_rayssa')&&src&&src.c&&Math.random()<.75){src.c.blocked=S.round+1;log(`Eu quem boto medo: ${src.c.n} ficará impedido de agir na próxima rodada.`)}
  if((tc.ab||[]).includes('perceber')&&Math.random()<.5){const options=[t-1,t+1].filter(j=>j>=0&&f[j]);if(options.length){t=options[Math.floor(Math.random()*options.length)];log(`Perceber Movimento: ataque redirecionado para ${f[t].n}.`)}}
- let v=amt;const it=tc.item&&tc.item.id;
+ let v=amt;const it=tc.item&&tc.item.id;if(it==='moletom_famoso')v+=1;
  if(it==='botton')v-=1;if(has(tc,'Gordo'))v-=1;if(it==='moletom')v-=1;
  v+=stSum(tc,'tk');
  if(it==='cordao'&&src&&src.c&&(has(src.c,'Autista')||(src.c.ab||[]).includes('ordem'))){v-=3;const si=P[src.side].field.indexOf(src.c);if(si>=0){log(`Cordão: ${src.c.n} sofre 2 de dano ao atacar.`);hit(src.side,si,2)}}
@@ -882,7 +916,9 @@ function healC(g,t,n){
 }
 function combatFX(){}
 function strike(s,i,k,x,sg){
- const c=P[s].field[i],a=AB[k],t0=x.t;if(!c)return;combatFX(x.ts,x.ti,k);
+ const c=P[s].field[i],a=AB[k];if(!c)return;let t0=x.t;
+ if(t0&&t0.item&&t0.item.id==='moletom_famoso'&&Math.random()<.25){const f=P[x.ts].field,adj=[x.ti-1,x.ti+1].filter(j=>j>=0&&f[j]);if(adj.length){const j=adj[Math.floor(Math.random()*adj.length)];x={...x,ti:j,t:f[j]};t0=x.t;log(`Moletom Famoso redirecionou o efeito para ${t0.n}.`)}}
+ combatFX(x.ts,x.ti,k);
  log(`${c.n} ${sg?'entrou em surto e ':''}usou ${a.n} em ${t0.n}.`);
  if(hasLoboEs(t0)&&Math.random()<.1){log(`${t0.n} ativou E Se…: efeito refletido e alvo protegido.`);if(a.dm){const j=P[s].field.indexOf(c);if(j>=0)hit(s,j,outDmg(c,k,t0,sg),{side:x.ts,c:t0,force:true})}if(a.dw)addSt(c,{k:'dm',v:-a.dw[1],left:a.dw[2]});if(a.dot)addSt(c,{k:'dot',v:a.dot[1],left:a.dot[2]});if(a.tk)addSt(c,{k:'tk',v:a.tk[0],left:a.tk[1]});if(a.sk)c.blocked=S.round+(a.skRounds||1);return}
  const t=dmgTo(x.ts,x.ti,outDmg(c,k,t0,sg),{side:s,c});
@@ -892,7 +928,7 @@ function strike(s,i,k,x,sg){
  if(a.dot&&(k!=='chicote'||has(t0,'Macaco'))&&roll(t,a.dot[0])){addSt(t,{k:'dot',v:a.dot[1],left:a.dot[2]});log(`${t.n} sofrerá ${a.dot[1]} de dano por ${a.dot[2]} rodadas.`)}
  if(a.tk&&(k!=='punho'||c.punhoProc)){addSt(t,{k:'tk',v:a.tk[0],left:a.tk[1],fromNext:k==='desmoralizar',fromRound:S.round});log(`${t.n} sofrerá +${a.tk[0]} de dano por ataque por ${a.tk[1]} rodadas.`)}if(k==='punho')c.punhoProc=false;
  if(a.dw&&roll(t,a.dw[0])){addSt(t,{k:'dm',v:-a.dw[1],left:a.dw[2],fromNext:k==='tua_alma',fromRound:S.round});log(`${t.n} causa −${a.dw[1]} de dano por ${a.dw[2]} rodadas.`)}
- if(a.sk&&(!a.skFemale||isFemale(t))&&roll(t,a.sk)){t.blocked=S.round+(a.skRounds||(k==='pisotear'?2:1));log(`${t.n} não age até a rodada ${t.blocked}.`)}
+ if(a.sk&&(!a.f||a.f(t))&&(!a.skFemale||isFemale(t))&&roll(t,a.sk)){t.blocked=S.round+(a.skRounds||(k==='pisotear'?2:1));log(`${t.n} não age até a rodada ${t.blocked}.`)}
  if(k==='tchezar'){addSt(t,{k:'dm',v:-2,left:3});addSt(t,{k:'hm',v:-2,left:3});addSt(t,{k:'tk',v:-2,left:3})}
  if(c.item&&c.item.id==='moletom'&&roll(t,10)){addSt(t,{k:'half',v:1,left:3});log(`O próximo ataque de ${t.n} causa metade do dano.`)}
 }
@@ -918,6 +954,7 @@ function trindade(s,i){
 function act(s,i,k,tg){
  const c=P[s].field[i],a=AB[k],en=1-s;
  if(!c||!a)return;
+ if(amb('paz')&&(a.dm||a.dw||a.tk||a.dot||a.sk)){log(`A Paz no Mundo anulou ${a.n}.`);return}
  if((c.st||[]).some(x=>x.k==='repeat'&&x.action===k)){log(`${c.n} não pode repetir ${a.n} nesta rodada.`);return}
  c.lastAction=k;
  if(amb('apagao')&&!has(c,'Macaco')&&roll(c,ap('pct',10))){log(`Apagão: ${c.n} errou a habilidade.`);return}
@@ -928,6 +965,13 @@ function act(s,i,k,tg){
  if(k==='atira_terra'){P[en].field.forEach((q,j)=>{if(q&&roll(q,q.item&&q.item.tag==='chapeu'?25:50))hit(en,j,q.item&&q.item.tag==='chapeu'?2:3,{side:s,c,environment:true})});log(`${c.n} aplicou Meteoritos aos oponentes.`);return}
  if(k==='granada')T=P[en].field.map((t,ti)=>t?{ts:en,ti,t}:null).filter(Boolean);
  if(k==='desligar'){const x=T[0];if(x){log(`${x.t.n} foi desligado automaticamente por ELES.`);hit(x.ts,x.ti,x.t.hp,{side:s,c,force:true})}return}
+ if(k==='paz_mundo'){S.amb={k:'paz',n:'A Paz no Mundo',icon:'sun',p:{},left:0};if(c.item&&c.item.id==='farda_darwin')c.item=null;log(`${c.n} ativou A Paz no Mundo: todo dano e penalidade serão anulados até o próximo ambiente.`);return}
+ if(k==='filho_azul'){const src=SUMMONS.find(x=>x.n==='Filho Azul');if(src){P[s].reserve.push(mk(src));log(`${c.n} invocou Filho Azul.`)}return}
+ if(k==='chamar_diego'){const src=POOL.find(x=>x.n==='Diego');if(src){P[s].reserve.push(mk(src));log(`${c.n} chamou Diego.`)}return}
+ if(k==='pescaria'){const o=POOL.filter(x=>!SUMMON_ONLY.has(x.n)&&(x.c==='Insano'||(x.tg||[]).some(v=>nk(v)==='autista'))&&!P[s].field.concat(P[s].reserve,P[s].out).some(y=>y&&y.n===x.n));if(o.length){const z=mk(o[Math.floor(Math.random()*o.length)]);P[s].reserve.push(z);log(`${c.n} pescou ${z.n}.`)}else log('Não há Alguém Autista ou Insano disponível para pescar.');if(c.item&&c.item.id==='chapeu_isaque')c.item=null;return}
+ if(k==='x1_apostado'){const x=T[0];if(!x)return;if(Math.random()<.5){dmgTo(x.ts,x.ti,5,{side:s,c});log(`${c.n} acertou ${x.t.n} com o 1x1 apostado.`)}else{const j=P[s].field.indexOf(c);if(j>=0){hit(s,j,5,{side:s,c});log(`${c.n} sofreu o próprio disparo do 1x1 apostado.`)}}return}
+ if(k==='continue_exu'){const x=T[0];if(!x)return;if(has(x.t,'Macaco')){healC(c,x.t,3);log(`${x.t.n} é Macaco: Continue com Exu curou 3 PV.`)}else strike(s,i,k,x,false);return}
+ if(k==='ritual'){const x=T[0];if(!x)return;healC(c,x.t,2);addSt(x.t,{k:'dm',v:1,left:1});log(`${x.t.n} recebeu +1 dano por uma rodada.`);return}
  if(k==='ouvir'){addSt(c,{k:'immune',left:2});log(`${c.n} não pode sofrer dano por 2 rodadas.`);return}
  if(k==='vermelhinha'){const x=T[0];if(x){healC(c,x.t,2);if(isFemale(x.t))healC(c,x.t,2)}return}
  if(k==='danca'){P.forEach((pl,side)=>pl.field.forEach(q=>{if(!q)return;healC(c,q,2);if(side!==s)addSt(q,{k:'dm',v:-1,left:1})}));log('Dança Mexicana: personagens aliados recuperaram 2 PV; oponentes causam −1 dano por 1 rodada.');return}
@@ -954,12 +998,13 @@ function act(s,i,k,tg){
  if(k==='inv_dudu'||k==='inv_eles'||k==='inv_tche'){
   const names=k==='inv_dudu'?['Isaque','Pietro','Michael Jackson']:k==='inv_eles'?['Diego','Sâmia','João']:P[s].field.filter(x=>x&&has(x,'Tche')).slice(0,3).map(x=>x.n);
   for(const n of names){const j=P[s].field.findIndex(x=>x&&x.n===n);if(j>=0){P[s].out.push(P[s].field[j]);P[s].field[j]=null;log(`${n} foi sacrificado.`)}}
-  const reward=SUMMONS.find(x=>x.n===(k==='inv_dudu'?'Dudu':k==='inv_eles'?'ELES':'Tche-Tche'));
+  const reward=SUMMONS.find(x=>x.n===(k==='inv_dudu'?'Dudu':k==='inv_eles'?'ELES':'Tche-Tche-Re-Re-Tche-Tche'));
   if(reward){P[s].reserve.push(mk(reward));log(`${reward.n} foi invocado e entrou na mão.`);if(k==='inv_dudu'){P[en].field.slice().forEach((x,j)=>{if(x&&P[en].field[j])dmgTo(en,j,5,{side:s,c})});S.dmgUsed=true}}
   return;
  }
  if(k==='trindade'){trindade(s,i);S.dmgUsed=true;return}
- if(k==='trindade_eles'||k==='trixatombe'){const req=k==='trindade_eles'?['Diego','Sâmia','João']:['Tche-Tche','Tche-Tche','Tche-Tche'];for(const n of req){const j=P[s].field.findIndex(x=>x&&x.n===n);if(j>=0){P[s].out.push(P[s].field[j]);P[s].field[j]=null}}log(`${c.n} realizou o sacrifício e permaneceu em campo.`);c.awake=true;if(k==='trindade_eles'){P[en].field.forEach((x,j)=>{if(x)dmgTo(en,j,5,{side:s,c})})}S.dmgUsed=true;return}
+ if(k==='trindade_eles'){for(const n of ['Diego','Sâmia','João']){const j=P[s].field.findIndex(x=>x&&x.n===n);if(j>=0){P[s].out.push(P[s].field[j]);P[s].field[j]=null}}log(`${c.n} realizou a Santa Trindade.`);P[en].field.forEach((x,j)=>{if(x)dmgTo(en,j,5,{side:s,c})});S.dmgUsed=true;return}
+ if(k==='trixatombe'){const crew=P[s].field.map((x,j)=>x&&has(x,'Tche')?[x,j]:null).filter(Boolean).slice(0,3);if(crew.length<3)return;crew.forEach(([x,j])=>{P[s].out.push(x);P[s].field[j]=null;log(`${x.n} foi sacrificado.`)});const reward=SUMMONS.find(x=>x.n==='Tche-Tche-Re-Re-Tche-Tche');if(reward){P[s].reserve.push(mk(reward));log('Tche-Tche-Re-Re-Tche-Tche foi invocado.')}return}
  if(k==='camera'||k==='chorar'){const nm=k==='camera'?'Câmera':'Tche-Tche Fêmea',src=POOL.find(x=>x.n===nm);if(src){const z=mk(src);P[s].reserve.push(z);log(`${c.n} invocou ${nm}.`)}return}
  if(k==='quimica'||k==='bebedeira'){const card=NS.find(x=>x.id===(k==='quimica'?'bebida':'alcool_caseiro'));if(card){P[s].ns.hand.push({...card});log(`${c.n} criou ${card.n}.`)}return}
  if(k==='choradeira'||k==='perceber'||k==='fisica'){return}
@@ -973,7 +1018,7 @@ function act(s,i,k,tg){
   if(k==='ramira_discurso')healC(null,c,1)
  }else if(a.h){
   const x=T[0];if(!x)return;
-  healC(c,x.t,a.h);
+  healC(c,x.t,a.h+(a.bn?a.bn(c,x.t):0));
   if(k==='chupetinha')addSt(c,{k:'dm',v:-1,left:2,fromNext:true,fromRound:S.round});
   if(k==='cansada'){c.blocked=S.round+1;log(`${c.n} ficará sem agir na próxima rodada.`)}
   if(k==='ordem'){clearPen(x.t,true);log(`${c.n} ordenou: ${x.t.n} sem penalidades.`)}
@@ -1008,10 +1053,11 @@ function act(s,i,k,tg){
 /* ---- ambientes, itens, fim de rodada ---- */
 function police(){[0,1].forEach(s=>P[s].field.forEach((c,i)=>{if(c&&c.item&&c.item.tag==='arma'){log(`Averiguação Policial: ${c.item.n} de ${c.n} foi desligada.`);c.item=null;hit(s,i,ap('dmg',2),{environment:true})}}))}
 function endRound(){
+ if(S.peace&&S.peace.round<=S.round){S.peace=null;log('A Paz no Mundo terminou.')}
  for(const s of [0,1])P[s].field.forEach((owner)=>{if(owner&&owner.item&&owner.item.id==='totem'&&roll(owner,1)){const all=[];[0,1].forEach(q=>P[q].field.forEach((c,j)=>{if(c)all.push([q,j,c])}));if(all.length){const [q,j,c]=all[Math.floor(Math.random()*all.length)];log(`Totem do Darwin desligou ${c.n}.`);hit(q,j,c.hp,{side:s,c:owner,force:true})}}});
  for(const s of [0,1])P[s].field.forEach((c,i)=>{if(!c||!(c.ab||[]).includes('aposta'))return;if(c.bet==null)c.bet=S.round;if(S.round-c.bet>=2){log(`${c.n} não apostou a tempo e sofre 10 de dano.`);c.bet=S.round;hit(s,i,10)}});
  for(const s of [0,1])P[s].field.slice().forEach(c=>{if(!c)return;const keep=[];
-  for(const x of (c.st||[])){if(x.k==='dot'){const j=P[s].field.indexOf(c);if(j>=0)hit(s,j,x.v)}x.left--;if(x.k==='dismiss'&&x.left<=0){const j=P[s].field.indexOf(c);if(j>=0){if(['Catunda','ELES','Dudu','Tche-Tche'].includes(c.n))log(`Carta de Demissão não afeta ${c.n}.`);else{log(`Carta de Demissão desligou ${c.n}.`);P[s].out.push(c);P[s].field[j]=null;queueReplacement(s,j)}}}else if(x.left>0)keep.push(x)}c.st=keep});
+  for(const x of (c.st||[])){if(x.k==='dot'){const j=P[s].field.indexOf(c);if(j>=0)hit(s,j,x.v)}x.left--;if(x.k==='dismiss'&&x.left<=0){const j=P[s].field.indexOf(c);if(j>=0){if(['Catunda','ELES','Dudu','Tche-Tche-Re-Re-Tche-Tche'].includes(c.n))log(`Carta de Demissão não afeta ${c.n}.`);else{log(`Carta de Demissão desligou ${c.n}.`);P[s].out.push(c);P[s].field[j]=null;queueReplacement(s,j)}}}else if(x.left>0)keep.push(x)}c.st=keep});
  for(const s of [0,1])P[s].field.forEach(c=>{if(!c||!c.obs)return;
   let tg=null,ts=0,ti=0;[0,1].forEach(q=>P[q].field.forEach((y,j)=>{if(y&&y.id===c.obs.id){tg=y;ts=q;ti=j}}));
   if(!tg){delete c.obs;log(`${c.n} voltou a agir: a Obsessão acabou.`);return}
@@ -1040,8 +1086,9 @@ function playNS(side,idx,ti){
  if(card.type==='amb'){if(amb('apoc')&&card.id!=='apoc')return toast('O Apocalipse suprime todos os ambientes.');const apo=card.id==='apoc';
   S.amb={k:card.id,n:card.n,icon:card.icon,p:card.p||{},left:apo?(+(card.p||{}).rounds||6):0,prev:apo?(S.amb||null):null};
   q.hand.splice(idx,1);log(`${S.names[side]} colocou o ambiente ${card.n}.`);if(card.id==='pol')police();
- }else if(card.type==='ut'){
+ }else if(isUt(card)){
   if(card.id==='papel'){log('Papel: todos os Alguém no terreno ativo sofreram 1 de dano.');[0,1].forEach(q=>P[q].field.forEach((c,j)=>{if(c)hit(q,j,1,{environment:true})}))}
+  else if(card.id==='um_real'||card.id==='admissao'){log(`${S.names[side]} usou ${card.n}.`);useUt(side,card,null,-1)}
   else{const targetSide=card.id==='demissao'?1-side:side,t=P[targetSide].field[ti];if(!t)return;log(`${S.names[side]} usou ${card.n} em ${t.n}.`);useUt(side,card,t,ti)}
   q.hand.splice(idx,1);
  }else{
@@ -1101,7 +1148,7 @@ function summonAuto(s){
  for(let i=0;i<f.length;i++){const c=f[i];if(!c||!has(c,'Invocação')||c.lock)continue;
   let opts=abl(c).filter(k=>{const a=AB[k];return a&&!a.pas&&!a.tog&&avail(c,k,s)});if(!opts.length)continue;
   if(c.n==='ELES'&&opts.includes('desligar'))opts=['desligar'];
-  let k=opts.find(x=>AB[x].dm&&['e','e2'].includes(AB[x].t));if(!k)k=opts.find(x=>AB[x].t==='a')||opts.find(x=>AB[x].t==='n')||opts[0];
+  let k;if(c.n==='Filho Azul'&&opts.includes('filho_professor')&&f.some(x=>x&&has(x,'Professor')))k='filho_professor';else{k=opts.find(x=>AB[x].dm&&['e','e2'].includes(AB[x].t));if(!k)k=opts.find(x=>AB[x].t==='a')||opts.find(x=>AB[x].t==='n')||opts[0];}
   const a=AB[k];let tg=[];if(a.t==='e'||a.t==='e2'){const targets=f;const targetSide=en,idx=targets.findIndex(Boolean);if(idx>=0)tg=[[targetSide,idx]]}
   else if(a.t==='a'){const idx=f.findIndex(Boolean);if(idx>=0)tg=[[s,idx]]}
   log(`${c.n} age independentemente do dono.`);try{act(s,i,k,tg)}catch(e){log(`${c.n} não conseguiu agir nesta rodada.`)}
@@ -1127,7 +1174,7 @@ function aiNS(){
  const idx=Math.floor(Math.random()*q.hand.length),cd=q.hand[idx];
  if(cd.type==='amb'){if(amb('apoc')||Math.random()<.5)return;playNS(1,idx);return}
  if(cd.id==='papel'){playNS(1,idx);return}
- const f=P[1].field,ts=f.map((c,i)=>c&&(cd.type==='ut'||(!c.item&&canEquip(c,cd)))?i:-1).filter(i=>i>=0);
+ const f=P[1].field,ts=f.map((c,i)=>c&&(isUt(cd)||(!c.item&&canEquip(c,cd)))?i:-1).filter(i=>i>=0);
  if(!ts.length)return;
  const ti=cd.type==='ut'?ts.sort((a,b)=>f[a].hp/f[a].max-f[b].hp/f[b].max)[0]:ts[Math.floor(Math.random()*ts.length)];
  playNS(1,idx,ti);
@@ -1182,7 +1229,7 @@ function cardHTML(c,side,i){
   if(ok&&S.sel.pick.some(x=>x[0]===side&&x[1]===i))ok=false;
   if(ok)tg=' tgt'}
  if(S.swap!==null&&side===0&&canPlace(P[0].reserve[S.swap],i))tg=' tgt';
- if(S.nsel!=null){const q=P[0].ns.hand[S.nsel],ts=q&&q.id==='demissao'?1:0;if(q&&side===ts&&(q.type==='ut'||(q.type==='item'&&!c.item&&canEquip(c,q))))tg=' tgt'}
+ if(S.nsel!=null){const q=P[0].ns.hand[S.nsel],ts=q&&q.id==='demissao'?1:0;if(q&&side===ts&&(isUt(q)||(q.type==='item'&&!c.item&&canEquip(c,q))))tg=' tgt'}
  const sts=(c.st||[]).map(x=>`${LAB[x.k]||x.k}${x.k==='half'?'':' '+(x.v>0?'+':'')+x.v} (${x.left}r)`).join(' · ');
  const tl=CHR.filter(x=>chrOn(x,c)),slots=tl.map(tagHTML).join('');
  const isym=c.item&&NSICON[c.item.id]?`<img class="itsym" src="${NSICON[c.item.id]}" alt="" title="${E(c.item.n)}">`:'';
@@ -1221,7 +1268,7 @@ function tot(){[0,1].forEach(s=>{
 function nsRender(){
  const a=S.amb,q=P[0].ns||{hand:[],pile:[]},can=S.turn===0&&!S.over&&!S.nsUsed,L={amb:'Ambiente',ut:'Utensílio',item:'Geral'};
  $('amb').innerHTML=a?`<span class="ambp">${ico(a.icon||'cloud',16)} ${E(a.n)}${a.left?' ('+a.left+')':''}</span>`:'<span class="ambp off">Sem ambiente</span>';
- $('nsh').innerHTML=q.hand.map((c,i)=>NSIMG[c.id]?`<div class="chip nc has-img${S.nsel===i?' sel':''}${can?'':' dis'}" data-n="${i}" style="width:${NSIMG[c.id].ar<1?Math.round(190*NSIMG[c.id].ar):210}px" title="${E(c.n)}"><img src="${NSIMG[c.id].s}" alt="${E(c.n)}"></div>`:`<div class="chip nc${S.nsel===i?' sel':''}${can?'':' dis'}" data-n="${i}"><div class="mn">${E(c.n)}</div><div class="ms">${c.only?'Exclusivo: '+E(c.only):L[c.type]}</div><div class="nd">${E(c.d)}</div></div>`).join('')||'<span class="lbl" style="color:#cfd8ee">Sem cartas Não-Alguém</span>';
+ $('nsh').innerHTML=q.hand.map((c,i)=>NSIMG[c.id]?`<div class="chip nc has-img${S.nsel===i?' sel':''}${can?'':' dis'}" data-n="${i}" style="width:${NSIMG[c.id].ar<1?Math.round(190*NSIMG[c.id].ar):210}px" title="${E(c.n)}"><img src="${NSIMG[c.id].s}" alt="${E(c.n)}"></div>`:`<div class="chip nc${S.nsel===i?' sel':''}${can?'':' dis'}" data-n="${i}"><div class="mn">${E(c.n)}</div><div class="ms">${c.only?'Exclusivo: '+E(c.only):(isUt(c)?L.ut:L[c.type])}</div><div class="nd">${E(c.d)}</div></div>`).join('')||'<span class="lbl" style="color:#cfd8ee">Sem cartas Não-Alguém</span>';
 }
 function fitArena(){const g=document.getElementById('s-game');if(!g)return;const a=g.querySelector('.arena');if(!a)return;
  const d=Math.max(0,Math.round(a.offsetHeight-a.getBoundingClientRect().height))+'px';
@@ -1245,7 +1292,7 @@ function clickNS(i){
  const c=P[0].ns.hand[i];if(!c||S.turn!==0||S.over)return;
  if(S.nsUsed)return toast('Você já usou uma carta Não-Alguém nesta rodada.');
  if(c.type==='amb'){if(amb('apoc'))return toast('O Apocalipse suprime todos os ambientes.');playNS(0,i);S.nsel=null;sync();render();return}
- if(c.id==='papel'){playNS(0,i);S.nsel=null;sync();render();return}
+ if(c.id==='papel'||c.id==='um_real'||c.id==='admissao'){playNS(0,i);S.nsel=null;sync();render();return}
  S.nsel=S.nsel===i?null:i;S.sel=S.swap=null;render();
 }
 document.addEventListener('click',e=>{
@@ -1452,7 +1499,7 @@ const DC_PICK={p:[],n:[],tab:'p',f:{p:'all',n:'all'},cache:{}};
 const DC_NSL={amb:'Ambiente',ut:'Utensílio',item:'Geral'};
 const dcPeople=()=>POOL.filter(c=>!SUMMON_ONLY.has(c.n));
 function dcFace(c){const k=JSON.stringify(c);if(DC_PICK.cache[k])return DC_PICK.cache[k];const keep=S;S={sel:null,swap:null,nsel:null,amb:null,nsUsed:false,dmgUsed:false,turn:1,act:0,round:1,over:true,win:null,log:[],names:['','']};let h;try{h=cardHTML(mk(c),0,0).replace(' data-side="0" data-i="0"','')}catch(e){h='<div class="dc-fb">'+dcEsc(c.n)+'</div>'}finally{S=keep}return DC_PICK.cache[k]=h}
-function dcNsFace(c){if(NSIMG[c.id])return `<img class="dc-nsimg" src="${NSIMG[c.id].s}" alt="${dcEsc(c.n)}">`;let ic='';try{if(c.icon)ic='<span class="dc-ic">'+ico(c.icon,15)+'</span>'}catch(e){}return `<div class="dc-nsc t-${dcEsc(c.type)}"><div class="mn">${ic}${dcEsc(c.n)}</div><div class="ms">${c.only?'Exclusivo: '+dcEsc(c.only):dcEsc(DC_NSL[c.type]||'')}</div><div class="nd">${dcEsc(c.d)}</div></div>`}
+function dcNsFace(c){if(NSIMG[c.id])return `<img class="dc-nsimg" src="${NSIMG[c.id].s}" alt="${dcEsc(c.n)}">`;let ic='';try{if(c.icon)ic='<span class="dc-ic">'+ico(c.icon,15)+'</span>'}catch(e){}return `<div class="dc-nsc t-${dcEsc(c.type)}"><div class="mn">${ic}${dcEsc(c.n)}</div><div class="ms">${c.only?'Exclusivo: '+dcEsc(c.only):dcEsc(DC_NS(isUt(c)?L.ut:L[c.type])||'')}</div><div class="nd">${dcEsc(c.d)}</div></div>`}
 function dcBuildDeckInputs(){const ppl=dcPeople();
  document.getElementById('dc-gal-people').innerHTML=ppl.map(c=>`<div class="dc-pick" role="button" tabindex="0" aria-pressed="false" aria-label="${dcEsc(c.n)}" data-pk="p" data-pid="${dcEsc(c.n)}" data-f="${dcEsc(c.c)}"><div class="dc-face">${dcFace(c)}</div><span class="dc-ck">✓</span></div>`).join('');
  document.getElementById('dc-gal-ns').innerHTML=NS.map(c=>`<div class="dc-pick dc-nspick${NSIMG[c.id]&&NSIMG[c.id].ar>1?' wide':''}" role="button" tabindex="0" aria-pressed="false" aria-label="${dcEsc(c.n)}" data-pk="n" data-pid="${dcEsc(c.id)}" data-f="${dcEsc(c.type)}">${dcNsFace(c)}<span class="dc-ck">✓</span></div>`).join('');
