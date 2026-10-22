@@ -492,16 +492,16 @@ const LOGO="data:image/webp;base64,UklGRiKLAABXRUJQVlA4WAoAAAAQAAAAywEAYwEAQUxQS
 
 const POOL=[
 {n:'Yarlon',c:'Insano',hp:15,d:2,t:'macaco',tg:['Macaco','Aluno','Tche'],ab:['escutei','porrada']},
-{n:'Alex',c:'Insano',hp:10,d:2,t:'entrosa',tg:['Tche','Bebum','Entrosa','Rico'],ab:['aposta','vomitarb'],x:'A cada 2 rodadas: escolhe alvo −5 PV ou Alex −5 PV; se não usar, sofre 10 de dano.'},
+{n:'Alex',c:'Insano',hp:12,d:2,t:'entrosa',tg:['Tche','Bebum','Entrosa','Rico'],ab:['aposta','vomitarb'],x:'A cada 2 rodadas: escolhe alvo −5 PV ou Alex −5 PV; se não usar, sofre 10 de dano.'},
 {n:'Ângelo',c:'Abusador',hp:12,d:2,tg:['Tche','Bebum'],ab:['roubar','tiro2']},
 {n:'Duda',c:'Insano',hp:10,d:2,tg:['Aluno','Tche','Bebum'],ab:['lucidez','vomitar']},
 {n:'João',c:'Ordem',hp:15,d:2,tg:['Anjo'],ab:['camera','zerar'],x:'Atento: invoca Câmera uma vez por jogo. Zerar Prova: 2 dano, 25% de bloquear na próxima rodada.'},
-{n:'Catunda',c:'Ordem',hp:20,d:2,tg:['Anjo','Aluno','Professor','Rico'],ab:['vai_falar','amigo'],x:'“Vai continuar falando?” aplica +2 dano recebido por 3 rodadas. “Amigo, oh amigo” impede repetir a última ação por 4 rodadas.'},
+{n:'Catunda',c:'Ordem',hp:20,d:2,tg:['Anjo','Professor','Rico'],ab:['vai_falar','amigo'],x:'“Vai continuar falando?” aplica +2 dano recebido por 3 rodadas. “Amigo, oh amigo” impede repetir a última ação por 4 rodadas.'},
 {n:'Hugão',c:'Abusador',hp:20,d:2,tg:['Anjo','Professor'],ab:['hugao_porrada','sem_pressao'] },
 {n:'Diego',c:'Ordem',hp:12,d:2,tg:['Racista'],ab:['confiscar','tarrindo']},
 {n:'Isaque',c:'Insano',hp:12,d:2,t:'diabo',tg:['Diabo','Aluno','Autista'],ab:['nuvem_caspa','caspas'],x:'Nuvem de Caspas: −1 dano por 2 rodadas. Caspas Envenenadas: 2 dano por 2 rodadas.'},
 {n:'Kelvin',c:'Abusador',hp:12,d:2,t:'entrosa',tg:['Entrosa','Anjo','Aluno','Autista','Rico'],ab:['oracao','exatamente']},
-{n:'Gorreth',c:'Protetor',hp:15,d:2,t:'diabo',tg:['Diabo','Racista','Gordo'],ab:['vomito_quimico','quimica'],x:'Química Formada: a cada 2 rodadas cria Bebida Alcoólica.'},
+{n:'Gorreth',c:'Protetor',hp:10,d:2,t:'diabo',tg:['Diabo','Racista','Gordo'],ab:['vomito_quimico','quimica'],x:'Química Formada: a cada 2 rodadas cria Bebida Alcoólica.'},
 {n:'Fatori',c:'Protetor',hp:20,d:2,t:'diabo',tg:['Diabo','Professor'],ab:['espancar','fisica']},
 {n:'Pereira',c:'Abusador',hp:20,d:2,t:'diabo',tg:['Diabo','Macaco','Aluno'],ab:['agarrar','banana_cura']},
 {n:'Sâmia',c:'Ordem',hp:10,d:2,tg:['Anjo','Racista','Professor'],ab:['chicote','camera']},
@@ -533,7 +533,7 @@ POOL.forEach(p=>{p.gender=GENDER[p.n]||'NB'});
 const SUMMONS=[
 {n:'Dudu',c:'Insano',hp:20,d:5,tg:['Autista','Gordo','Rico'],w:2,ab:['punho','bigboy'],x:'Obtido pela Santa Trindade; ao surgir causa 5 de dano a todos os inimigos.'},
 {n:'ELES',c:'Ordem',hp:40,d:2,tg:['Rico'],ab:['desligar','supervisionar'],x:'Obtido pela Santa Trindade de Diego, Sâmia e João.'},
-{n:'Tche-Tche-Re-Re-Tche-Tche',c:'Nenhuma',hp:40,d:2,t:'diabo',tg:['Diabo','Macaco','Tche','Invocação'],ab:['pisotear','tchezar'],x:'Invocado sacrificando três Alguém com a característica Tche-Tche.'},
+{n:'Tche-Tche-Re-Re-Tche-Tche',c:'Insano',hp:40,d:2,t:'diabo',tg:['Diabo','Macaco','Tche'],ab:['pisotear','tchezar'],summon:true,x:'Invocado sacrificando três Alguém com a característica Tche-Tche.'},
 {n:'Filho Azul',c:'Nenhuma',hp:10,d:1,tg:['Macaco','Invocação'],ab:['filho_professor','filho_soco'],x:'Invocado por Lemes; age independentemente.'}
 ];
 SUMMONS.forEach(p=>{p.gender=GENDER[p.n]||'NB'});
@@ -653,7 +653,7 @@ const shuf=a=>{const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(M
 const uid=()=>Math.random().toString(36).slice(2,8);
 const K2={Protetor:'guard',Abusador:'abuso',Ordem:'ordem',Insano:'surto'};
 const SUP=['¹','²','³','⁴','⁵','⁶','⁷'];
-const mk=p=>{const ab=p.ab?[...p.ab]:['atk',clsAb(p.c)];if(!SUMMON_ONLY.has(p.n)){if(['Isaque','Pietro','Michael Jackson'].includes(p.n))ab.push('inv_dudu');if(['Diego','Sâmia','João'].includes(p.n))ab.push('inv_eles');if((p.tg||[]).some(x=>nk(x)==='tche'))ab.push('inv_tche')}if(!ab.some(k=>AB[k]&&AB[k].dm))ab.unshift('atk');return {...p,id:uid(),cls:p.c,max:p.hp,used:{},blocked:false,lock:false,st:[],ab}};
+const mk=p=>{const ab=p.ab?[...p.ab]:['atk'];const ck=clsAb(p.c);if(CLS.some(x=>x.id===p.c)&&!ab.includes(ck))ab.push(ck);if(!SUMMON_ONLY.has(p.n)){if(['Isaque','Pietro','Michael Jackson'].includes(p.n))ab.push('inv_dudu');if(['Diego','Sâmia','João'].includes(p.n))ab.push('inv_eles');if((p.tg||[]).some(x=>nk(x)==='tche'))ab.push('inv_tche')}if(!ab.some(k=>AB[k]&&AB[k].dm))ab.unshift('atk');return {...p,id:uid(),cls:p.c,max:p.hp,used:{},blocked:false,lock:false,st:[],ab}};
 let P=null,REPL=[[],[]],S={mp:false,v:0,log:[],sel:null,swap:null,nsel:null,amb:null,nsUsed:false,dmgUsed:false,turn:0,act:2,round:1,over:false,win:null,names:['Você','Rival']};
 let DB=null,USER=null,ME={id:'',name:''},ROOM=null,ref=null,unsub=null,myIdx=0,ISADMIN=false,cur='login',tt,PREV=[null,null];
 function toast(t){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),3200)}
@@ -685,15 +685,15 @@ const NS=[
 {id:'adesivo',n:'Adesivo do Ciro Gomez',type:'item',icon:'sticker',d:'Uma vez, reduz dano à metade e é consumido.'},
 {id:'molotov',n:'Coquetel Molotov',type:'item',icon:'flame',tag:'arma',gr:['molotov'],d:'3 dano em até 2 alvos; 25% queimadura. Consumido no uso.'},
 {id:'moletom',n:'Moletom manchado de sangue',type:'item',icon:'shirt',d:'Recebe −1 dano; 10% próximo ataque do alvo causa metade.'},
-{id:'cordao',n:'Cordão de Autismo',type:'item',icon:'lanyard',d:'Autista/Ordem sofre 2 ao atacar você; seu ataque causa −3.'},
-{id:'chapeu_isaque',n:'Chapéu do Pescador',type:'item',icon:'hat',tag:'chapeu',only:'Isaque',gr:['pescaria'],d:'Uma vez por cena, recebe um Alguém Autista ou Insano. Desliga após uso.'},
+{id:'cordao',n:'Cordão de Autismo',type:'item',icon:'lanyard',d:'Alguém Autista ou da classe Ordem sofre 2 de dano ao atacar o portador.'},
+{id:'chapeu_isaque',n:'Chapéu do Pescador',type:'item',icon:'hat',tag:'chapeu',only:'Isaque',gr:['pescaria'],d:'Pescaria: uma vez por cena, Isaque recebe uma carta Alguém Autista ou Insano. A carta é desligada após o uso.'},
 {id:'chapeu_kelvin',n:'Chapéu de Cowboy',type:'item',icon:'cowboy',tag:'chapeu',only:'Kelvin',gr:['disparo'],d:'Disparo: 3 dano (+2 contra Macaco ou Professor).'},
 {id:'luva',n:'Luva do P.P.',type:'item',icon:'glove',only:'Pereira',gr:['agarrar','amor'],d:'Agarrar +2; Amor Irrestrito dá mais +2 contra alvo amado.'},
 {id:'totem',n:'Totem do Darwin',type:'item',icon:'cross',req:['Aluno','Professor','Ordem'],d:'Exclusivo para Aluno, Professor e/ou Ordem. A cada rodada, 1% de chance de desligar um Alguém no terreno ativo.'},
 {id:'camiseta_terceirao',n:'Camiseta do Terceirão',type:'item',icon:'shirt',only:'Hugão',gr:['vermelhinha'],d:'Hugão causa +1 dano (+2 contra Fêmea) e recebe Você fica Vermelhinha: cura 2 PV (+2 se Fêmea).'},
 {id:'botton',n:'Botton do Dudu',type:'item',icon:'badge',d:'Sofre −1 dano e causa +1 dano. Dudu recebe Tua Alma é Imunda: 2 dano por 3 rodadas e −1 dano ao alvo na próxima rodada.'},
-{id:'moletom_famoso',n:'Moletom Famoso',type:'item',icon:'shirt',d:'O usuário sofre +1 dano; 25% de redirecionar dano e penalidades para um aliado adjacente.'},
-{id:'farda_darwin',n:'Farda do Darwin',type:'item',icon:'shirt',all:['Ordem','Aluno'],gr:['paz_mundo'],d:'Exclusiva de Ordem e Aluno. Paz pela Paz: anula todo dano e penalidade; consumida após uso.'},
+{id:'moletom_famoso',n:'Moletom Famoso',type:'item',icon:'shirt',d:'O usuário sofre +1 dano; 25% de redirecionar para um Alguém adjacente o dano e as penalidades de uma habilidade.'},
+{id:'farda_darwin',n:'Farda do Darwin',type:'item',icon:'shirt',all:['Ordem','Aluno'],gr:['paz_mundo'],d:'Exclusiva de Alguém da classe Ordem e com a característica Aluno. Sofre −1 dano de Alguém Ordem. Paz pela Paz ativa A Paz no Mundo por 3 rodadas; consome a Farda.'},
 {id:'colar_exu',n:'Colar de Exu',type:'item',icon:'lanyard',only:'Renoir',gr:['protecao_exu'],d:'Renoir causa +1 dano; Proteção de Exu faz o alvo causar −2 dano por uma rodada.'},
 {id:'celular',n:'Celular',type:'item',icon:'phone',req:['Tche'],gr:['x1_apostado'],d:'Exclusivo Tche-Tche. 50% causa 5 dano ao alvo escolhido ou 5 dano ao usuário.'}
 ];
@@ -720,11 +720,14 @@ function tagHTML(x){
  if(k&&TAGIMG[k])return `<span class="oc" title="${E(x.n)}"><img src="${TAGIMG[k]}" alt="${E(x.n)}"></span>`;
  return `<span class="oc txt" title="${E(x.n)}">${E(String(x.n).slice(0,2))}</span>`;
 }
-const W=c=>c.t==='entrosa'||has(c,'Entrosa')||has(c,'Invocação')?0:(c.w||1);
+const isInvocation=c=>!!c&&(has(c,'Invocação')||c.n==='Tche-Tche-Re-Re-Tche-Tche');
+const W=c=>c.t==='entrosa'||has(c,'Entrosa')||isInvocation(c)?0:(c.w||1);
 const usedCap=p=>p.field.reduce((a,c)=>a+(c?W(c):0),0);
-const stSum=(c,k)=>(c.st||[]).filter(x=>x.k===k&&(!x.fromNext||S.round>x.fromRound)).reduce((a,x)=>a+x.v,0);
-const isPen=x=>(x.k==='dm'&&x.v<0)||(x.k==='hm'&&x.v<0)||x.k==='dot'||x.k==='tk'||x.k==='half'||x.k==='vs'||x.k==='dismiss'||x.k==='repeat';
-const addSt=(t,x)=>{if(amb('paz')){log('A Paz no Mundo anulou uma penalidade.');return}(t.st=t.st||[]).push(x)};
+const stSum=(c,k)=>(c.st||[]).filter(x=>!x.pending&&x.k===k&&(!x.fromNext||S.round>x.fromRound)).reduce((a,x)=>a+x.v,0);
+const skillBatch=(t,k)=>({key:k,id:'sb_'+uid(),wait:(t.st||[]).some(x=>x.stackKey===k)});
+const addSkillSt=(t,x,b)=>{x.stackKey=b.key;x.stackBatch=b.id;x.pending=b.wait;addSt(t,x)};
+const isPen=x=>!x.pending&&((x.k==='dm'&&x.v<0)||(x.k==='hm'&&x.v<0)||x.k==='dot'||x.k==='tk'||x.k==='half'||x.k==='vs'||x.k==='dismiss'||x.k==='repeat');
+const addSt=(t,x)=>{if(amb('paz')&&isPen(x)){log('A Paz no Mundo anulou uma penalidade.');return}(t.st=t.st||[]).push(x)};
 const LV=[75,50,25,10,5];
 const pc=(c,p)=>{if(c&&c.item&&c.item.id==='cone'){const j=LV.indexOf(p);return j>=0&&j<LV.length-1?LV[j+1]:p}return p};
 const roll=(c,p)=>Math.random()*100<pc(c,p);
@@ -862,19 +865,19 @@ function outDmg(c,k,t,sg){
  const it=c.item&&c.item.id;
  if(it==='botton')d++;if(it==='colar_exu')d++;
  if(it==='camiseta_terceirao'){d++;if(isFemale(t))d+=2}
- if(it==='oculos'){if(has(c,'Professor'))d++;if(Math.random()<.25)d+=Math.max(1,Math.ceil(d*.1))}
+ if(it==='oculos'){if(has(c,'Professor'))d++;if(Math.random()<.25)d+=Math.floor(d*.1)}
  const hf=(c.st||[]).findIndex(x=>x.k==='half');
  if(hf>=0){d=Math.ceil(d/2);c.st.splice(hf,1);log(`${c.n} causa só metade do dano.`)}
- return Math.max(0,d);
+ return d;
 }
 function queueReplacement(side,i){if(side<0||side>1||!P[side]?.reserve?.length)return;REPL[side]=REPL[side]||[];if(!REPL[side].includes(i))REPL[side].push(i)}
 function hasReplacementAvailable(side=0){const p=P&&P[side];if(!p||side!==0||!p.reserve.length)return false;return (REPL[side]||[]).some(i=>!p.field[i]&&p.reserve.some(c=>canPlace(c,i)))}
 function hit(side,i,amt,src){
- const c=P[side].field[i];if(!c)return;if(amb('paz')){log('A Paz no Mundo anulou o dano.');return}
+ const c=P[side].field[i];if(!c)return;if(amt<0){const healed=Math.min(c.max-c.hp,-amt);c.hp+=healed;log(`${c.n} recuperou ${healed} PV por dano negativo.`);return}if(amb('paz')){log('A Paz no Mundo anulou o dano.');return}
  if(!src?.force&&(c.st||[]).some(x=>x.k==='immune')){log(`${c.n} está protegido e não sofreu dano.`);return}
  if(src&&src.environment&&hasLoboEs(c)&&roll(c,10)){log(`${c.n} anulou o efeito do ambiente (E Se…).`);return}
  if((c.ab||[]).includes('fisica')&&amt>0&&roll(c,50)){healC(null,c,2);log(`Física Filé: ${c.n} recuperou 2 PV.`)}
- if(amb('punk')&&amt>0&&roll(c,ap('pct',25))){const x=Math.ceil(amt*1.5);log(`Roda Punk: ${c.n} sofre ${x-amt} de dano a mais.`);amt=x}
+ if(amb('punk')&&amt>0&&roll(c,ap('pct',25))){const x=Math.floor(amt*1.5);log(`Roda Punk: ${c.n} sofre ${x-amt} de dano a mais.`);amt=x}
  c.hp-=amt;log(`${c.n} sofreu ${amt} de dano.`);
  if(c.hp<=0){log(`${c.n} foi desligado.`);P[side].out.push(c);P[side].field[i]=null;queueReplacement(side,i);
   if(has(c,'Tche')&&src&&src.c&&!src.choradeira){const owners=P[side].field.filter(q=>q&&q!==c&&(q.ab||[]).includes('choradeira'));if(owners.length){const si=P[src.side].field.indexOf(src.c);if(si>=0){log('Choradeira: quem desligou um Tche-Tche sofreu 1 de dano.');hit(src.side,si,1,{...src,choradeira:true})}}}
@@ -888,16 +891,15 @@ function dmgTo(side,i,amt,src){
   if(p&&(p.ab||[]).includes('guard')&&!p.used.guard&&!p.lock&&!p.noGuard){p.used.guard=true;t=a;log(`${p.n} (Protetor) assumiu o alvo no lugar de ${f[i].n}.`);break}}
  if(t===i){const bi=f.findIndex((y,j)=>y&&(y.ab||[]).includes('bigboy')&&j!==i&&!y.lock);if(bi>=0&&Math.random()<.25){t=bi;bb=true;log(`Big Boy: ${f[bi].n} virou o alvo.`)}}
  const tc=f[t];if(!tc)return;
- if((tc.ab||[]).includes('medo_rayssa')&&src&&src.c&&Math.random()<.75){src.c.blocked=S.round+1;log(`Eu quem boto medo: ${src.c.n} ficará impedido de agir na próxima rodada.`)}
  if((tc.ab||[]).includes('perceber')&&Math.random()<.5){const options=[t-1,t+1].filter(j=>j>=0&&f[j]);if(options.length){t=options[Math.floor(Math.random()*options.length)];log(`Perceber Movimento: ataque redirecionado para ${f[t].n}.`)}}
  let v=amt;const it=tc.item&&tc.item.id;if(it==='moletom_famoso')v+=1;
- if(it==='botton')v-=1;if(has(tc,'Gordo'))v-=1;if(it==='moletom')v-=1;
+ if(it==='adesivo'&&src&&src.skill&&amt>0){v=Math.floor(v/2);log('Adesivo: dano da habilidade e bônus reduzidos à metade; penalidades mantidas.');tc.item=null}
  v+=stSum(tc,'tk');
- if(it==='cordao'&&src&&src.c&&(has(src.c,'Autista')||(src.c.ab||[]).includes('ordem'))){v-=3;const si=P[src.side].field.indexOf(src.c);if(si>=0){log(`Cordão: ${src.c.n} sofre 2 de dano ao atacar.`);hit(src.side,si,2)}}
- if(it==='adesivo'){v=Math.ceil(v/2);log('Adesivo: o dano caiu pela metade e o adesivo foi desligado.');tc.item=null}
- v=Math.max(0,v);
+ if(it==='botton')v-=1;if(has(tc,'Gordo'))v-=1;if(it==='moletom')v-=1;
+ if(it==='cordao'&&src&&src.c&&(has(src.c,'Autista')||(src.c.ab||[]).includes('ordem'))){const si=P[src.side].field.indexOf(src.c);if(si>=0){log(`Cordão: ${src.c.n} sofre 2 de dano ao atacar.`);hit(src.side,si,2)}}
+ if(it==='farda_darwin'&&src&&src.c&&(src.c.c==='Ordem'||src.c.cls==='Ordem'))v-=1;
  hit(side,t,v,src);
- if(bb&&src&&src.c&&v>0){const r=Math.ceil(v*.25),si=P[src.side].field.indexOf(src.c);if(si>=0){log(`Big Boy devolveu ${r} de dano.`);hit(src.side,si,r)}}
+ if(bb&&src&&src.c&&v>0){const r=Math.floor(v*.25),si=P[src.side].field.indexOf(src.c);if(si>=0){log(`Big Boy devolveu ${r} de dano.`);hit(src.side,si,r)}}
  return tc;
 }
 function clearPen(t,all){
@@ -910,8 +912,8 @@ function benefit(g,t){
   if(g&&has(g,'Professor')){g.hp=Math.min(g.max,g.hp+1);log(`${g.n} (Professor) ganhou +1 PV.`)}}
 }
 function healC(g,t,n){
- const nh=g&&(g.st||[]).findIndex(x=>x.k==='nextheal'&&x.round<S.round);n=Math.max(0,n+(g?stSum(g,'hm'):0)+(nh>=0?g.st[nh].v:0)+(g&&has(g,'Autista')?(noisy()?-2:1):0));if(nh>=0)g.st.splice(nh,1);
- t.hp=Math.min(t.max,t.hp+n);log(`${t.n} recuperou ${n} PV.`);
+ const nh=g&&(g.st||[]).findIndex(x=>x.k==='nextheal'&&x.round<S.round);n=n+(g?stSum(g,'hm'):0)+(nh>=0?g.st[nh].v:0)+(g&&has(g,'Autista')?(noisy()?-2:1):0);if(nh>=0)g.st.splice(nh,1);
+ if(n<0){const target=[0,1].map(side=>[side,P[side].field.indexOf(t)]).find(([,idx])=>idx>=0);if(target){hit(target[0],target[1],-n,{healingPenalty:true});return}}t.hp=Math.min(t.max,t.hp+n);log(`${t.n} recuperou ${n} PV.`);
  benefit(g,t);
 }
 function combatFX(){}
@@ -921,15 +923,16 @@ function strike(s,i,k,x,sg){
  combatFX(x.ts,x.ti,k);
  log(`${c.n} ${sg?'entrou em surto e ':''}usou ${a.n} em ${t0.n}.`);
  if(hasLoboEs(t0)&&Math.random()<.1){log(`${t0.n} ativou E Se…: efeito refletido e alvo protegido.`);if(a.dm){const j=P[s].field.indexOf(c);if(j>=0)hit(s,j,outDmg(c,k,t0,sg),{side:x.ts,c:t0,force:true})}if(a.dw)addSt(c,{k:'dm',v:-a.dw[1],left:a.dw[2]});if(a.dot)addSt(c,{k:'dot',v:a.dot[1],left:a.dot[2]});if(a.tk)addSt(c,{k:'tk',v:a.tk[0],left:a.tk[1]});if(a.sk)c.blocked=S.round+(a.skRounds||1);return}
- const t=dmgTo(x.ts,x.ti,outDmg(c,k,t0,sg),{side:s,c});
+ const t=dmgTo(x.ts,x.ti,outDmg(c,k,t0,sg),{side:s,c,skill:true});
  if(!t||!P[x.ts].field.includes(t))return;
+ const batch=skillBatch(t,k);
  if(a.extra&&roll(t,a.extra[0])){hit(x.ts,x.ti,a.extra[1],{side:s,c});log(`${t0.n} sofreu ${a.extra[1]} de dano adicional.`)}
  if(a.student&&has(t0,'Aluno')){hit(x.ts,x.ti,a.student,{side:s,c});log(`${t0.n} (Aluno) sofreu ${a.student} de dano adicional.`)}
- if(a.dot&&(k!=='chicote'||has(t0,'Macaco'))&&roll(t,a.dot[0])){addSt(t,{k:'dot',v:a.dot[1],left:a.dot[2]});log(`${t.n} sofrerá ${a.dot[1]} de dano por ${a.dot[2]} rodadas.`)}
- if(a.tk&&(k!=='punho'||c.punhoProc)){addSt(t,{k:'tk',v:a.tk[0],left:a.tk[1],fromNext:k==='desmoralizar',fromRound:S.round});log(`${t.n} sofrerá +${a.tk[0]} de dano por ataque por ${a.tk[1]} rodadas.`)}if(k==='punho')c.punhoProc=false;
- if(a.dw&&roll(t,a.dw[0])){addSt(t,{k:'dm',v:-a.dw[1],left:a.dw[2],fromNext:k==='tua_alma',fromRound:S.round});log(`${t.n} causa −${a.dw[1]} de dano por ${a.dw[2]} rodadas.`)}
+ if(a.dot&&(k!=='chicote'||has(t0,'Macaco'))&&roll(t,a.dot[0])){addSkillSt(t,{k:'dot',v:a.dot[1],left:a.dot[2],fromNext:true,fromRound:S.round},batch);log(`${t.n} sofrerá ${a.dot[1]} de dano por ${a.dot[2]} rodadas.`)}
+ if(a.tk&&(k!=='punho'||c.punhoProc)){addSkillSt(t,{k:'tk',v:a.tk[0],left:a.tk[1],fromNext:k==='desmoralizar',fromRound:S.round},batch);log(`${t.n} sofrerá +${a.tk[0]} de dano por ataque por ${a.tk[1]} rodadas.`)}if(k==='punho')c.punhoProc=false;
+ if(a.dw&&roll(t,a.dw[0])){addSkillSt(t,{k:'dm',v:-a.dw[1],left:a.dw[2],fromNext:k==='tua_alma',fromRound:S.round},batch);log(`${t.n} causa −${a.dw[1]} de dano por ${a.dw[2]} rodadas.`)}
  if(a.sk&&(!a.f||a.f(t))&&(!a.skFemale||isFemale(t))&&roll(t,a.sk)){t.blocked=S.round+(a.skRounds||(k==='pisotear'?2:1));log(`${t.n} não age até a rodada ${t.blocked}.`)}
- if(k==='tchezar'){addSt(t,{k:'dm',v:-2,left:3});addSt(t,{k:'hm',v:-2,left:3});addSt(t,{k:'tk',v:-2,left:3})}
+ if(k==='tchezar'){addSkillSt(t,{k:'dm',v:-2,left:2},batch);addSkillSt(t,{k:'hm',v:-2,left:2},batch);addSkillSt(t,{k:'tk',v:-2,left:2},batch)}
  if(c.item&&c.item.id==='moletom'&&roll(t,10)){addSt(t,{k:'half',v:1,left:3});log(`O próximo ataque de ${t.n} causa metade do dano.`)}
 }
 function fish(s,i,kind){
@@ -960,12 +963,13 @@ function act(s,i,k,tg){
  if(amb('apagao')&&!has(c,'Macaco')&&roll(c,ap('pct',10))){log(`Apagão: ${c.n} errou a habilidade.`);return}
  if(a.once==='game')c.used[k]=true;if(a.once==='round')c.used.im=S.round;
  let T=(tg||[]).map(([ts,ti])=>({ts,ti,t:P[ts].field[ti]})).filter(x=>x.t);
+ if(!amb('paz')&&T.some(x=>x.ts!==s&&abl(x.t).includes('medo_rayssa'))&&Math.random()<.75){if(!amb('paz'))c.blocked=S.round+1;log(`Eu quem boto medo: ${c.n} ficará impedido de agir na próxima rodada.`)}
  if(c.taunt){const j=P[en].field.findIndex(x=>x&&x.id===c.taunt);if(j>=0&&T.some(x=>x.ts===en)){T=T.map(x=>x.ts===en?{ts:en,ti:j,t:P[en].field[j]}:x);log(`${c.n} foi obrigado a atacar Kelvin.`)}delete c.taunt;}
  if(k==='oka'||k==='vomito_quimico')T=P[en].field.map((t,ti)=>t?{ts:en,ti,t}:null).filter(Boolean);
  if(k==='atira_terra'){P[en].field.forEach((q,j)=>{if(q&&roll(q,q.item&&q.item.tag==='chapeu'?25:50))hit(en,j,q.item&&q.item.tag==='chapeu'?2:3,{side:s,c,environment:true})});log(`${c.n} aplicou Meteoritos aos oponentes.`);return}
  if(k==='granada')T=P[en].field.map((t,ti)=>t?{ts:en,ti,t}:null).filter(Boolean);
  if(k==='desligar'){const x=T[0];if(x){log(`${x.t.n} foi desligado automaticamente por ELES.`);hit(x.ts,x.ti,x.t.hp,{side:s,c,force:true})}return}
- if(k==='paz_mundo'){S.amb={k:'paz',n:'A Paz no Mundo',icon:'sun',p:{},left:0};if(c.item&&c.item.id==='farda_darwin')c.item=null;log(`${c.n} ativou A Paz no Mundo: todo dano e penalidade serão anulados até o próximo ambiente.`);return}
+ if(k==='paz_mundo'){S.amb={k:'paz',n:'A Paz no Mundo',icon:'sun',p:{},left:3,prev:null};if(c.item&&c.item.id==='farda_darwin')c.item=null;log(`${c.n} ativou A Paz no Mundo: todo dano e penalidade serão anulados por 3 rodadas.`);return}
  if(k==='filho_azul'){const src=SUMMONS.find(x=>x.n==='Filho Azul');if(src){P[s].reserve.push(mk(src));log(`${c.n} invocou Filho Azul.`)}return}
  if(k==='chamar_diego'){const src=POOL.find(x=>x.n==='Diego');if(src){P[s].reserve.push(mk(src));log(`${c.n} chamou Diego.`)}return}
  if(k==='pescaria'){const o=POOL.filter(x=>!SUMMON_ONLY.has(x.n)&&(x.c==='Insano'||(x.tg||[]).some(v=>nk(v)==='autista'))&&!P[s].field.concat(P[s].reserve,P[s].out).some(y=>y&&y.n===x.n));if(o.length){const z=mk(o[Math.floor(Math.random()*o.length)]);P[s].reserve.push(z);log(`${c.n} pescou ${z.n}.`)}else log('Não há Alguém Autista ou Insano disponível para pescar.');if(c.item&&c.item.id==='chapeu_isaque')c.item=null;return}
@@ -982,24 +986,24 @@ function act(s,i,k,tg){
  if(k==='amizades'||k==='supervisionar'||k==='camera'||k==='chorar'){const nm=k==='chorar'?'Tche-Tche Fêmea':k==='amizades'?'Pessoal da Limpeza':'Câmera';const src=POOL.find(x=>x.n===nm);if(src){P[s].reserve.push(mk(src));log(`${c.n} invocou ${nm}.`)}return}
  if(k==='lider'){const have=new Set([...P[s].field,...P[s].reserve,...P[s].out].filter(Boolean).map(x=>x.n));const o=POOL.filter(x=>!SUMMON_ONLY.has(x.n)&&has(x,'Tche')&&!have.has(x.n));if(o.length){const got=mk(o[Math.floor(Math.random()*o.length)]);P[s].reserve.push(got);log(`${c.n} recrutou ${got.n} (Tche-Tche).`)}else log('Não há Alguém Tche-Tche disponível.');return}
  if(['vai_falar','nuvem_caspa','caspas','cansaco','amigo','joao_voz','to_mal'].includes(k)){
-  const x=T[0];if(!x)return;
+  const x=T[0];if(!x)return;const batch=skillBatch(x.t,k);
   if(k==='cansaco'){
-   if(Math.random()<.25){x.t.blocked=S.round+1;log(`${x.t.n} não poderá agir na próxima rodada.`)}
-   else{addSt(x.t,{k:'dm',v:-2,left:3});addSt(x.t,{k:'hm',v:-2,left:3});log(`${x.t.n} causa −2 de dano e cura por 3 rodadas.`)}
+   if(Math.random()<.25){if(!amb('paz'))x.t.blocked=S.round+1;log(`${x.t.n} não poderá agir na próxima rodada.`)}
+   else{addSkillSt(x.t,{k:'dm',v:-2,left:3},batch);addSkillSt(x.t,{k:'hm',v:-2,left:3},batch);log(`${x.t.n} causa −2 de dano e cura por 3 rodadas.`)}
   }else if(k==='amigo'){
-   if(x.t.lastAction)addSt(x.t,{k:'repeat',action:x.t.lastAction,left:4});
+   if(x.t.lastAction)addSkillSt(x.t,{k:'repeat',action:x.t.lastAction,left:4},batch);
    log(`${x.t.n} não poderá repetir sua última ação por 4 rodadas.`)
-  }else if(k==='caspas'){addSt(x.t,{k:'dot',v:2,left:2});log(`${x.t.n} sofre 2 de dano por 2 rodadas.`)}
-  else if(k==='vai_falar'){addSt(x.t,{k:'tk',v:2,left:3});log(`${x.t.n} sofre +2 de dano por ataque por 3 rodadas.`)}
-  else if(k==='nuvem_caspa'){addSt(x.t,{k:'dm',v:-1,left:2});log(`${x.t.n} causa −1 de dano por 2 rodadas.`)}
-  else{addSt(x.t,{k:'dm',v:-1,left:999});log(`${x.t.n} causa −1 de dano pelo resto do jogo.`)}
+  }else if(k==='caspas'){addSkillSt(x.t,{k:'dot',v:2,left:2,fromNext:true,fromRound:S.round},batch);log(`${x.t.n} sofre 2 de dano por 2 rodadas.`)}
+  else if(k==='vai_falar'){addSkillSt(x.t,{k:'tk',v:2,left:3},batch);log(`${x.t.n} sofre +2 de dano por ataque por 3 rodadas.`)}
+  else if(k==='nuvem_caspa'){addSkillSt(x.t,{k:'dm',v:-1,left:2},batch);log(`${x.t.n} causa −1 de dano por 2 rodadas.`)}
+  else{addSkillSt(x.t,{k:'dm',v:-1,left:999},batch);log(`${x.t.n} causa −1 de dano pelo resto do jogo.`)}
   return;
  }
  if(k==='inv_dudu'||k==='inv_eles'||k==='inv_tche'){
   const names=k==='inv_dudu'?['Isaque','Pietro','Michael Jackson']:k==='inv_eles'?['Diego','Sâmia','João']:P[s].field.filter(x=>x&&has(x,'Tche')).slice(0,3).map(x=>x.n);
   for(const n of names){const j=P[s].field.findIndex(x=>x&&x.n===n);if(j>=0){P[s].out.push(P[s].field[j]);P[s].field[j]=null;log(`${n} foi sacrificado.`)}}
   const reward=SUMMONS.find(x=>x.n===(k==='inv_dudu'?'Dudu':k==='inv_eles'?'ELES':'Tche-Tche-Re-Re-Tche-Tche'));
-  if(reward){P[s].reserve.push(mk(reward));log(`${reward.n} foi invocado e entrou na mão.`);if(k==='inv_dudu'){P[en].field.slice().forEach((x,j)=>{if(x&&P[en].field[j])dmgTo(en,j,5,{side:s,c})});S.dmgUsed=true}}
+  if(reward){P[s].reserve.push(mk(reward));log(`${reward.n} foi invocado e entrou na mão.`);if(k==='inv_dudu'){P.forEach((pl,side)=>pl.field.slice().forEach((x,j)=>{if(x&&P[side].field[j])dmgTo(side,j,2,{side:s,c})}));S.dmgUsed=true}}
   return;
  }
  if(k==='trindade'){trindade(s,i);S.dmgUsed=true;return}
@@ -1020,15 +1024,15 @@ function act(s,i,k,tg){
   const x=T[0];if(!x)return;
   healC(c,x.t,a.h+(a.bn?a.bn(c,x.t):0));
   if(k==='chupetinha')addSt(c,{k:'dm',v:-1,left:2,fromNext:true,fromRound:S.round});
-  if(k==='cansada'){c.blocked=S.round+1;log(`${c.n} ficará sem agir na próxima rodada.`)}
+  if(k==='cansada'){if(!amb('paz'))c.blocked=S.round+1;log(`${c.n} ficará sem agir na próxima rodada.`)}
   if(k==='ordem'){clearPen(x.t,true);log(`${c.n} ordenou: ${x.t.n} sem penalidades.`)}
   else if(has(c,'Anjo'))clearPen(x.t,false);
  }else if(k==='abuso'){
   const x=T[0];if(!x)return;let ti=x.ti,bb=false;const f=P[en].field;
   for(const q of [ti-1,ti+1]){const p=f[q];if(p&&(p.ab||[]).includes('guard')&&!p.used.guard&&!p.lock&&!p.noGuard){p.used.guard=true;ti=q;log(`${p.n} (Protetor) assumiu o alvo.`);break}}
   if(ti===x.ti){const bi=f.findIndex((y,j)=>y&&y.t==='dudu'&&j!==ti&&!y.lock);if(bi>=0&&Math.random()<.25){ti=bi;bb=true;log('Big Boy virou o alvo.')}}
-  const t=f[ti];t.blocked=S.round+1;log(`${c.n} abusou de ${t.n}: não age na rodada ${S.round+1}.`);
-  if(bb&&Math.random()<.25){c.blocked=S.round+1;log(`Big Boy devolveu a penalidade a ${c.n}.`)}
+  const t=f[ti];if(!amb('paz'))t.blocked=S.round+1;log(`${c.n} abusou de ${t.n}: não age na rodada ${S.round+1}.`);
+  if(bb&&Math.random()<.25){if(!amb('paz'))c.blocked=S.round+1;log(`Big Boy devolveu a penalidade a ${c.n}.`)}
  }else if(k==='insp'||k==='stress'){
   const t=T[0]&&T[0].t;if(!t)return;c.used.im=S.round;
   if(k==='insp'){addSt(t,{k:'dm',v:1,left:3});addSt(t,{k:'hm',v:1,left:3});log(`${c.n} inspirou ${t.n}: +1 de dano e +1 de cura por 3 rodadas.`)}
@@ -1043,9 +1047,9 @@ function act(s,i,k,tg){
  }else if(k==='vomitarb'){const t=T[0]&&T[0].t;if(!t)return;combatFX(T[0].ts,T[0].ti,'vomitar');c.st=(c.st||[]).filter(x=>!x.alc);addSt(t,{k:'dm',v:-2,left:1});log(`${c.n} vomitou: sem penalidades de bebida. ${t.n} causa −2 de dano até a próxima rodada.`)
  }else if(k==='nerd'){const t=T[0]&&T[0].t;if(!t)return;c.mark={n:t.n,b:2};log(`${c.n} marcou ${t.n}: próximo ataque +2.`)
  }else if(k==='exatamente'){const t=T[0]&&T[0].t;if(!t)return;t.taunt=c.id;log(`${t.n} foi provocado por ${c.n}.`);
- }else if(k==='tchezar'){const t=T[0]&&T[0].t;if(!t)return;addSt(t,{k:'dm',v:-2,left:3});addSt(t,{k:'hm',v:-2,left:3});addSt(t,{k:'tk',v:-2,left:3});log(`${t.n} foi afetado por Tche-Tche-zar por 3 rodadas.`)
+ }else if(k==='tchezar'){const t=T[0]&&T[0].t;if(!t)return;addSt(t,{k:'dm',v:-2,left:2});addSt(t,{k:'hm',v:-2,left:2});addSt(t,{k:'tk',v:-2,left:2});log(`${t.n} foi afetado por Tche-Tche-zar por 2 rodadas.`)
  }else if(k==='passar_pano'){const pen=(c.st||[]).findIndex(isPen);if(pen>=0)c.st.splice(pen,1);log(`${c.n} removeu uma penalidade.`)
- }else if(k==='cansada'){c.blocked=S.round+1;healC(c,c,10);log(`${c.n} ficará sem agir na próxima rodada.`)
+ }else if(k==='cansada'){if(!amb('paz'))c.blocked=S.round+1;healC(c,c,10);log(`${c.n} ficará sem agir na próxima rodada.`)
  }else if(k==='roubar'||k==='confiscar'){const q=P[en];let st;if(q.reserve.length){st=q.reserve.splice(Math.floor(Math.random()*q.reserve.length),1)[0];P[s].reserve.push(st);log(`${c.n} roubou ${st.n}.`)}else if(q.ns&&q.ns.hand.length){st=q.ns.hand.splice(0,1)[0];P[s].ns.hand.push(st);log(`${c.n} roubou a carta ${st.n}.`)}
  }else if(k==='lucidez'){if(c.blocked){c.blocked=false;c.lock=false;log(`${c.n} se recuperou do bloqueio.`)}else{const pen=(c.st||[]).filter(isPen).sort((a,b)=>Math.abs(b.v)*b.left-Math.abs(a.v)*a.left)[0];if(pen){c.st.splice(c.st.indexOf(pen),1);log(`${c.n} recuperou a lucidez: uma penalidade a menos.`)}}
  }else if(k==='pesc_a')fish(s,i,'a');else if(k==='pesc_i')fish(s,i,'i');else if(k==='pesc_m')fish(s,i,'m');
@@ -1053,11 +1057,10 @@ function act(s,i,k,tg){
 /* ---- ambientes, itens, fim de rodada ---- */
 function police(){[0,1].forEach(s=>P[s].field.forEach((c,i)=>{if(c&&c.item&&c.item.tag==='arma'){log(`Averiguação Policial: ${c.item.n} de ${c.n} foi desligada.`);c.item=null;hit(s,i,ap('dmg',2),{environment:true})}}))}
 function endRound(){
- if(S.peace&&S.peace.round<=S.round){S.peace=null;log('A Paz no Mundo terminou.')}
  for(const s of [0,1])P[s].field.forEach((owner)=>{if(owner&&owner.item&&owner.item.id==='totem'&&roll(owner,1)){const all=[];[0,1].forEach(q=>P[q].field.forEach((c,j)=>{if(c)all.push([q,j,c])}));if(all.length){const [q,j,c]=all[Math.floor(Math.random()*all.length)];log(`Totem do Darwin desligou ${c.n}.`);hit(q,j,c.hp,{side:s,c:owner,force:true})}}});
  for(const s of [0,1])P[s].field.forEach((c,i)=>{if(!c||!(c.ab||[]).includes('aposta'))return;if(c.bet==null)c.bet=S.round;if(S.round-c.bet>=2){log(`${c.n} não apostou a tempo e sofre 10 de dano.`);c.bet=S.round;hit(s,i,10)}});
  for(const s of [0,1])P[s].field.slice().forEach(c=>{if(!c)return;const keep=[];
-  for(const x of (c.st||[])){if(x.k==='dot'){const j=P[s].field.indexOf(c);if(j>=0)hit(s,j,x.v)}x.left--;if(x.k==='dismiss'&&x.left<=0){const j=P[s].field.indexOf(c);if(j>=0){if(['Catunda','ELES','Dudu','Tche-Tche-Re-Re-Tche-Tche'].includes(c.n))log(`Carta de Demissão não afeta ${c.n}.`);else{log(`Carta de Demissão desligou ${c.n}.`);P[s].out.push(c);P[s].field[j]=null;queueReplacement(s,j)}}}else if(x.left>0)keep.push(x)}c.st=keep});
+  const expired=new Set();for(const x of (c.st||[])){if(x.pending||(x.fromNext&&S.round<=x.fromRound)){keep.push(x);continue}x.left--;if(x.k==='dismiss'&&x.left<=0){const j=P[s].field.indexOf(c);if(j>=0){if(['Catunda','ELES','Dudu','Tche-Tche-Re-Re-Tche-Tche'].includes(c.n))log(`Carta de Demissão não afeta ${c.n}.`);else{log(`Carta de Demissão desligou ${c.n}.`);P[s].out.push(c);P[s].field[j]=null;queueReplacement(s,j)}}}else if(x.left>0)keep.push(x);else if(x.stackKey)expired.add(x.stackKey)}c.st=keep;for(const key of expired){if(keep.some(x=>x.stackKey===key&&!x.pending))continue;const first=keep.find(x=>x.stackKey===key&&x.pending);if(first){const batch=first.stackBatch;keep.filter(x=>x.stackBatch===batch).forEach(x=>x.pending=false);log(`${first.k==='dot'?'Dano contínuo':'Efeito'} de ${key} começou após o efeito anterior.`)}}});
  for(const s of [0,1])P[s].field.forEach(c=>{if(!c||!c.obs)return;
   let tg=null,ts=0,ti=0;[0,1].forEach(q=>P[q].field.forEach((y,j)=>{if(y&&y.id===c.obs.id){tg=y;ts=q;ti=j}}));
   if(!tg){delete c.obs;log(`${c.n} voltou a agir: a Obsessão acabou.`);return}
@@ -1066,6 +1069,7 @@ function endRound(){
  if(a.k==='apoc'){[0,1].forEach(s=>P[s].field.forEach((c,i)=>{if(c&&hasLoboEs(c)&&roll(c,10)){log(`${c.n} anulou o Apocalipse com E Se….`)}else if(c&&roll(c,ap('pct',6))){log(`Apocalipse: ${c.n} foi desligado.`);P[s].out.push(c);P[s].field[i]=null;queueReplacement(s,i)}}));a.left--;if(a.left<=0){log('O Apocalipse terminou.');S.amb=a.prev||null}}
  else if(a.k==='met'){[0,1].forEach(s=>P[s].field.forEach((c,i)=>{if(!c)return;const hat=c.item&&c.item.tag==='chapeu';if(roll(c,hat?ap('pcHat',25):ap('pct',50))){log(`Meteorito atingiu ${c.n}.`);hit(s,i,hat?ap('dmgHat',2):ap('dmg',3),{environment:true})}}))}
  else if(a.k==='pol')police();
+ else if(a.k==='paz'){a.left--;if(a.left<=0){log('A Paz no Mundo terminou.');S.amb=a.prev||null}}
 }
 function useUt(s,card,t,ti){
  if(card.id==='um_real'){const gain=Math.random()<.5?s:1-s,o=POOL.filter(x=>!SUMMON_ONLY.has(x.n)&&!P[gain].field.concat(P[gain].reserve,P[gain].out).some(y=>y&&y.n===x.n));if(o.length){P[gain].reserve.push(mk(o[Math.floor(Math.random()*o.length)]));log(`${S.names[gain]} ganhou uma carta Alguém com 1 Real.`)}else log('Não há carta Alguém disponível.');return}
@@ -1104,16 +1108,16 @@ function guardPunk(k){const a=AB[k];if(!amb('punk')||S.dmgUsed||(a&&a.dm)||S.act
 function fill(p,say){
  const put=(i,c)=>{p.field[i]=c;if(say)log(`${c.n} entrou no terreno.`)};
  for(let i=0;i<3;i++)if(!p.field[i]){
-  const cap=3-usedCap(p),invCount=p.field.filter(c=>c&&has(c,'Invocação')).length;
-  let j=p.reserve.findIndex(c=>(!has(c,'Invocação')||invCount<2)&&c.t!=='entrosa'&&W(c)<=cap);
-  if(j<0)j=p.reserve.findIndex(c=>(!has(c,'Invocação')||invCount<2)&&c.t==='entrosa'&&W(c)<=cap);
+  const cap=3-usedCap(p),invCount=p.field.filter(c=>isInvocation(c)).length;
+  let j=p.reserve.findIndex(c=>(!isInvocation(c)||invCount<2)&&c.t!=='entrosa'&&W(c)<=cap);
+  if(j<0)j=p.reserve.findIndex(c=>(!isInvocation(c)||invCount<2)&&c.t==='entrosa'&&W(c)<=cap);
   if(j>=0)put(i,p.reserve.splice(j,1)[0]);
  }
  for(let i=3;i<6;i++)if(!p.field[i]){
-  const invCount=p.field.filter(c=>c&&has(c,'Invocação')).length,hasEntrosa=p.field.some(c=>c&&has(c,'Entrosa'));
+  const invCount=p.field.filter(c=>isInvocation(c)).length,hasEntrosa=p.field.some(c=>c&&has(c,'Entrosa'));
   let j=-1;
-  if(i===3)j=p.reserve.findIndex(c=>c.t==='entrosa'||(has(c,'Invocação')&&invCount<2)||(hasEntrosa&&!has(c,'Invocação')&&W(c)<=3-usedCap(p)));
-  else j=p.reserve.findIndex(c=>has(c,'Invocação')&&invCount<2||(hasEntrosa&&!has(c,'Invocação')&&W(c)<=3-usedCap(p)));
+  if(i===3)j=p.reserve.findIndex(c=>c.t==='entrosa'||(isInvocation(c)&&invCount<2)||(hasEntrosa&&!isInvocation(c)&&W(c)<=3-usedCap(p)));
+  else j=p.reserve.findIndex(c=>isInvocation(c)&&invCount<2||(hasEntrosa&&!isInvocation(c)&&W(c)<=3-usedCap(p)));
   if(j>=0)put(i,p.reserve.splice(j,1)[0]);
  }
 }
@@ -1127,17 +1131,18 @@ function deal(spec=null){
 }
 function canPlace(inc,ti){
  if(!inc||!P[0].field[ti]&&ti>=3&&ti>=6)return false;
- const old=P[0].field[ti],invCount=P[0].field.filter((x,j)=>x&&j!==ti&&has(x,'Invocação')).length;
- if(has(inc,'Invocação')&&invCount>=2)return false;
+ const old=P[0].field[ti],invCount=P[0].field.filter((x,j)=>x&&j!==ti&&isInvocation(x)).length;
+ if(isInvocation(inc)&&invCount>=2)return false;
  if(ti<3)return 3-usedCap(P[0])+(old?W(old):0)>=W(inc);
- if(ti>=3&&ti<6){if(old)return false;if(has(inc,'Invocação'))return invCount<2;return P[0].field.some(x=>x&&has(x,'Entrosa'))&&W(inc)<=3-usedCap(P[0])+(old?W(old):0)}
+ if(ti>=3&&ti<6){if(old)return false;if(isInvocation(inc))return invCount<2;return P[0].field.some(x=>x&&has(x,'Entrosa'))&&W(inc)<=3-usedCap(P[0])+(old?W(old):0)}
  return false;
 }
 function checkWin(){
  for(const s of [0,1])if(!P[s].field.some(Boolean)&&!P[s].reserve.length){S.over=true;S.win=1-s}
 }
 function toCanon(){const pair=typeof msTables==='function'?(msTables()[MS_LOCAL_TABLE]||[]):[],canonicalTurn=S.turn===0?myIdx:1-myIdx;return{P:myIdx===1?[P[1],P[0]]:P,repl:myIdx===1?[REPL[1],REPL[0]]:REPL,turn:canonicalTurn,turnId:pair[canonicalTurn]?.id||null,gameId:MS_GAME_ID||null,act:S.act,round:S.round,over:S.over,win:S.win==null?null:(S.win===0?myIdx:1-myIdx),log:S.log,v:S.v,amb:S.amb||null,ns:!!S.nsUsed,du:!!S.dmgUsed,names:myIdx===1?[S.names[1],S.names[0]]:S.names}}
-function fromCanon(c){P=myIdx===0?c.P:[c.P[1],c.P[0]];REPL=myIdx===0?(c.repl||[[],[]]):[(c.repl||[[],[]])[1]||[],(c.repl||[[],[]])[0]||[]];S.names=myIdx===0?(c.names||S.names):((c.names&&[c.names[1],c.names[0]])||S.names);S.turnId=c.turnId||null;S.turn=c.turnId?(c.turnId===msClientId()?0:1):(c.turn===myIdx?0:1);S.act=c.act;S.round=c.round;S.over=c.over;S.win=c.win==null?null:(c.win===myIdx?0:1);S.log=c.log;S.v=c.v;S.amb=c.amb||null;S.nsUsed=!!c.ns;S.dmgUsed=!!c.du;S.sel=S.swap=S.nsel=null}
+function migratePatchCard(x){if(!x)return;const cls=x.cls||x.c;const ck=clsAb(cls);if(CLS.some(z=>z.id===cls)){x.ab=x.ab||[];if(!x.ab.includes(ck))x.ab.push(ck)}if(x.n==='Gorreth'){if(x.hp===x.max)x.hp=10;x.max=10;x.hp=Math.min(x.hp,10)}if(x.n==='Alex'){if(x.max===10&&x.hp===10)x.hp=12;x.max=12}if(x.n==='Tche-Tche-Re-Re-Tche-Tche'){x.c=x.cls='Insano';x.max=40;x.w=1;x.summon=true;x.tg=(x.tg||[]).filter(z=>z!=='Invocação');x.ab=(x.ab||[]).filter(z=>z!=='inv_tche');x.gender='NB';if(!x.ab.includes('surto'))x.ab.push('surto')}if(x.n==='Dudu'||x.n==='ELES')x.tg=(x.tg||[]).filter(z=>z!=='Invocação');if(x.n==='Catunda')x.tg=(x.tg||[]).filter(z=>z!=='Aluno')}
+function fromCanon(c){P=myIdx===0?c.P:[c.P[1],c.P[0]];P.forEach(p=>{if(p){[...(p.field||[]),...(p.reserve||[]),...(p.out||[])].forEach(migratePatchCard)}});REPL=myIdx===0?(c.repl||[[],[]]):[(c.repl||[[],[]])[1]||[],(c.repl||[[],[]])[0]||[]];S.names=myIdx===0?(c.names||S.names):((c.names&&[c.names[1],c.names[0]])||S.names);S.turnId=c.turnId||null;S.turn=c.turnId?(c.turnId===msClientId()?0:1):(c.turn===myIdx?0:1);S.act=c.act;S.round=c.round;S.over=c.over;S.win=c.win==null?null:(c.win===myIdx?0:1);S.log=c.log;S.v=c.v;S.amb=c.amb||null;S.nsUsed=!!c.ns;S.dmgUsed=!!c.du;S.sel=S.swap=S.nsel=null}
 function sync(){if(!S.mp)return;S.v++;const c=toCanon();if(PCONN&&PCONN.open){try{PCONN.send({type:'state',c})}catch(e){toast('Falha ao enviar estado da partida.')}}else if(ref)ref.update({state:JSON.stringify(c),status:S.over?'end':'play',t:Date.now()}).catch(e=>toast('Falha ao sincronizar ('+(e&&e.code)+')'))}
 function spend(){
  S.act--;S.sel=S.swap=S.nsel=null;checkWin();sync();render();
@@ -1145,7 +1150,7 @@ function spend(){
 }
 function summonAuto(s){
  const f=P[s].field,en=1-s;
- for(let i=0;i<f.length;i++){const c=f[i];if(!c||!has(c,'Invocação')||c.lock)continue;
+ for(let i=0;i<f.length;i++){const c=f[i];if(!c||!isInvocation(c)||c.lock)continue;
   let opts=abl(c).filter(k=>{const a=AB[k];return a&&!a.pas&&!a.tog&&avail(c,k,s)});if(!opts.length)continue;
   if(c.n==='ELES'&&opts.includes('desligar'))opts=['desligar'];
   let k;if(c.n==='Filho Azul'&&opts.includes('filho_professor')&&f.some(x=>x&&has(x,'Professor')))k='filho_professor';else{k=opts.find(x=>AB[x].dm&&['e','e2'].includes(AB[x].t));if(!k)k=opts.find(x=>AB[x].t==='a')||opts.find(x=>AB[x].t==='n')||opts[0];}
@@ -1157,13 +1162,13 @@ function summonAuto(s){
 function startTurn(s){
  const p=P[s];if(s===1&&!S.mp)fill(p,true);if(S.round<=20&&S.round%2===0&&p.ns&&p.ns.pile.length&&p.ns.lastDrawRound!==S.round){p.ns.hand.push(p.ns.pile.shift());p.ns.lastDrawRound=S.round;log(`${S.names[s]} recebeu uma carta Não-Alguém pela rodada ${S.round}.`)}
  p.field.forEach(c=>{if(c){c.lock=!!c.blocked&&c.blocked<=S.round;if(c.lock){c.blocked=false;log(`${c.n} está impedido de agir.`)}}});
- summonAuto(s);
 }
 function endTurn(){
  if(S.over)return;if(S.turn===0&&hasReplacementAvailable())return toast('Escolha primeiro quem vai substituir o personagem desligado.');
+ summonAuto(S.turn);
  P[S.turn].field.forEach(c=>c&&(c.lock=false));
  S.sel=S.swap=S.nsel=null;S.turn=1-S.turn;S.act=2;S.nsUsed=false;S.dmgUsed=false;
- if((S.turn===0?myIdx:1-myIdx)===0){endRound();checkWin();if(S.over){sync();render();return}S.round++;P.forEach(p=>[...p.field,...p.reserve].forEach(c=>c&&(c.used.guard=false)));log(`Rodada ${S.round}: vez de ${S.names[S.turn]}.`)}
+ if((S.turn===0?myIdx:1-myIdx)===0){endRound();checkWin();if(S.over){sync();render();return}S.round++;P.forEach((p,side)=>p.field.forEach((c,i)=>{if(c)(c.st||[]).filter(x=>x.k==='dot'&&!x.pending).forEach(x=>hit(side,i,x.v))}));P.forEach(p=>[...p.field,...p.reserve].forEach(c=>c&&(c.used.guard=false)));log(`Rodada ${S.round}: vez de ${S.names[S.turn]}.`)}
  else log(`Vez de ${S.names[S.turn]}.`);
  startTurn(S.turn);sync();render();
  if(!S.mp&&S.turn===1)setTimeout(()=>ai(2),900);
@@ -1189,7 +1194,7 @@ function ai(n){
  const hurt=me.map((c,i)=>({c,i})).filter(o=>o.c&&o.c.hp<=o.c.max-2).sort((a,b)=>a.c.hp-b.c.hp)[0];
  const skip=['trindade','amor','obs_c','obs_d','pesc_a','pesc_i','pesc_m','insp','stress'];
  const opts=[];
- me.forEach((c,i)=>{if(!c||has(c,'Invocação'))return;abl(c).forEach(k=>{const a=AB[k];
+ me.forEach((c,i)=>{if(!c||isInvocation(c))return;abl(c).forEach(k=>{const a=AB[k];
   if(!avail(c,k,1)||skip.includes(k)||(forceA&&!a.dm))return;
   if(a.h&&(!hurt||forceA))return;
   if(k==='surto'&&c.hp<=3)return;
@@ -1210,7 +1215,7 @@ function ai(n){
 const LAB={dm:'dano',hm:'cura',dot:'dano/rod.',tk:'sofre',half:'metade',vs:'vs',immune:'imune',repeat:'repetição'};
 const HXI={bolt:'<svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z" fill="currentColor"/></svg>',shield:'<svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 5v14c3-1.4 5-4.6 5-8V7z" fill="currentColor"/></svg>',user:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z" fill="currentColor"/></svg>'};
 function cardHTML(c,side,i){
- const mine=side===0&&S.turn===0&&S.act>0&&!S.over&&!has(c,'Invocação'),mt=side===0&&S.turn===0&&!S.over&&!has(c,'Invocação');
+ const mine=side===0&&S.turn===0&&S.act>0&&!S.over&&!isInvocation(c),mt=side===0&&S.turn===0&&!S.over&&!isInvocation(c);
  const rows=abl(c).map((k,j)=>{const a=AB[k];if(!a)return'';
   let cl='hab',val=a.v;
   if(a.tog){const on=a.tog==='noGuard'?!c.noGuard:!!c.surto;val=a.tog==='noGuard'&&c.used.guard?'usado':(on?'ligado':'desligado');cl+=mt?' tog':' pas'}
@@ -1255,7 +1260,7 @@ function slotsHTML(s){
   const sw=s===0&&S.swap!==null&&canPlace(P[0].reserve[S.swap],i);
   if(i>=3){if(sw)h+=slotEl(s,i,1);return}
   const incoming=s===0&&S.swap!==null?P[0].reserve[S.swap]:null;
-  if(cap>0||(incoming&&has(incoming,'Invocação'))){h+=slotEl(s,i,sw);if(cap>0)cap--}
+  if(cap>0||(incoming&&isInvocation(incoming))){h+=slotEl(s,i,sw);if(cap>0)cap--}
  });
  return h;
 }
@@ -2132,20 +2137,22 @@ button.g,button.big.g{background:var(--g-bg),rgba(124,58,255,.9)!important;box-s
 </style><script id="dc-guide-js">(function(){
 const E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const wrap=document.createElement('div');wrap.id='gd';wrap.innerHTML='<div id="gd-box" role="dialog" aria-modal="true" aria-labelledby="gd-t"><div id="gd-head"><h2 id="gd-t">Guia de como jogar</h2><button type="button" id="gd-x" class="thm" style="position:static;width:38px;height:38px" aria-label="Fechar">×</button></div><div class="gd-tabs" id="gd-tabs"></div><div id="gd-body"></div></div>';document.body.appendChild(wrap);
-const TABS=[['how','Como jogar'],['cards','Cartas (Alguém)'],['abs','Habilidades'],['ns','Não-Alguém'],['cls','Classes e tags']];
+const TABS=[['how','Como jogar'],['cards','Cartas (Alguém)'],['abs','Habilidades'],['ns','Não-Alguém'],['cls','Classes e tags'],['junior','Darwin Júnior']];
 let tab='how',q='';
 const once=a=>/1×/.test(a.v||'')?'':a.once==='game'?' · 1×/jogo':a.once==='round'?' · 1×/rodada':'';
 function how(){const S=[['Objetivo','Desligue todos os Alguém do rival. Quando o PV de um Alguém chega a 0, ele é desligado. Vence quem desligar todos os do oponente.'],
 ['Montagem','Cada pessoa possui 6 cartas Alguém. No próprio terreno, podem ficar até 3 Alguém, salvo quando uma característica ou habilidade permitir ultrapassar esse limite.'],
 ['Seu turno','Por padrão, cada pessoa tem 2 ações por rodada para agir com seus Alguém. Clique numa habilidade e depois no alvo.'],
-['Não-Alguém','Há duas pilhas: Alguém (personagens) e Não-Alguém (ambientes e itens). Cada pessoa começa com 3 Não-Alguém e recebe 1 a cada 2 rodadas até a rodada 20; a partir da 21ª, não recebe mais. Pode fazer 1 ação Não-Alguém por rodada: usar/equipar item ou expandir ambiente. Cada Alguém equipa 1 item.'],
+['Não-Alguém','Há duas pilhas: Alguém (personagens) e Não-Alguém (ambientes e itens). Cada pessoa começa com 3 Não-Alguém e recebe 1 a cada 2 rodadas até a rodada 20; a partir da 21ª, não recebe mais. Pode fazer 1 ação Não-Alguém por rodada: usar/equipar item ou expandir ambiente. Cada Alguém equipa 1 item. Dano e cura podem ficar negativos; arredonde para baixo. NB é afetado como Macho e Fêmea. Efeitos duram até o fim da duração; dano contínuo ocorre no início da rodada.'],
 ['Classes','Protetor, Abusador, Ordem e Insano mudam como o Alguém joga. Veja a aba "Classes e tags".'],
 ['Desligamento','Quando um Alguém perde todos os PV, ele é desligado (eliminado).'],
-['Invocações','Invocações entram apenas por habilidades específicas, não aparecem no sorteio inicial, não contam para o limite de 3 e há no máximo 2 por terreno. Agem independentemente do dono.'],
+['Invocações','Invocações entram apenas por habilidades específicas, não aparecem no sorteio inicial, não contam para o limite de 3 e há no máximo 2 por terreno. Agem independentemente do dono, no fim do turno do dono. No máximo 2 Invocações por terreno; ELES, Dudu e Tche-Tche-Re-Re-Tche-Tche não têm a característica Invocação, embora este último seja obtido por sacrifício.'],
 ['Jogar com amigos','Crie uma sala, copie o link de convite e mande. O amigo só clica no link para entrar. Também dá para jogar solo contra o computador.'],
 ['Baralhos','Em "Meus baralhos" você monta o seu e escolhe jogar com ele, com o baralho clássico ou com um aleatório.'],
 ['Dica','Toque ou clique numa carta para vê-la ampliada com todas as habilidades escritas.']];
 return S.map((s,i)=>`<div class="gd-step"><i>${i+1}</i><div><b>${E(s[0])}</b><br>${E(s[1])}</div></div>`).join('')}
+const JUNIOR_RULES="# Darwin Júnior\n\n## 1. Regras gerais\n\n### 1.1. Objetivo\nPara vencer, é preciso desligar todas as peças do oponente.\n\n### 1.2. Tabuleiro\nO tabuleiro possui 7×7 casas. Cada pessoa possui seu próprio lado do tabuleiro, de maneira semelhante ao xadrez.\n\n### 1.3. Peças\nCada pessoa utiliza cinco peças:\n- 1 ELES;\n- 2 Coordenação;\n- 2 Tche-Tche.\n\nCada peça possui Pontos de Vida (PV), Inquietude e Bestialidade.\n\n- **PV:** determina quanto dano uma peça pode suportar antes de ser desligada.\n- **Inquietude:** determina a distância máxima de movimentação da peça.\n- **Bestialidade:** determina o dano base de seus ataques.\n\nQuando uma peça chega a 0 PV, ela é desligada e retirada do jogo.\n\n### 1.4. Posicionamento inicial\nNo lado de cada pessoa, as cinco peças são posicionadas na seguinte ordem, da esquerda para a direita:\n\nTche-Tche — Coordenação — ELES — Coordenação — Tche-Tche.\n\n### 1.5. Ações\nCada pessoa possui três ações por rodada. As ações podem ser utilizadas para:\n- Ativar habilidades;\n- Movimentar peças.\n\nUma mesma habilidade não pode ser utilizada duas vezes na mesma rodada. Cada peça só pode se movimentar uma vez por rodada.\n\n### 1.6. Movimentação\nCada classe possui suas próprias regras de movimentação:\n\n- **ELES:** pode se movimentar horizontalmente, verticalmente ou diagonalmente.\n- **Coordenação:** pode se movimentar apenas na diagonal.\n- **Tche-Tche:** pode se movimentar em linhas retas, pelas linhas e colunas do tabuleiro.\n\nAs peças podem atravessar outras peças durante a movimentação, mas não podem terminar o movimento em uma casa ocupada por outra peça.\n\n### 1.7. Habilidades passivas e ativas\nAs habilidades são identificadas da seguinte forma:\n- **(P):** habilidade passiva.\n- **(A):** habilidade ativa.\n\nUma habilidade passiva ocorre imediatamente quando seu gatilho é acionado.\n\n### 1.8. Empurrões\nUma peça empurrada é afastada um quadrado para longe da peça que causou o empurrão.\n\nSe não for possível realizar o empurrão, esse efeito não acontece, mas os demais efeitos da habilidade continuam normalmente.\n\n### 1.9. Empate\nSe a partida terminar em empate, o resultado é considerado um empate.\n\n---\n\n## 2. Peças\n\n### 2.1. Classe ELES\n\n#### Mardónio Paz\n- **PV:** 10\n- **Inquietude:** 3\n- **Bestialidade:** 4\n\n**(P) Gordo:** peças adjacentes a Mardónio Paz sofrem dano de ataque.\n\n**(A) Punho de Ferro:** escolha uma peça a até 3 quadrados de distância. Ela sofre dano de ataque.\n\n#### Catunda\n- **PV:** 8\n- **Inquietude:** 3\n- **Bestialidade:** 4\n\n**(P) Você Vai Destruir o Mundo:** quando uma peça causa dano a Catunda, ela sofre dano de ataque.\n\n**(A) Amigo, Oh Amigo:** uma peça a até 5 quadrados de distância sofre dano de ataque.\n\n#### ELES\n- **PV:** 6\n- **Inquietude:** 4\n- **Bestialidade:** 3\n\n**(P) Proteção Seletiva:** quando uma peça aliada fica adjacente a ELES, ela recupera 2 PV.\n\n**(A) Desligamento:** todas as peças inimigas a até 3 quadrados de distância sofrem dano de ataque.\n\n---\n\n### 2.2. Classe Coordenação\n\n#### Sâmia\n- **PV:** 4\n- **Inquietude:** 2\n- **Bestialidade:** 3\n\n**(P) Sorriso:** quando uma peça Tche-Tche fica a até 3 quadrados de distância, ela sofre dano de ataque.\n\n**(A) Ameaçar:** escolha uma peça a até 3 quadrados de distância. Ela sofre dano de ataque.\n\n#### João\n- **PV:** 6\n- **Inquietude:** 2\n- **Bestialidade:** 3\n\n**(P) Bufada:** quando uma peça fica adjacente a João, ela é empurrada um quadrado para longe dele.\n\n**(A) Porrada:** escolha uma peça a até 2 quadrados de distância. Ela sofre dano de ataque.\n\n#### Diego\n- **PV:** 4\n- **Inquietude:** 3\n- **Bestialidade:** 2\n\n**(P) Tá Rindo do Quê?:** quando uma peça a até 6 quadrados de distância utiliza uma habilidade ou passiva que causa dano de ataque, Diego causa dano de ataque a ela, exceto se ela for aliada.\n\n**(A) Confiscar:** escolha uma peça a até 2 quadrados de distância. Ela fica impedida de agir ou se movimentar por 2 rodadas.\n\n#### Oscar\n- **PV:** 6\n- **Inquietude:** 1\n- **Bestialidade:** 4\n\n**(P) Ham-hum:** quando uma peça aliada se aproxima de Oscar, ela recupera 1 PV.\n\n**(A) Meu Carrinho Vai Molhar:** todas as peças adjacentes a Oscar sofrem dano de ataque.\n\n---\n\n### 2.3. Classe Tche-Tche\n\n#### Yarlon\n- **PV:** 2\n- **Inquietude:** 3\n- **Bestialidade:** 1\n\n**(P) Eu Escutei:** quando uma peça Tche-Tche fica adjacente a Yarlon, ela sofre dano de ataque.\n\n#### Davi\n- **PV:** 4\n- **Inquietude:** 2\n- **Bestialidade:** 2\n\n**(A) Barulho:** escolha uma peça a até 2 quadrados de distância. Ela sofre dano de ataque.\n\n#### Pietro\n- **PV:** 4\n- **Inquietude:** 2\n- **Bestialidade:** 2\n\n**(A) Eu Sou o Maestro:** escolha uma peça adjacente a Pietro. Ela sofre dano de ataque. As peças aliadas adjacentes a Pietro causam o dobro de dano na próxima habilidade que utilizarem.\n\n#### Ângelo\n- **PV:** 6\n- **Inquietude:** 1\n- **Bestialidade:** 3\n\n**(P) Eu Escutei:** quando uma peça Tche-Tche fica adjacente a Ângelo, ela sofre dano de ataque.\n\n#### João Pedro\n- **PV:** 4\n- **Inquietude:** 2\n- **Bestialidade:** 2\n\n**(A) Barulho:** escolha uma peça a até 2 quadrados de distância. Ela sofre dano de ataque.\n\n\n#### Lobo\n- **PV:** 4\n- **Inquietude:** 2\n- **Bestialidade:** 2\n\n**(A) Bolo de Pote:** escolha uma peça aliada a até 3 quadrados de distância. Ela recupera PV em uma quantidade igual ao dano de ataque.";
+function junior(){return '<pre style="white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;line-height:1.55;margin:0">'+E(JUNIOR_RULES)+'</pre>'}
 function abList(p){try{return mk(p).ab||p.ab||[]}catch(e){return p.ab||[]}}
 const tagName=id=>{const c=(typeof CHR!=='undefined'?CHR:[]).find(x=>x.id===id||x.g===id||x.t===id||x.n===id);return c?c.n:id};
 function cards(){const L=(typeof POOL!=='undefined'?POOL:[]).concat(typeof SUMMONS!=='undefined'?SUMMONS:[]);const f=L.filter(p=>!q||(p.n+' '+p.c+' '+(p.tg||[]).join(' ')).toLowerCase().includes(q));
@@ -2154,14 +2161,14 @@ return `<div class="gd-c"><b>${E(p.n)}</b><div class="m"><span class="gd-pill pv
 function abs(){return '<div class="gd-grid">'+Object.keys(AB).map(k=>{const a=AB[k];return `<div class="gd-c"><b>${E(a.n)}</b>${once(a)}<div class="gd-ab">${a.v?E(a.v):(a.dm?'Causa o dano base do Alguém.':'Habilidade passiva ou especial.')}</div></div>`}).join('')+'</div>'}
 function ns(){const T=[['amb','Ambientes (1 por vez no campo)'],['ut','Utensílios (usados na hora)'],['item','Itens (equipados, 1 por Alguém)']];return T.map(([t,l])=>`<h3>${l}</h3><div class="gd-grid">`+NS.filter(x=>x.type===t).map(x=>`<div class="gd-c"><b>${E(x.n)}</b>${x.only?`<div class="m"><span class="gd-pill cl">Exclusiva: ${E(x.only)}</span></div>`:''}<div class="gd-ab">${E(x.d)}</div></div>`).join('')+'</div>').join('')}
 function cls(){const CD={Protetor:'Uma vez por rodada, pode se tornar o alvo de uma habilidade no lugar de um Alguém ao seu lado.',Abusador:'Uma vez por jogo, impede o alvo de agir na próxima rodada.',Ordem:'Uma vez por jogo, remove todas as penalidades do alvo e recupera 2 PV.',Insano:'Ao atacar, causa +2 de dano e sofre 2 de dano.'};const TD={Demônio:'Ao ser desligado, causa 2 de dano à pessoa responsável.',Anjo:'Ao curar, pode remover uma penalidade à sua escolha.',Macaco:'Gosta de banana e causa +1 dano no escuro.',Racista:'Causa +2 dano contra Alguém com característica Macaco.',Aluno:'Ao receber benefício, ganha +1 PV.',Professor:'Ao beneficiar um Aluno, recupera +1 PV.',Entrosa:'Ignora o limite de 3 Alguém no terreno.', 'Tche-Tche':'Causa +1 dano por cada outro Tche-Tche no mesmo terreno.','Bêbum':'Ao consumir bebida alcoólica, recupera +2 PV.',Autista:'Em local com ruído, causa −2 dano e cura; fora dele, causa +1 dano e +1 cura.',Gordo:'Sofre −1 dano.',Fundador:'Ao ser desligado, o dono recebe um Alguém da classe Ordem.',Rico:'Ao ser desligado, fornece uma carta Não-Alguém ao dono.',Predador:'Sem efeito adicional definido neste patch.'};
-return '<h3>Classes</h3><div class="gd-grid">'+CLS.map(c=>`<div class="gd-c"><b>${E(c.n)}</b><div class="gd-ab">${E(CD[c.id]||(AB[c.ab]&&AB[c.ab].v)||'')}</div></div>`).join('')+'</div><h3>Características</h3><div class="gd-grid">'+CHR.map(c=>`<div class="gd-c"><b>${E(c.n)}</b><div class="gd-ab">${E(TD[c.n]||'Característica de personagem.')}</div></div>`).join('')+'</div><h3>Gêneros</h3><div class="gd-c">Cada carta tem gênero Macho, Fêmea ou NB. NB é afetado como Macho e/ou Fêmea.</div>'}
-function draw(){const tb=document.getElementById('gd-tabs');tb.innerHTML=TABS.map(([k,l])=>`<button type="button" data-t="${k}" class="${k===tab?'on':''}">${l}</button>`).join('');let h='';try{h={how,cards,abs,ns,cls}[tab]()}catch(e){h='<p>Não consegui carregar esta aba.</p>'}document.getElementById('gd-body').innerHTML=h;const i=document.getElementById('gd-q');if(i)i.oninput=()=>{q=i.value.toLowerCase();const p=i.selectionStart;draw();const j=document.getElementById('gd-q');j.focus();j.setSelectionRange(p,p)}}
+return '<h3>Classes</h3><div class="gd-grid">'+CLS.map(c=>`<div class="gd-c"><b>${E(c.n)}</b><div class="gd-ab">${E(CD[c.id]||(AB[c.ab]&&AB[c.ab].v)||'')}</div></div>`).join('')+'</div><h3>Características</h3><div class="gd-grid">'+CHR.map(c=>`<div class="gd-c"><b>${E(c.n)}</b><div class="gd-ab">${E(TD[c.n]||'Característica de personagem.')}</div></div>`).join('')+'</div><h3>Gêneros</h3><div class="gd-c">Cada carta tem gênero Macho, Fêmea ou NB. NB é afetado como Macho e Fêmea simultaneamente.</div>'}
+function draw(){const tb=document.getElementById('gd-tabs');tb.innerHTML=TABS.map(([k,l])=>`<button type="button" data-t="${k}" class="${k===tab?'on':''}">${l}</button>`).join('');let h='';try{h={how,cards,abs,ns,cls,junior}[tab]()}catch(e){h='<p>Não consegui carregar esta aba.</p>'}document.getElementById('gd-body').innerHTML=h;const i=document.getElementById('gd-q');if(i)i.oninput=()=>{q=i.value.toLowerCase();const p=i.selectionStart;draw();const j=document.getElementById('gd-q');j.focus();j.setSelectionRange(p,p)}}
 document.getElementById('gd-tabs').onclick=e=>{const b=e.target.closest('button');if(b){tab=b.dataset.t;document.getElementById('gd-body').scrollTop=0;draw()}};
 const close=()=>wrap.classList.remove('on');document.getElementById('gd-x').onclick=close;wrap.onclick=e=>{if(e.target===wrap)close()};addEventListener('keydown',e=>{if(e.key==='Escape')close()});
 function open(){tab='how';q='';draw();wrap.classList.add('on')}
 const b=document.createElement('button');b.id='dc-guide-open';b.className='big y';b.type='button';b.innerHTML='📖 Guia de como jogar';
 const bs=document.getElementById('bs');if(bs)bs.parentNode.insertBefore(b,bs);b.onclick=open;
-const v=document.getElementById('dc-version');if(v)v.textContent='V6.1';document.title=document.title.replace(/V\d+(\.\d+)?/,'V6.1');
+const v=document.getElementById('dc-version');if(v)v.textContent='V6.3';document.title=document.title.replace(/V\d+(\.\d+)?/,'V6.3');
 })();
 </script><style id="dc-v6-css">#dc-fx-layer{position:fixed;inset:0;pointer-events:none;z-index:1250;overflow:hidden}
 .fxp{position:fixed;left:0;top:0;pointer-events:none;will-change:transform,opacity;contain:layout style}
